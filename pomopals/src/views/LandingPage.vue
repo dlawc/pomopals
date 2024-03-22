@@ -19,10 +19,10 @@ export default {
   name: 'LandingPage',
   methods: {
     navigateToLogin() {
-      this.$router.push({ name: 'Login' }); // Assuming you have a route named 'Login'
+      this.$router.push({ name: 'LoginPage' }); 
     },
     navigateToSignup() {
-      this.$router.push({ name: 'Signup' }); // Assuming you have a route named 'Signup'
+      this.$router.push({ name: 'SignupPage' }); 
     }
   }
 }
@@ -35,9 +35,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.3);
   background-image: url('/bg.jpeg');
-  background-size: cover; /* Fits the background image to the container */
+  background-size: cover; 
   background-repeat: no-repeat; 
   display: flex;
   justify-content: center;
