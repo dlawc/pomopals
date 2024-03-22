@@ -22,7 +22,7 @@ export default {
       this.$router.push({ name: 'LoginPage' }); 
     },
     navigateToSignup() {
-      this.$router.push({ name: 'SignupPage' }); 
+      this.$router.push({ name: 'SignUpPage' }); 
     }
   }
 }
