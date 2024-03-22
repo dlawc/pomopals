@@ -28,6 +28,9 @@
     </div>
   </template>
   
+
+
+  
   <script>
   import FormField from '@/components/FormField.vue';
 import firebase from '@/firebase';
