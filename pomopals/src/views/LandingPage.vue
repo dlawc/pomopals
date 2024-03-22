@@ -4,7 +4,9 @@
       <div class="landing-page">
         <img src="@/assets/pomopals_icon.png" alt="PomoPals Icon" class="landing-icon">
         <h1>PomoPals</h1>
-        <p>Welcome to our productivity-boosting app! Stay focused and productive with our customizable Pomodoro timers and group study sessions. Achieve your academic goals with ease!</p>
+        <p>Welcome to our productivity-boosting app!<br>
+           Stay focused and productive with our customizable Pomodoro timers and group study sessions. <br>
+           Achieve your academic goals with ease!</p>
         <button type="button" class="landing-button" @click="navigateToLogin">Log In</button>
         <button type="button" class="landing-button" @click="navigateToSignup">Sign Up</button>
       </div>
