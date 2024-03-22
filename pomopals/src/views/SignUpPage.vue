@@ -13,14 +13,13 @@
                 </div>
 
                 <form @submit.prevent="signUp">
-                    <form-field label="Email" fieldId="email" type="email" v-model="credentials.email" />
+                    <form-field label="Email" fieldId="email" type="email" v-model="credentials.email" @update:value="credentials.email = $event" />
                     <form-field label="Username" fieldId="username" type="username" v-model="credentials.username" />
                     <form-field label="Password" fieldId="password" :value="credentials.password" :isPassword="true"
                         @update:value="credentials.password = $event" />
                     <div class="white-rectangle"></div>
                     <button type="submit" class="sign-up-button">Sign Up</button>
                 </form>
-
                 <div class="create-account">
                     <p>
                         Already have an account?
@@ -34,6 +33,7 @@
 
 <script>
 import FormField from '@/components/FormField.vue';
+import firebase from '@/firebase';
 export default {
     name: 'SignUpPage',
     data() {
@@ -47,12 +47,47 @@ export default {
         };
     },
     methods: {
-        signInWithGoogle() {
-            // Logic for signing in with Google
-        },
-        signUp() {
-            // Logic for signing up with email, password, and username
-        },
+        async signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      const result = await firebase.auth().signInWithPopup(provider);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const token = result.credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // Redirect to dashboard or home page after successful sign-in
+      this.$router.push('/dashboard');
+    } catch (error) {
+      console.error(error);
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      const credential = error.credential;
+      // Show error message to your user or log it.
+    }},
+        async signUp() {
+    try {
+      // Create a new user with email and password
+      const userCredential = await firebase.auth().createUserWithEmailAndPassword(this.credentials.email, this.credentials.password);
+      const user = userCredential.user;
+
+      // Optionally, update the user's profile with the username
+      await user.updateProfile({
+        displayName: this.credentials.username,
+      });
+
+      // You can now use the updated user information or redirect the user to another page
+      console.log('User created and signed in with username:', user.displayName);
+      this.$router.push('/dashboard'); // Redirect to the dashboard or another route
+    } catch (error) {
+      console.error('Error signing up:', error);
+      // Handle errors here, such as showing a notification to the user
+      // Example: this.errorMessage = error.message;
+    }
+  },
         togglePasswordVisibility() {
             this.passwordVisible = !this.passwordVisible;
         }
@@ -147,68 +182,6 @@ export default {
 .divider span {
     white-space: nowrap;
     /* Keep the 'or' on the same line */
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    box-sizing: border-box;
-}
-
-.required {
-    color: red;
-}
-
-.password-container {
-    position: relative;
-}
-
-.input-container {
-    position: relative;
-    display: flex;
-}
-
-.input-container input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px 0 0 16px;
-    /* Rounded corners on the left side */
-    margin-bottom: 0;
-    /* Remove if you have any bottom margin */
-}
-
-.toggle-password {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-left: none;
-    /* Removes the border between the button and the input */
-    border-radius: 0 16px 16px 0;
-    /* Rounded corners on the right side */
-    background: #eee;
-    cursor: pointer;
-}
-
-.forgot-password {
-    text-align: right;
-    margin-bottom: 20px;
-    font-size: 0.9em;
-}
-
-.forgot-password a {
-    color: #ae76a1;
-    text-decoration: none;
 }
 
 .sign-up-button {

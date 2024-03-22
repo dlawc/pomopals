@@ -30,6 +30,8 @@
   
   <script>
   import FormField from '@/components/FormField.vue';
+import firebase from '@/firebase';
+
   export default {
     name: 'SignInPage',
     data() {
@@ -42,12 +44,41 @@
       };
     },
     methods: {
-      signInWithGoogle() {
-        // Logic to sign in with Google
-      },
-      signIn() {
-        // Logic to sign in with email and password
-      },
+    async signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      const result = await firebase.auth().signInWithPopup(provider);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const token = result.credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // Redirect to dashboard or home page after successful sign-in
+      this.$router.push('/dashboard');
+    } catch (error) {
+      console.error(error);
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      const credential = error.credential;
+      // Show error message to your user or log it.
+    }},
+    async signIn() {
+    try {
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(this.credentials.email.trim(), this.credentials.password);
+      // Signed in 
+      const user = userCredential.user;
+      // Redirect to dashboard or another route
+      this.$router.push('/dashboard');
+    } catch (error) {
+      console.error(error);
+      // Handle errors here, such as showing a notification to the user
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    }
+  },
       togglePasswordVisibility() {
         this.passwordVisible = !this.passwordVisible;
       }
@@ -130,53 +161,6 @@
     white-space: nowrap; /* Keep the 'or' on the same line */
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    box-sizing: border-box; 
-}
-
-.required {
-    color: red;
-}
-
-.password-container {
-    position: relative;
-}
-
-.input-container {
-    position: relative;
-    display: flex;
-}
-
-.input-container input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px 0 0 16px; /* Rounded corners on the left side */
-    margin-bottom: 0; /* Remove if you have any bottom margin */
-}
-
-.toggle-password {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-left: none; /* Removes the border between the button and the input */
-    border-radius: 0 16px 16px 0; /* Rounded corners on the right side */
-    background: #eee;
-    cursor: pointer;
-}
-
 .forgot-password {
     text-align: right;
     margin-bottom: 20px;
@@ -215,12 +199,5 @@
 .create-account a:hover {
   color: #9c6891;
 }
-
-.white-rectangle {
-    height: 20px; 
-    background-color: #ffffff; 
-}
-
-
 
 </style>
