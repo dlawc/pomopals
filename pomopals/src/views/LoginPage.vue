@@ -11,19 +11,9 @@
           </div>
           
           <form @submit.prevent="signIn">
-            <div class="form-group">
-              <label for="email">Email<span class="required">*</span></label>
-              <input type="email" id="email" v-model="credentials.email" required>
-            </div>
-            <div class="form-group">
-              <label for="password">Password<span class="required">*</span></label>
-              <div class="input-container">
-                <input :type="passwordFieldType" id="password" v-model="credentials.password" required>
-                <button type="button" class="toggle-password" @click="togglePasswordVisibility">
-                  {{ passwordVisible ? 'Hide' : 'Show' }}
-                </button>
-              </div>
-            </div>
+            <form-field label="Email" fieldId="email" type="email" v-model="credentials.email" />
+            <form-field label="Password" fieldId="password" :value="credentials.password" :isPassword="true"
+                        @update:value="credentials.password = $event" />
             <div class="forgot-password">
               <router-link to="/forgot-password">Forgot password?</router-link>
             </div>
@@ -39,6 +29,7 @@
   </template>
   
   <script>
+  import FormField from '@/components/FormField.vue';
   export default {
     name: 'SignInPage',
     data() {
@@ -65,26 +56,16 @@
       passwordFieldType() {
         return this.passwordVisible ? 'text' : 'password';
       }
+    },
+    components: {
+        'form-field' : FormField
     }
   }
   </script>
   
 <style scoped>
 /* Scoped styles for the component */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  background-image: url('/bg.jpeg');
-  background-size: cover; 
-  background-repeat: no-repeat; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .login-container {
     flex-direction: column; 
@@ -241,17 +222,5 @@
 }
 
 
-body, html {
-    margin: 0;
-    font-family: 'DM Sans', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    background-color: #f4f7fa;
-    background-image: url('/bg.jpeg'); /* Adjust the path if necessary */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
+
 </style>

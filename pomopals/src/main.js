@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router' // if using Vue Router
 import firebase from './firebase' // the path to the firebase module
 import 'firebaseui/dist/firebaseui.css'
+import './assets/global.css'; // Adjust the path to your global styles
 
 
 const app = createApp(App)
