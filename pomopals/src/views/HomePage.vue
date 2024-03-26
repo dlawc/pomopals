@@ -2,7 +2,7 @@
 
 <template>
     <div>
-      <h1>Welcome to My Vue App!</h1>
+      <h1>Welcome to Pomopals!</h1>
       <button @click="redirectToFriendsPage">Go to Friends Page</button>
     </div>
   </template>

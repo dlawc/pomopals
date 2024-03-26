@@ -3,10 +3,17 @@
 </template>
 
 <script>
+import firebase from "@/firebase";
+
 export default {
   methods: {
     signOut() {
-
+      firebase.auth().signOut().then(() => {
+        alert('User signed out successfully');
+        this.$router.push('/');
+      }).catch((error) => {
+        console.error("Error signing out:", error);
+      });
     }
   }
 };
