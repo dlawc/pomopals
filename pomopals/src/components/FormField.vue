@@ -6,14 +6,14 @@
         :type="fieldType" 
         :id="fieldId" 
         :value="value" 
-        @input="$emit('update:value', $event.target.value)" 
+        @input="$emit('update:value', $event.target.value)"
         required
         :class="{ 'input-with-button': isPassword }"
       >
-        <img 
+      <img 
         v-if="isPassword" 
         :src="isVisible ? hideIcon : eyeIcon" 
-        @click="toggleVisibility($event)"
+        @click="toggleVisibility"
         class="password-toggle-icon" 
         :alt="isVisible ? 'Hide password' : 'Show password'"
       >
@@ -83,7 +83,6 @@ export default {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
-  /* Input border, same as your .login-form inputs */
   border-radius: 16px;
   font-family: 'DM Sans', sans-serif;
   font-size: 1rem;
@@ -98,16 +97,15 @@ export default {
 
 .input-with-button {
   flex: 1;
-  border-radius: 16px 0 0 16px; /* Rounded corners on the left side if there's a button */
+  border-radius: 16px 0 0 16px; 
 }
 
 .input-with-button input {
-  padding-right: 40px; /* Adjust padding to prevent text from going under the icon */
+  padding-right: 40px; 
 }
 
 .toggle-password {
-  /* existing styles */
-  border-radius: 0 16px 16px 0; /* Rounded corners on the right side */
+  border-radius: 0 16px 16px 0; 
 }
 
 .password-toggle-icon {
@@ -115,12 +113,11 @@ export default {
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  height: 20px; /* adjust as needed */
+  height: 20px; 
   width: auto;
   cursor: pointer;
 }
 .required {
   color: red;
-  /* Required field asterisk color */
 }
 </style>
