@@ -7,11 +7,7 @@
       <div class="header-content">
         <h1 class="header-title">My Friends</h1>
         <div class="header-controls">
-          <AddFriendButton @onAddFriend="showAddFriendModal = true" />
-          <AddFriendModal
-            v-if="showAddFriendModal"
-            @requestSent="handleFriendRequest"
-          />
+          <AddFriendButton/>
           <input
             type="search"
             placeholder="Search Friends"
@@ -21,42 +17,18 @@
       </div>
     </div>
 
-    <div class="friends-list">
-      <div class="list-header">
-        <span>Username</span>
-      </div>
-      <ul>
-        <li v-for="friend in filteredFriends" :key="friend">
-          <span>{{ friend }}</span>
-          <button class="delete-button" @click="deleteFriend(friend)">
-            Delete
-          </button>
-        </li>
-      </ul>
-    </div>
+    <FriendsList :searchQuery="searchQuery"/>
   </div>
 </template>
 
 <script>
 import AddFriendButton from "@/components/AddFriendButton.vue";
-import AddFriendModal from "@/components/AddFriendModal.vue";
+import FriendsList from "@/components/FriendsList.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
 export default {
   data() {
     return {
       showAddFriendModal: false,
-      friends: [
-        "Josh123",
-        "Kylie",
-        "johnappleseed",
-        "JJ",
-        "arissa7",
-        "isabel",
-        "david",
-        "Edwin",
-        "Angelina55",
-        "windows",
-      ],
       searchQuery: "",
     };
   },
@@ -69,8 +41,6 @@ export default {
   },
   methods: {
     handleFriendRequest(username) {
-      // Send the friend request using the username
-      // This might involve calling an API and then updating the UI accordingly
       this.showAddFriendModal = false; // Hide the modal after sending the request
     },
     deleteFriend(friend) {
@@ -79,7 +49,7 @@ export default {
   },
   components: {
     AddFriendButton,
-    AddFriendModal,
+    FriendsList,
     SignOutButton,
   },
 };
@@ -153,44 +123,4 @@ export default {
   margin-right: 10px;
 }
 
-.friends-list {
-  background: white;
-  color: black;
-  margin: 0 auto;
-  width: 80%;
-  max-width: 800px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.list-header {
-  background: black;
-  color: aliceblue;
-  padding: 10px;
-  border-bottom: 1px solid #cccccc;
-  text-align: left;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-ul li {
-  padding: 10px;
-  border-bottom: 1px solid #cccccc;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.delete-button {
-  background-color: #c20606;
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
 </style>
