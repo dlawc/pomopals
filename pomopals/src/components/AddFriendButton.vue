@@ -1,5 +1,5 @@
 <template>
-  <button class="button" @click="addFriends">+ Add Friends</button>
+  <button class="button" @click="togglePopup">+ Add Friends</button>
   <div v-if="showPopup" class="popup">
     <input v-model="friend_username" placeholder="Enter friend's username" />
     <button @click="sendRequest">Send Request</button>
@@ -10,6 +10,7 @@
 import firebase from "@/firebase";
 
 export default {
+  name: "AddFriendButton",
   data() {
     return {
       showPopup: false,
@@ -23,13 +24,11 @@ export default {
     this.currentUser = firebase.auth().currentUser;
     if (this.currentUser) {
       this.username = this.currentUser.displayName;
-      console.log(this.username);
+      console.log("username:", this.username);
     }
   },
   methods: {
-    addFriends() {
-      // Trigger modal or action to add a friend
-      console.log("Add friend clicked");
+    togglePopup() {
       this.showPopup = !this.showPopup;
     },
     sendRequest() {
@@ -147,10 +146,15 @@ export default {
   font-size: 1em;
   outline: none;
   margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #878787; /* Darker shade on hover for feedback */
 }
 
 .popup {
-  position: absolute;
+  position: fixed;
   right: 0;
   background-color: white;
   border: 1px solid #ccc;
