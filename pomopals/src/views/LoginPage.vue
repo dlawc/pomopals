@@ -95,8 +95,15 @@ export default {
               alert("Username already taken, please try another one.");
             }
           } while (!username || usernameExists);
+          
+          // Update user's profile with the username
+          await user.updateProfile({
+            displayName: username,
+          });
+
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
+            friends: {},
           });
           this.$router.push("/home");
         } else {

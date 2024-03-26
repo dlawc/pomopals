@@ -99,8 +99,15 @@ export default {
               alert("Username already taken, please try another one.");
             }
           } while (!username || usernameExists);
+
+          // Update user's profile with the username
+          await user.updateProfile({
+            displayName: username,
+          });
+
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
+            friends: {},
           });
           this.$router.push("/home");
         } else {
@@ -131,6 +138,9 @@ export default {
             this.credentials.password
           );
         const user = userCredential.user;
+        await user.updateProfile({
+          displayName: this.credentials.username,
+        });
 
         // Store user information in Firestore under 'users' collection with username as document ID
         await firebase
@@ -139,11 +149,12 @@ export default {
           .doc(this.credentials.username)
           .set({
             email: this.credentials.email,
+            friends: {},
             // Include any other user information here
           });
         console.log(
           "User created and signed in with username:",
-          user.displayName
+          this.credentials.username
         );
         alert(
           "Signup successful! You will now be redirected to the login page."
