@@ -25,6 +25,7 @@
 import AddFriendButton from "@/components/AddFriendButton.vue";
 import FriendsList from "@/components/FriendsList.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
+
 export default {
   data() {
     return {
