@@ -1,0 +1,430 @@
+<template>
+  <div class="container">
+    <div class="timer">
+      <svg
+        width="163"
+        height="165"
+        viewBox="-8 -8 184 188"
+        fill="none"
+        id="first-segment"
+      >
+        <path
+          stroke="#E9D2B1"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M165.16,163.38A172,172,0,0,0,0,0"
+        />
+        <path
+          id="top-right"
+          stroke="#FFFFFF"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M165.16,163.38A172,172,0,0,0,0,0"
+        />
+      </svg>
+      <svg
+        width="163"
+        height="165"
+        viewBox="-8 -8 184 188"
+        fill="none"
+        id="second-segment"
+      >
+        <path
+          stroke="#E9D2B1"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M0,163.34A172,172,0,0,0,164.44,0"
+        />
+        <path
+          id="bottom-right"
+          stroke="#FFFFFF"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M0,163.34A172,172,0,0,0,164.44,0"
+        />
+      </svg>
+      <svg
+        width="163"
+        height="165"
+        viewBox="-8 -8 184 188"
+        fill="none"
+        id="third-segment"
+      >
+        <path
+          stroke="#E9D2B1"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M0,0A172,172,0,0,0,165.16,162.61"
+        />
+        <path
+          id="bottom-left"
+          stroke="#FFFFFF"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M0,0A172,172,0,0,0,165.16,162.61"
+        />
+      </svg>
+      <svg
+        width="163"
+        height="165"
+        viewBox="-8 -8 184 188"
+        fill="none"
+        id="fourth-segment"
+      >
+        <path
+          stroke="#E9D2B1"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M160.17,0A172,172,0,0,0,0,161.51"
+        />
+        <path
+          id="top-left"
+          stroke="#FFFFFF"
+          stroke-width="15"
+          stroke-linecap="round"
+          d="M160.17,0A172,172,0,0,0,0,161.51"
+        />
+      </svg>
+      <div class="time">
+        <p v-if="isResting">Rest!</p>
+        <div id="timeDisplay">{{ timeDisplay }}</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button
+        v-if="!isSettingTime && this.pomodoroDuration != 0"
+        @click="click"
+        id="startButton"
+      >
+        {{ buttonText }}
+      </button>
+
+      <button
+        v-if="!isSettingTime && this.pomodoroDuration != 0"
+        id="cancelButton"
+        @click="cancelDuration"
+      >
+        Cancel
+      </button>
+
+      <div v-if="isSettingTime">
+        <input
+          id="inputDurationBox"
+          type="number"
+          v-model="inputDuration"
+          placeholder="Work duration in minutes"
+        />
+        <input
+          id="inputRestDurationBox"
+          type="number"
+          v-model="inputRestDuration"
+          placeholder="Rest duration in minutes"
+        />
+        <button id="updateButton" @click="updateDuration">Update</button>
+      </div>
+
+      <button v-if="!isSettingTime" @click="showInputBox" id="settingButton">
+        Setting
+      </button>
+    </div>
+  </div>
+</template>
+
+<script>
+import ProgressBar from "progressbar.js";
+import boop from "../assets/boop.mp3";
+
+export default {
+  name: "Home",
+  data: function () {
+    let pomodoroDuration = 0;
+
+    return {
+      inputDuration: "",
+      inputRestDuration: "",
+      pomodoroDuration,
+      restDuration: 0,
+      currentTimeInSeconds: pomodoroDuration,
+      currentSegment: 1,
+      buttonText: "Start!",
+      topRight: null,
+      bottomRight: null,
+      bottomLeft: null,
+      topLeft: null,
+      pathOptions: {
+        easing: "linear",
+        duration: (pomodoroDuration + 1) * 1000,
+      },
+      interval: null,
+      boopAudio: new Audio(boop),
+      isResting: false,
+      isSettingTime: false,
+    };
+  },
+  mounted: function () {
+    this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
+    this.topRight.set(1);
+
+    this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
+    this.bottomRight.set(1);
+
+    this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
+    this.bottomLeft.set(1);
+
+    this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
+    this.topLeft.set(1);
+  },
+
+  methods: {
+    click() {
+      if (this.buttonText === "Start!" || this.buttonText === "Resume") {
+        this.animateBar();
+        this.buttonText = "Pause";
+      } else if (this.buttonText === "Pause") {
+        this.pauseBar();
+        this.buttonText = "Resume";
+      }
+    },
+
+    pauseBar() {
+      clearInterval(this.interval);
+      switch (this.currentSegment) {
+        case 1:
+          this.topRight.stop();
+          break;
+        case 2:
+          this.bottomRight.stop();
+          break;
+        case 3:
+          this.bottomLeft.stop();
+          break;
+        case 4:
+          this.topLeft.stop();
+          break;
+      }
+    },
+
+    onFinish() {
+      if (this.currentTimeInSeconds <= 0) {
+        if (this.currentSegment < 4) {
+          this.currentSegment += 1;
+        } else {
+          this.topRight.set(1);
+          this.topLeft.set(1);
+          this.bottomRight.set(1);
+          this.bottomLeft.set(1);
+
+          this.currentSegment = 1;
+        }
+
+        clearInterval(this.interval);
+
+        this.boopAudio.play();
+
+        this.isResting = true;
+        this.buttonText = "Rest";
+
+        setTimeout(() => {
+          this.currentTimeInSeconds = this.restDuration;
+
+          this.startRest();
+        }, 4100);
+      }
+    },
+
+    reduceTime() {
+      this.interval = setInterval(() => {
+        if (this.currentTimeInSeconds > 0) {
+          this.currentTimeInSeconds -= 1;
+        }
+      }, 1000);
+    },
+
+    startRest() {
+      // Set new interval
+      this.reduceTime();
+      setTimeout(() => {
+        clearInterval(this.interval);
+        this.boopAudio.play();
+        this.currentTimeInSeconds = this.pomodoroDuration;
+        this.buttonText = "Start!";
+        this.isResting = false;
+      }, this.restDuration * 1000);
+    },
+
+    animateBar() {
+      this.reduceTime();
+      let segment = null;
+      switch (this.currentSegment) {
+        case 1:
+          segment = this.topRight;
+          break;
+        case 2:
+          segment = this.bottomRight;
+          break;
+        case 3:
+          segment = this.bottomLeft;
+          break;
+        case 4:
+          segment = this.topLeft;
+          break;
+      }
+      segment.animate(
+        0,
+        {
+          duration: (this.currentTimeInSeconds + 1) * 1000,
+        },
+        this.onFinish
+      );
+    },
+
+    showInputBox() {
+      this.isSettingTime = true;
+    },
+
+    updateDuration() {
+      let duration = Number(this.inputDuration);
+      let restDuration = Number(this.inputRestDuration);
+      if (
+        !isNaN(duration) &&
+        duration > 0 &&
+        !isNaN(restDuration) &&
+        restDuration > 0
+      ) {
+        this.pomodoroDuration = duration * 60;
+        this.currentTimeInSeconds = this.pomodoroDuration;
+        this.pathOptions.duration = (this.pomodoroDuration + 1) * 1000;
+        this.restDuration = restDuration * 60;
+        this.isSettingTime = false;
+      } else {
+        alert("Please enter valid durations");
+      }
+    },
+
+    cancelDuration() {
+      // Stop any ongoing animation or interval
+      clearInterval(this.interval);
+
+      // Stop the progress bars if they are running
+      if (this.topRight) this.topRight.stop();
+      if (this.bottomRight) this.bottomRight.stop();
+      if (this.bottomLeft) this.bottomLeft.stop();
+      if (this.topLeft) this.topLeft.stop();
+
+      // Reset the current time to pomodoroDuration
+      this.currentTimeInSeconds = this.pomodoroDuration;
+
+      // Reset the UI elements
+      this.isResting = false; // Assuming you want to exit the resting state if in one
+      this.buttonText = "Start!"; // Reset the button text to indicate a fresh start
+
+      // Optionally, reset the current segment if you're using it to track progress
+      this.currentSegment = 1;
+
+      // Reset the paths to their full state if needed
+      this.topRight.set(1);
+      this.bottomRight.set(1);
+      this.bottomLeft.set(1);
+      this.topLeft.set(1);
+    },
+  },
+  computed: {
+    timeDisplay() {
+      const minutes = String(parseInt(this.currentTimeInSeconds / 60));
+      const seconds = String(this.currentTimeInSeconds % 60);
+      const paddedMinutes = ("0" + minutes).slice(-2);
+      const paddedSeconds = ("0" + seconds).slice(-2);
+
+      return `${paddedMinutes}:${paddedSeconds}`;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center vertically in the container */
+  align-items: center; /* Center horizontally */
+  min-height: 100vh; /* Stretch to fill the viewport height */
+  text-align: center; /* Center text for any direct child text elements */
+}
+.timer {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  margin-top: -0; /* shifts up timer by 125px */
+}
+
+#first-segment {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+#second-segment {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+#third-segment {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+#fourth-segment {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.time {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#timeDisplay {
+  font-size: 64px;
+  color: white;
+}
+
+p {
+  font-size: 48px;
+  line-height: 48px;
+  text-align: center;
+  color: white;
+}
+
+.buttons {
+  display: flex; /* Enable flexbox layout */
+  justify-content: center; /* Center the buttons horizontally */
+  align-items: center; /* Align the buttons vertically */
+  gap: 20px; /* Optional: Add some space between the buttons */
+}
+
+#inputDurationBox,
+#inputRestDurationBox {
+  width: auto;
+}
+
+#startButton,
+#cancelButton,
+#settingButton,
+#updateButton {
+  margin-top: 50px;
+  width: 200px;
+  height: 68px;
+  background: white;
+  border-radius: 20px;
+  font-size: 36px;
+  border: none;
+  cursor: pointer;
+}
+</style>
