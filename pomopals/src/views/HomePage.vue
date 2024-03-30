@@ -4,6 +4,7 @@
     <div>
       <h1>Welcome to Pomopals!</h1>
       <button @click="redirectToFriendsPage">Go to Friends Page</button>
+      <button @click="redirectToLeaderboardPage">Go to Leaderboard Page</button>
     </div>
   </template>
   
@@ -12,6 +13,9 @@
     methods: {
       redirectToFriendsPage() {
         this.$router.push('/friends');
+      },
+      redirectToLeaderboardPage() {
+        this.$router.push('/leaderboard');
       }
     }
   }
