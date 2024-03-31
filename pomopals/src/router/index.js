@@ -4,6 +4,8 @@ import LoginPage from '@/views/LoginPage.vue'
 import SignUpPage from '@/views/SignUpPage.vue'
 import HomePage from '@/views/HomePage.vue'
 import FriendsPage from '@/views/FriendsPage.vue'
+import LeaderboardPage from '@/views/LeaderboardPage.vue'
+import FriendsLeaderboardPage from '@/views/FriendsLeaderboardPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,16 @@ const router = createRouter({
       path: '/friends',
       name: 'FriendsPage',
       component: FriendsPage
+    },
+    {
+      path: '/leaderboard',
+      name: 'LeaderboardPage',
+      component: LeaderboardPage
+    },
+    {
+      path: '/friendsleaderboard',
+      name: 'FriendsLeaderboardPage',
+      component: FriendsLeaderboardPage
     }
   ]
 })
