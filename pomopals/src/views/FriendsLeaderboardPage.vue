@@ -1,6 +1,9 @@
 <template>
     <div class="leaderboard-page">
       <div class="header">
+        <button class="home-button" @click="redirectToHome">
+            <font-awesome-icon icon="home" />
+        </button>
         <div class="signout">
           <SignOutButton />
         </div>
@@ -9,14 +12,12 @@
         </div>
         
         <div class="tabs">
-            <GoToGlobalLeaderboardButton
-            :is-active="currentLeaderboard === 'global'"
-            @clicked="handleTabClick"
-            />
-            <GoToFriendsLeaderboardButton
-            :is-active="currentLeaderboard === 'friends'"
-            @clicked="handleTabClick"
-            />
+            <button class="tab-button" @click="redirectToGlobal">
+                Global Leaderboard
+            </button>
+            <button class="tab-button active-tab" @click="redirectToFriends">
+                Friends Leaderboard
+            </button>
         </div>
 
         <div class="timeframe-selector">
@@ -49,10 +50,13 @@
   </template>
   
   <script>
-  import SignOutButton from "@/components/SignOutButton.vue";
-  import GoToFriendsLeaderboardButton from "@/components/GoToFriendsLeaderboard.vue";
-  import GoToGlobalLeaderboardButton from "@/components/GoToGlobalLeaderboard.vue"
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import { faHome } from '@fortawesome/free-solid-svg-icons';
+  import { library } from '@fortawesome/fontawesome-svg-core';
 
+  import SignOutButton from "@/components/SignOutButton.vue";
+
+  library.add(faHome);
 
   export default {
     name: 'LeaderboardPage',
@@ -73,12 +77,20 @@
       },
       changeTimeframe() {
         console.log(timeframe + ' leaderboard selected');
-      }
+      },
+      redirectToGlobal() {
+        this.$router.push('/leaderboard');
+      },
+      redirectToFriends() {
+      // logic to stay on this page or refresh
+      },
+      redirectToHome() {
+        this.$router.push('/home');
+      },
     },
     components: {
         SignOutButton,
-        GoToFriendsLeaderboardButton,
-        GoToGlobalLeaderboardButton,
+        FontAwesomeIcon,
     },
   }
   </script>
@@ -97,6 +109,20 @@
   width: 100vw;
   height: 100vh;
   z-index: 1;
+}
+
+.home-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  border: none;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
 .signout {
