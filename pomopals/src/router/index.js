@@ -6,6 +6,7 @@ import HomePage from '@/views/HomePage.vue'
 import FriendsPage from '@/views/FriendsPage.vue'
 import LeaderboardPage from '@/views/LeaderboardPage.vue'
 import FriendsLeaderboardPage from '@/views/FriendsLeaderboardPage.vue'
+import URLBlockerPage from '@/views/URLBlockerPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/friendsleaderboard',
       name: 'FriendsLeaderboardPage',
       component: FriendsLeaderboardPage
+    }, 
+    {
+      path: '/urlblocker', 
+      name: 'URLBlockerPage', 
+      component: URLBlockerPage
     }
   ]
 })
