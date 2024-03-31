@@ -5,7 +5,7 @@
           <SignOutButton />
         </div>
         <div class="header-content">
-            <h1 class="header-title">Leaderboard</h1>
+            <h1 class="header-title">Friends Leaderboard</h1>
         </div>
         
         <div class="tabs">
@@ -34,20 +34,15 @@
             <div class="header-points">Points</div>
           </div>
           <div class="leaderboard-item" 
-            v-for="(item, index) in leaderboardItems" 
-            :key="index"
-            :class="{ 'highlighted': item.username === 'YourUsername (You)' }">
-            <div class="item-rank">
-              <span class="rank-medal">{{ item.medal }}</span>
+                v-for="(item, index) in leaderboardItems" 
+                :key="index"
+                :class="{ 'highlighted': item.username === 'YourUsername (You)' }">
+                <div class="item-rank">
+                <span class="rank-medal">{{ item.medal }}</span>
+                </div>
+                <div class="item-username">{{ item.username }}</div>
+                <div class="item-points">{{ item.points }}</div>
             </div>
-            <div class="item-username">{{ item.username }}</div>
-            <div class="item-button">
-              <button v-if="item.showButton" class="add-friend-btn" :class="{ added: item.added }" @click="toggleAdd(item, index)">
-                {{ item.added ? 'Added' : '+ Add Friend' }}
-              </button>
-            </div>
-            <div class="item-points">{{ item.points }}</div>
-          </div>
         </div>
       </div>
     </div>
@@ -65,16 +60,10 @@
       return {
         selectedTimeframe: 'all',
         leaderboardItems: [
-        { username: 'Josh123', points: 1793, medal: '🥇', showButton: true, added: true },
-        { username: 'elli065', points: 1652, medal: '🥈', showButton: true, added: false },
-        { username: 'johnappleseed', points: 1574, medal: '🥉', showButton: true, added: true },
-        { username: 'YourUsername (You)', points: 1502, medal: '4', showButton: false, added: false },
-        { username: 'imthebest01', points: 1496, medal: '5', showButton: true, added: false },
-        { username: 'tricia!', points: 1493, medal: '6', showButton: true, added: false },
-        { username: 'studying567', points: 1421, medal: '7', showButton: true, added: true },
-        { username: 'eddie', points: 1400, medal: '8', showButton: true, added: false },
-        { username: 'ilove2study462', points: 1357, medal: '9', showButton: true, added: false },
-        { username: 'penelope', points: 1244, medal: '10', showButton: true, added: false }
+        { username: 'Josh123', points: 1793, medal: '🥇'},
+        { username: 'johnappleseed', points: 1574, medal: '🥈'},
+        { username: 'YourUsername (You)', points: 1502, medal: '🥉', showButton: false},
+        { username: 'studying567', points: 1421, medal: '4', showButton: true},
         ]
       };
     },
@@ -176,24 +165,6 @@
 .leaderboard-item.highlighted {
   background-color: orange; /* Highlight color */
   font-weight: bold;
-}
-
-.add-friend-btn {
-  background-color: #55bc47;
-  border: none;
-  border-radius: 20px;
-  color: white;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-}
-
-.add-friend-btn:hover {
-  background-color: #47a83e;
-}
-
-.add-friend-btn.added {
-  background-color: #7927b0;
 }
 
 .tabs {
