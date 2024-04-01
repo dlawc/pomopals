@@ -1,97 +1,150 @@
-<template> 
-    <div class = "AchievementPage">
-        <div id = "SignOutTab">
-            <button id = "SignOut" type = "button">Sign Out</button> 
-        </div>
-        <div id = "MyAchievementsTab">
-            <h1 id = "MyAchievements"> My Achievements </h1>
-        </div>
-        <div id = "ViewAllTab">
-            <button id = "ViewAllButton" type = "button"> View All</button>
-            <image src = https://parspng.com/wp-content/uploads/2021/11/arrowpng.parspng.com-13.png id = "arrowdown"> </image>
-        </div>
-        <div id = "AchievementsUnlockedTab">
-            <h1 id = "AchievementsUnlocked"> Achievements Unlocked </h1>
-            <image src = "useraward.png" id = "useraward"></image>
-            <image src = "leaderaward.png" id = "leaderaward"></image>
-            <h1 class = "title" id = "NoviceUser"> Novice User</h1>
-            <h1 class = "subtitle" id = "studytimelvl1">Total Study Time Reached 24hrs</h1>
-            <h1 class = "title" id = "leaderboardlvl1"> Leaderboard Competitor</h1>
-            <h1 class = "subtitle" id = "top3lvl1"> Place Top 3 in Your Monthly LeaderBoard Once</h1>
-            <h1 class = "challengetitle" id = "challenge1" > Challenge Complete </h1>
-            <h1 class = "challengetitle" id = "challenge2"> Challenge Complete </h1>
-        </div>
-        <div id = "AchievementsInProgTab">
-            <h1 id = "AchievementsInProg"> Achievements In-Progress</h1>
-            <image src = "greyuseraward.png" id = "greyuseraward"></image>
-            <image src = "greyleaderaward.png" id = "greyleaderaward"></image>
-            <h1 class = "greytitle" id = "Userlvl2"> Master User</h1>
-            <h1 class = "greysubtitle" id = "studytimelvl2">Total Study Time Reached 200 hrs</h1>
-            <h1 class = "greytitle" id = "leaderboardlvl2"> Leaderboard Expert</h1>
-            <h1 class = "greysubtitle" id = "top3lvl2"> Place Top 3 in Your Monthly LeaderBoard 5 times</h1>
-        </div>              
+<template>
+    <div class="achievementpage">
+    <button id = "SignOut" type = "button">Sign Out</button> 
+    <div id = "headercontainer">
+        <h1 id = "myachievementsheader">My Achievements</h1>
+    </div>  
+    <div id = "viewallcontainer">
+        <button id = "viewallbutton" type = "button"> View All</button>
+        <image src = https://parspng.com/wp-content/uploads/2021/11/arrowpng.parspng.com-13.png id = "arrowdownimg"> </image>
     </div>
-    <div id = "buttonContainer"> 
-        <button id = "homebutton" type = "button"></button>
-        <button id = "leaderboardbutton" type = "button"></button>
-        <button id = "friendsbutton" type = "button"></button>
-        <button id = "achievementbutton" type = "button"></button>
-        <button id = "urlbutton" type = "button"></button>
+    <div class = "achievements-container">
+    <div id = "AchievementCompletedContainer">
+    <h1 id = "AchievementsCompletedHeader"> Achievements Unlocked</h1>
+    <div id = "Achievementunlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
+        <img :src="achievement.icon" alt="achievement.title" class="achievementcompleted-icon">
+        <div class="achievementcompleted-details">
+          <h2 class="title">{{ achievement.title }}</h2>
+          <p class="subtitle">{{ achievement.description }}</p>
+        </div>
+        <span class="progresscompleted-text">Challenge Completed</span>
     </div>
+</div>
+    <div id="AchievementsInProgContainer" class="achievement-tab">
+      <h1 id="AchievementsInProgHeader">Achievements In-Progress</h1>
+      <!-- Use the computed property 'achievementsWithProgress' here -->
+      <div class="achievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
+        <img :src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
+        <div class="achievement-details">
+          <h2 class="greytitle">{{ achievement.title }}</h2>
+          <p class="greysubtitle">{{ achievement.description }}</p>
+        </div>
+        <span class="progress-text">({{ achievement.current }}/{{ achievement.goal }})</span>
+      <ProgressBar :value="achievement.progress" id = "inprogressbar" />
+      </div>
+    </div>
+</div>
+</div>
+  </template>
+  <script>
+  import ProgressBar from './ProgressBar.vue';
+  
+  export default {
+    components: {
+      ProgressBar
+    },
+    data() {
+      return {
+        achievements: [
+          {
+            id: 1,
+            title: 'Master User',
+            description: 'Total Study Time Reached 200 hrs',
+            icon: 'useraward.png', // Ensure this is the correct relative path
+            current: 200,
+            goal: 200,
+          },
+          {
+            id: 2,
+            title: 'Leaderboard Novice',
+            description: 'Place Top 3 in Your Monthly Leaderboard Once',
+            icon: 'leaderaward.png', // Ensure this is the correct relative path
+            current: 4,
+            goal: 1,
+          },{
+            id: 3,
+            title: 'Leaderboard Competitor',
+            description: 'Place Top 3 in Your Monthly Leaderboard 5 times',
+            icon: 'leaderaward.png', // Ensure this is the correct relative path
+            current: 4,
+            goal: 5,
+          },
+          {
+            id: 4,
+            title: 'Leaderboard Legend',
+            description: 'Place Top 3 in Your Monthly LeaderBoard 10 times',
+            icon: 'leaderaward.png', // Ensure this is the correct relative path
+            current: 6,
+            goal: 10,
+          }
+          // ... more achievements
+        ]
+      };
+    },
+    computed: {
+    // Computed property that adds the progress calculation
     
-</template>
-
-<style>
-
-.AchievementPage{
-    position: absolute;
-width: 1280px;
-height: 832px;
-left: 0px;
-top: 0px;
+    inProgressAchievements() {
+      return this.achievements.filter(achievement => achievement.current < achievement.goal).map(achievement => ({
+        ...achievement,
+        progress: (achievement.current / achievement.goal) * 100,
+      }));
+    },
+    completedAchievements() {
+      return this.achievements.filter(achievement => achievement.current >= achievement.goal).map(achievement => ({
+        ...achievement,
+        progress: (achievement.current / achievement.goal) * 100,
+      }));
+    },
+  },
+};
+  </script>
+  <style>
+  .achievementpage{
+display: flex;
+flex-direction: column;
+width: 100%;
+height: 1000vh;
 background: #4D003C;
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-}
-
+  }
 #SignOut{
-position: absolute;
-width: 162px;
-height: 49px;
-left: 1089px;
-top: 33px;
-font-family: 'Lucida Sans';
+    float: right;
+    width: 162px;
+    height: 49px;
+margin-left: auto;
+font-family: 'Space Grotesk';
 font-style: normal;
 font-weight: 700;
 font-size: 24px;
 line-height: 31px;
 text-align: center;
-color: #FFFFFF;
+background-color: transparent;
 border: none;
-background: 0
-}
-
-#MyAchievements{
-position: absolute;
-width: 546px;
+color: #FFFFFF;
+  }
+#myachievementsheader{
+width: 700px;
 height: 82px;
-left: 377px;
-top: 79px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
-font-size: 60px;
+font-size: 64px;
 line-height: 82px;
 text-align: center;
 text-transform: capitalize;
 color: #FFFFFF;
+display:flex;
+margin-left: auto;
+margin-right: auto;
 }
-
-#ViewAllButton{
-position: absolute;
+#viewallcontainer{
+    margin-left: auto;
+    margin-right: 5vw;
+}
+#viewallbutton{
 width: 164px;
 height: 33px;
-left: 1027px;
-top: 136px;
 background: #AE76A1;
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 50px;
@@ -103,173 +156,82 @@ line-height: 31px;
 text-align: center;
 color: #FFFFFF;
 }
-
-#arrowdown{
+#arrowdownimg{
 position: absolute;
 width: 25px;
 height: 17px;
-left: 1030px;
-top: 148px;
+left: 1445px;
+top: 145px;
 background-size: 25px ;
 }
-
-#AchievementsUnlockedTab {
-position: absolute;
-width: 1095px;
-height: 292px;
-left: 99px;
-top: 192px;
+  #AchievementCompletedContainer{
+width: 90vw;
+margin-left:auto;
+margin-right: auto;
 background: #B857A1;
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 10px;
-}
-
-#AchievementsUnlocked{
-position: absolute;
-width: 400px;
+overflow-y: auto;
+overflow-x: auto;
+margin-bottom: 10px;
+  }
+  #AchievementsCompletedHeader{
+width: 586px;
 height: 62px;
-left: 20px;
-top: 20px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
 line-height: 41px;
-text-align: center;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-
-#AchievementsInProgTab{
-position: absolute;
-width: 1095px;
-height: 283px;
-left: 99px;
-top: 501px;
-background: #CDAEC7;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-border-radius: 10px;
+  #Achievementunlocked {
+    display: flex;
+    align-items: center;
+  width: 100%; /* Set to the desired width or max-width */
+  background-color: #B857A1; /* The purple background color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+  flex-direction: row;
 }
-
-#AchievementsInProg{
-position: absolute;
-width: 450px;
-height: 62px;
-left: 20px;
-top: 20px;
-font-family: 'Lucida Sans';
-font-style: normal;
-font-weight: 700;
-font-size: 32px;
-line-height: 41px;
-text-align: center;
-text-transform: capitalize;
-color: #FFFFFF;
+.achievementcompleted-icon{
+    width: 100px; /* Example width */
+  height: auto; /* Maintain aspect ratio */
+  margin-right: 20px;
 }
-
-#buttonContainer{
-    position: fixed; 
-  top: 50%; 
-  left: 2%;
-  transform: translateY(-50%); 
-  display: flex; 
+.achievementscompleted-details{
+    flex-grow: 20; /* Makes the detail container take up the remaining space */
+  text-align: right;
   flex-direction: column; 
-  align-items: center;
-  margin-bottom: 100px;
 }
-#homebutton{
-background: url('home.png');
-}
-#leaderboardbutton {
-background: url('Vector.png');
-}
-#friendsbutton{
-background: url('friends.png');
-}
-#achievementbutton{
-    background: url('achievement.png');
-}
-#urlbutton{
-    background: url('url.png');
-}
-#homebutton, #leaderboardbutton, #friendsbutton, #achievementbutton,#urlbutton {
-    width: 40px; 
-    height: 38px; 
-    background-repeat: no-repeat;
-    background-position: center; 
-    background-size: contain; 
-    margin-bottom: 10px; 
-    border: none; 
-    outline: none; 
-}
-#useraward{
-width: 88px;
-height: 76px;
-margin-left: 10px;
-margin-top: 70px;
-margin-bottom: 100px;
-}
-
-#leaderaward{
-width: 76px;
-height: 80px;
-margin-left: -80px;
-}
-
 .title{
-
-font-family: 'lucida sans';
+width: 700px;
+height: 53px;
+font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
 line-height: 41px;
 text-transform: capitalize;
-
 color: #FFFFFF;
-}
-#NoviceUser{
-position: absolute;
-width: 357px;
-height: 53px;
-left: 105px;
-top: 65px;
 }
 .subtitle{
+ margin-top: -15px;
+width: 700px;
+height: 53px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
+font-size: 20px;
 line-height: 31px;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-#studytimelvl1{
-position: absolute;
-width: 625px;
-height: 53px;
-left: 105px;
-top: 105px;
-}
-
-#leaderboardlvl1{
-position: absolute;
-width: 410px;
-height: 53px;
-left: 105px;
-top: 170px;
-}
-
-#top3lvl1{
-position: absolute;
-width: 625px;
-height: 53px;
-left: 105px;
-top: 210px;
-}
-
-.challengetitle{
-
-font-family: 'Lucida Sans';
+.progresscompleted-text{
+    margin-left: 14vw;
+width: 700px;
+height: 39px;
+font-family: 'Lucida Sams';
 font-style: normal;
 font-weight: 700;
 font-size: 30px;
@@ -277,95 +239,71 @@ line-height: 38px;
 text-align: center;
 text-decoration-line: underline;
 text-transform: uppercase;
-
 color: #11DD11;
-
 text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
-#challenge1{
-position: absolute;
-width: 380px;
-height: 39px;
-left: 700px;
-top: 80px;
-}
 
-#challenge2{
-position: absolute;
-width: 380px;
-height: 39px;
-left: 700px;
-top: 190px;
+
+  #AchievementsInProgContainer {
+    width: 90vw;
+    height: 50vh;
+    margin-left: auto;
+    margin-right: auto;
+    background: #CDAEC7;
+    overflow-y: auto;
+    border-radius: 10px;
 }
-#greyuseraward{
-position: absolute;
-width: 100px;
-height: 76px;
-left: 10px;
-top: 70px;
-}
-#greyleaderaward{
-position: absolute;
-width: 70px;
-height: 76px;
-left: 20px;
-top: 170px;
-}
-.greytitle{
+#AchievementsInProgHeader{
+height: 62px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
 line-height: 41px;
 text-transform: capitalize;
-
-color: #474242;
+color: #FFFFFF;
+}
+.achievement-in-progress{
+    display: flex;
+    align-items: center;
+  flex-direction: row;
 
 }
-
-.greysubtitle{
+.achievementinprog-icon{
+    width: 100px; /* Example width */
+  height: 85px; /* Maintain aspect ratio */
+  margin-right: 20px;
+}
+.progress-text{
+    margin-left: 26vw;
+    margin-right: 1vw;
+    
+}
+#inprogressbar{
+    margin-left: auto;
+    margin-right: 1vw;
+    min-width: 100px;
+}
+.greytitle {
+width: 700px;
+height: 53px;
+font-family: 'Lucida Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 32px;
+text-transform: capitalize;
+color: #474242;
+}
+.greysubtitle {
+width: 700px;
+height: 53px;
+margin-top: -15px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 400;
-font-size: 24px;
-line-height: 31px;
+font-size: 20px;
 text-transform: capitalize;
-
 color: #474242;
 }
-
-#Userlvl2{
-position: absolute;
-width: 357px;
-height: 53px;
-left: 105px;
-top: 65px;
-}
-
-#studytimelvl2{
-position: absolute;
-width: 625px;
-height: 53px;
-left: 105px;
-top: 105px;
-}
-
-#leaderboardlvl2{
-    /* Leaderboard Expert */
-
-position: absolute;
-width: 396px;
-height: 53px;
-left: 105px;
-top: 170px;
-}
-#top3lvl2{
-position: absolute;
-width: 625px;
-height: 53px;
-left: 105px;
-top: 210px;
-}
-
-</style>
+  </style>
 
