@@ -231,6 +231,23 @@ export default {
 
           this.startRest();
         }, 4100);
+
+        let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+        let currentUser = firebaseAuth.currentUser;
+        let username = currentUser.displayName; // username as primary key
+        console.log(username);
+        let userRef = firestore.collection("users").doc(username);
+        let doc = await userRef.get();
+        if (doc.exists && doc.data().xp) {
+          // xp already has value
+          let currXP = doc.data().xp;
+          await userRef.update({ xp: currXP + this.pomodoroDuration });
+          console.log("xp updated");
+        } else {
+          await userRef.set({ xp: this.pomodoroDuration });
+          console.log("xp created");
+        }
       }
     },
 
@@ -304,31 +321,24 @@ export default {
     },
 
     cancelDuration() {
-      // Stop any ongoing animation or interval
       clearInterval(this.interval);
 
-      // Stop the progress bars if they are running
       if (this.topRight) this.topRight.stop();
       if (this.bottomRight) this.bottomRight.stop();
       if (this.bottomLeft) this.bottomLeft.stop();
       if (this.topLeft) this.topLeft.stop();
 
-      // Reset the current time to pomodoroDuration
       this.currentTimeInSeconds = this.pomodoroDuration;
 
-      // Reset the UI elements
-      this.isResting = false; // Assuming you want to exit the resting state if in one
-      this.buttonText = "Start!"; // Reset the button text to indicate a fresh start
+      this.isResting = false;
+      this.buttonText = "Start!";
 
-      // Optionally, reset the current segment if you're using it to track progress
       this.currentSegment = 1;
 
-      // Reset the paths to their full state if needed
       this.topRight.set(1);
       this.bottomRight.set(1);
       this.bottomLeft.set(1);
       this.topLeft.set(1);
-      alert("Cancelled Time!");
     },
   },
   computed: {
