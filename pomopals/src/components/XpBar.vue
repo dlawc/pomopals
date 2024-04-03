@@ -59,13 +59,15 @@ export default {
   width: 60%;
   border-collapse: collapse;
   margin-top: 10vh;
+  background-color: white;
 }
 
 #table th,
 #table td {
   border: 1px solid #ddd;
-  text-align: left;
   padding: 8px;
+  text-align: center;
+  color: black;
 }
 
 #table th {
