@@ -125,7 +125,7 @@
       </div>
 
       <button v-if="!isSettingTime" @click="showInputBox" id="settingButton">
-        Setting
+        Settings
       </button>
     </div>
   </div>
@@ -327,6 +327,7 @@ export default {
       this.bottomRight.set(1);
       this.bottomLeft.set(1);
       this.topLeft.set(1);
+      alert("Cancelled Time!");
     },
   },
   computed: {
@@ -345,17 +346,17 @@ export default {
 <style scoped>
 .container {
   display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: center; /* Center vertically in the container */
-  align-items: center; /* Center horizontally */
-  min-height: 100vh; /* Stretch to fill the viewport height */
-  text-align: center; /* Center text for any direct child text elements */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
 }
 .timer {
   position: relative;
   width: 330px;
   height: 330px;
-  margin-top: -0; /* shifts up timer by 125px */
+  margin-top: -0;
 }
 
 #first-segment {
@@ -403,10 +404,10 @@ p {
 }
 
 .buttons {
-  display: flex; /* Enable flexbox layout */
-  justify-content: center; /* Center the buttons horizontally */
-  align-items: center; /* Align the buttons vertically */
-  gap: 20px; /* Optional: Add some space between the buttons */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 #inputDurationBox,

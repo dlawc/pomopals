@@ -1,3 +1,18 @@
+<template>
+  <div class="xpBar">
+    <table id="table">
+      <tr>
+        <th id="currentXPHeader">Current XP</th>
+        <th id="totalXPHeader">Total XP</th>
+      </tr>
+      <tr>
+        <td id="currentXP">###</td>
+        <td id="totalXP">$$$</td>
+      </tr>
+    </table>
+  </div>
+</template>
+
 <script>
 export default {
   name: "XpBar",
@@ -5,29 +20,29 @@ export default {
 };
 </script>
 
-<template>
-  <div class="xpBar">
-    <div id="currentXP">Current XP</div>
-    <div id="totalXP">Total XP</div>
-  </div>
-</template>
-
 <style scoped>
 .xpBar {
-  display: flex; /* Use Flexbox */
-  justify-content: space-around; /* Distribute space around items */
-  align-items: center; /* Align items vertically in the center */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-#currentXP,
-#totalXP {
-  transform: translateY(125px);
-  width: 100px; /* Smaller width */
-  height: 34px; /* Smaller height */
-  background: white;
-  border-radius: 10px; /* Adjusted border radius */
-  font-size: 18px; /* Smaller font size */
-  border: none;
-  text-align: center;
+#table {
+  width: 60%;
+  border-collapse: collapse;
+  margin-top: 10vh;
+}
+
+#table th,
+#table td {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 8px;
+}
+
+#table th {
+  background-color: #f2f2f2;
+  color: black;
 }
 </style>
