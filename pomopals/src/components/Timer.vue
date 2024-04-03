@@ -239,6 +239,8 @@ export default {
         console.log(username);
         let userRef = firestore.collection("users").doc(username);
         let doc = await userRef.get();
+
+        // update total xp
         if (doc.exists && doc.data().xp) {
           // xp already has value
           let currXP = doc.data().xp;
@@ -248,6 +250,24 @@ export default {
           await userRef.set({ xp: this.pomodoroDuration });
           console.log("xp created");
         }
+
+        // update xp with time
+        let key = new Date().toISOString(); // time whenever xp is written
+        let value = this.pomodoroDuration;
+        await userRef
+          .update({
+            [`xpWithTime.${key}`]: value,
+          })
+          .catch(async (error) => {
+            // if map not exist, create it with the map
+            if (error.code === "not-found") {
+              await userRef.set({
+                xpWithTime: { [key]: value },
+              });
+            } else {
+              console.error(error);
+            }
+          });
       }
     },
 
