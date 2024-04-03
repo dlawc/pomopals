@@ -2,21 +2,46 @@
   <div class="xpBar">
     <table id="table">
       <tr>
-        <th id="currentXPHeader">Current XP</th>
         <th id="totalXPHeader">Total XP</th>
       </tr>
       <tr>
-        <td id="currentXP">###</td>
-        <td id="totalXP">$$$</td>
+        <td id="totalXP">{{ totalXP }}</td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
+import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "XpBar",
-  components: {},
+  data() {
+    return {
+      totalXP: null,
+    };
+  },
+  async mounted() {
+    let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+    let currentUser = firebaseAuth.currentUser;
+    let username = currentUser.displayName; // username as primary key
+    let userRef = firestore.collection("users").doc(username);
+
+    try {
+      let doc = await userRef.get();
+      if (doc.exists) {
+        if (doc.data().xp !== undefined) {
+          this.totalXP = doc.data().xp;
+        } else {
+          this.totalXP = "xp unavailable";
+        }
+      } else {
+        this.totalXP = "user data unavailable";
+      }
+    } catch (error) {
+      this.totalXP = "error fetching data";
+    }
+  },
 };
 </script>
 
@@ -26,10 +51,11 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  text-align: center;
 }
 
 #table {
-  transform: translateY(125px);
+  transform: translateY(65px);
   width: 60%;
   border-collapse: collapse;
   margin-top: 10vh;
