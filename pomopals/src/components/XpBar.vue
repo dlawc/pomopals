@@ -29,6 +29,7 @@ export default {
 }
 
 #table {
+  transform: translateY(125px);
   width: 60%;
   border-collapse: collapse;
   margin-top: 10vh;

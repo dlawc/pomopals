@@ -37,11 +37,11 @@ export default {
 }
 
 #friendsButton {
-  top: 15%;
+  top: 19%;
   transform: translateY(-100%);
 }
 
 #leaderboardButton {
-  top: 15%;
+  top: 19%;
 }
 </style>

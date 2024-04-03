@@ -4,7 +4,7 @@
       <span>Username</span>
     </div>
     <ul>
-        <li v-for="friend in filteredFriends" :key="friend">
+      <li v-for="friend in filteredFriends" :key="friend">
         <span>{{ friend }}</span>
         <button class="delete-button" @click="deleteFriend(friend)">
           Delete

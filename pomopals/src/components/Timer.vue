@@ -134,6 +134,8 @@
 <script>
 import ProgressBar from "progressbar.js";
 import boop from "../assets/boop.mp3";
+import firebase from "../firebase.js";
+import { firebaseAuth, firestore } from "../firebase.js";
 
 export default {
   name: "Home",
@@ -205,7 +207,7 @@ export default {
       }
     },
 
-    onFinish() {
+    async onFinish() {
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
@@ -358,7 +360,6 @@ export default {
   height: 330px;
   margin-top: -0;
 }
-
 #first-segment {
   position: absolute;
   top: 0;
