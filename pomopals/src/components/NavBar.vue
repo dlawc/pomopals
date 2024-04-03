@@ -11,8 +11,8 @@
 </template>
 <script> 
 export default {
-    name:"Nav"
-}
+    name:"Nav", 
+} 
 </script>
 <style>
 .navbar{
@@ -27,7 +27,8 @@ export default {
 }
 .nav-btn{
     background-color: transparent;
-}
+} 
+/* make the icons change when u hover */
 #home:hover img {
     content: url('@/assets/home_filled.png'); 
 }
