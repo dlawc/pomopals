@@ -1,31 +1,21 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
+import NavBar from "@/components/NavBar.vue"
 
 export default {
   name: "HomePage",
-  components: { XpBar, Timer },
+  components: { XpBar, Timer, NavBar },
   methods: {
-    redirectToFriendsPage() {
-      this.$router.push("/friends");
-    },
-    redirectToLeaderboardPage() {
-      this.$router.push("/leaderboard");
-    },
   },
 };
 </script>
 
 <template>
   <div class="home">
+    <div><NavBar/></div>
     <div><XpBar /></div>
     <div><Timer /></div>
-    <button id="friendsButton" @click="redirectToFriendsPage">
-      Go to Friends Page
-    </button>
-    <button id="leaderboardButton" @click="redirectToLeaderboardPage">
-      Go to Leaderboard Page
-    </button>
   </div>
 </template>
 

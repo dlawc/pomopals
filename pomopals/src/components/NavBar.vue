@@ -4,7 +4,7 @@
         <router-link to="/home" class = "nav-btn" id = "home"><img src = "@/assets/home_empty.png" width = 30></router-link><br>
         <router-link to="/leaderboard" class = "nav-btn" id = "leaderboard"><img src = "@/assets/leaderboard_empty.png" width = 30></router-link><br>
         <router-link to="/friends" class = "nav-btn" id = "friends"><img src = "@/assets/friends_empty.png" width = 30></router-link><br>
-        <!--<router-link to="/achievements" class = "nav-btn" id = "achievements"><img src = "@/assets/achievements_empty.png" width = 30></router-link><br>-->
+        <router-link to="/achievements" class = "nav-btn" id = "achievements"><img src = "@/assets/achievements_empty.png" width = 30></router-link><br>
         <router-link to="/urlblocker" class = "nav-btn" id = "url"><img src = "@/assets/url_empty.png" width = 30></router-link>
     </nav>
     </div>

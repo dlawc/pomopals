@@ -7,6 +7,7 @@ import FriendsPage from "@/views/FriendsPage.vue";
 import LeaderboardPage from "@/views/LeaderboardPage.vue";
 import FriendsLeaderboardPage from "@/views/FriendsLeaderboardPage.vue";
 import URLBlockerPage from "@/views/URLBlockerPage.vue";
+import AchievementPage from "@/views/Achievements.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,11 @@ const router = createRouter({
       name: "URLBlockerPage",
       component: URLBlockerPage,
     },
+    {
+      path: "/achievements", 
+      name: "AchievementPage", 
+      component: AchievementPage,
+    }, 
   ],
 });
 
