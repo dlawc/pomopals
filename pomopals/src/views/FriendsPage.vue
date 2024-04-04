@@ -1,5 +1,8 @@
 <template>
   <div class="friends-page">
+    <div class = "navbar">
+      <NavBar/>
+    </div>
     <div class="header">
       <div class="signout">
         <SignOutButton />
@@ -25,6 +28,7 @@
 import AddFriendButton from "@/components/AddFriendButton.vue";
 import FriendsList from "@/components/FriendsList.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
+import NavBar from "@/components/NavBar.vue"
 
 export default {
   data() {
@@ -52,6 +56,7 @@ export default {
     AddFriendButton,
     FriendsList,
     SignOutButton,
+    NavBar, 
   },
 };
 </script>

@@ -10,7 +10,9 @@
         <div class="header-content">
             <h1 class="header-title">Friends Leaderboard</h1>
         </div>
-        
+        <div class = "navbar">
+          <NavBar/>
+        </div>
         <div class="tabs">
             <button class="tab-button" @click="redirectToGlobal">
                 Global Leaderboard
@@ -55,6 +57,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core';
 
   import SignOutButton from "@/components/SignOutButton.vue";
+  import NavBar from "@/components/NavBar.vue"
 
   library.add(faHome);
 
@@ -91,6 +94,7 @@
     components: {
         SignOutButton,
         FontAwesomeIcon,
+        NavBar, 
     },
   }
   </script>

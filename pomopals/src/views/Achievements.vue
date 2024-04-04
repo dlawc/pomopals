@@ -1,5 +1,6 @@
 <template>
   <div class="achievementpage">
+    <NavBar/>
   <button id = "SignOut" type = "button">Sign Out</button> 
   <div id = "headercontainer">
       <h1 id = "myachievementsheader">My Achievements</h1>
@@ -41,9 +42,11 @@
 import ProgressBar from '@/components/ProgressBar.vue';
 import firebase from '../firebase.js';
 import {  doc, getDoc } from "firebase/firestore";
+import NavBar from "@/components/NavBar.vue"
 export default {
   components: {
-    ProgressBar
+    ProgressBar, 
+    NavBar,
   },
   data() {
     return {

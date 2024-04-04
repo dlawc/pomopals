@@ -1,5 +1,8 @@
 <template>
     <div class="leaderboard-page">
+      <div class = "navbar">
+        <NavBar/>
+      </div>
       <div class="header">
         <button class="home-button" @click="redirectToHome">
             <font-awesome-icon icon="home" />
@@ -60,6 +63,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core';
 
   import SignOutButton from "@/components/SignOutButton.vue";
+  import NavBar from "@/components/NavBar.vue"
 
   library.add(faHome);
 
@@ -103,6 +107,7 @@
     components: {
         SignOutButton,
         FontAwesomeIcon,
+        NavBar, 
     },
   }
   </script>
