@@ -16,14 +16,16 @@
 body,
 html {
   margin: 0;
+  padding: 0; /* Ensures there is no padding that could cause scrolling */
   font-family: "DM Sans", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   background-color: #f4f7fa;
-  background-image: url("/bg.jpeg"); 
+  background-image: url("/bg.jpeg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  /*overflow: hidden; prevents scrolling */
 }

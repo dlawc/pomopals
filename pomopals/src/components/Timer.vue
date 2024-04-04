@@ -125,7 +125,7 @@
       </div>
 
       <button v-if="!isSettingTime" @click="showInputBox" id="settingButton">
-        Setting
+        Settings
       </button>
     </div>
   </div>
@@ -134,6 +134,7 @@
 <script>
 import ProgressBar from "progressbar.js";
 import boop from "../assets/boop.mp3";
+import { firebaseAuth, firestore, db } from "../firebase.js";
 
 export default {
   name: "Home",
@@ -205,7 +206,7 @@ export default {
       }
     },
 
-    onFinish() {
+    async onFinish() {
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
@@ -230,6 +231,43 @@ export default {
 
           this.startRest();
         }, 4100);
+
+        let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+        let currentUser = firebaseAuth.currentUser;
+        let username = currentUser.displayName; // username as primary key
+        console.log(username);
+        let userRef = firestore.collection("users").doc(username);
+        let doc = await userRef.get();
+
+        // update total xp
+        if (doc.exists && doc.data().xp) {
+          // xp already has value
+          let currXP = doc.data().xp;
+          await userRef.update({ xp: currXP + this.pomodoroDuration });
+          console.log("xp updated");
+        } else {
+          await userRef.set({ xp: this.pomodoroDuration });
+          console.log("xp created");
+        }
+
+        // update xp with time
+        let key = new Date().toISOString(); // time whenever xp is written
+        let value = this.pomodoroDuration;
+        await userRef
+          .update({
+            [`xpWithTime.${key}`]: value,
+          })
+          .catch(async (error) => {
+            // if map not exist, create it with the map
+            if (error.code === "not-found") {
+              await userRef.set({
+                xpWithTime: { [key]: value },
+              });
+            } else {
+              console.error(error);
+            }
+          });
       }
     },
 
@@ -303,26 +341,20 @@ export default {
     },
 
     cancelDuration() {
-      // Stop any ongoing animation or interval
       clearInterval(this.interval);
 
-      // Stop the progress bars if they are running
       if (this.topRight) this.topRight.stop();
       if (this.bottomRight) this.bottomRight.stop();
       if (this.bottomLeft) this.bottomLeft.stop();
       if (this.topLeft) this.topLeft.stop();
 
-      // Reset the current time to pomodoroDuration
       this.currentTimeInSeconds = this.pomodoroDuration;
 
-      // Reset the UI elements
-      this.isResting = false; // Assuming you want to exit the resting state if in one
-      this.buttonText = "Start!"; // Reset the button text to indicate a fresh start
+      this.isResting = false;
+      this.buttonText = "Start!";
 
-      // Optionally, reset the current segment if you're using it to track progress
       this.currentSegment = 1;
 
-      // Reset the paths to their full state if needed
       this.topRight.set(1);
       this.bottomRight.set(1);
       this.bottomLeft.set(1);
@@ -345,19 +377,18 @@ export default {
 <style scoped>
 .container {
   display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: center; /* Center vertically in the container */
-  align-items: center; /* Center horizontally */
-  min-height: 100vh; /* Stretch to fill the viewport height */
-  text-align: center; /* Center text for any direct child text elements */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
 }
 .timer {
   position: relative;
   width: 330px;
   height: 330px;
-  margin-top: -0; /* shifts up timer by 125px */
+  margin-top: -0;
 }
-
 #first-segment {
   position: absolute;
   top: 0;
@@ -403,10 +434,10 @@ p {
 }
 
 .buttons {
-  display: flex; /* Enable flexbox layout */
-  justify-content: center; /* Center the buttons horizontally */
-  align-items: center; /* Align the buttons vertically */
-  gap: 20px; /* Optional: Add some space between the buttons */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 #inputDurationBox,
