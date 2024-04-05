@@ -7,13 +7,12 @@
   </div>  
   <div id = "viewallcontainer">
       <button id = "viewallbutton" type = "button"> View All</button>
-      <image src = https://parspng.com/wp-content/uploads/2021/11/arrowpng.parspng.com-13.png id = "arrowdownimg"> </image>
   </div>
   <div class = "achievements-container">
   <div id = "AchievementCompletedContainer">
   <h1 id = "AchievementsCompletedHeader"> Achievements Unlocked</h1>
   <div id = "Achievementunlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
-      <img :src="achievement.icon" alt="achievement.title" class="achievementcompleted-icon">
+      <img :src=" achievement.icon" alt="achievement.title" class="achievementcompleted-icon">
       <div class="achievementcompleted-details">
         <h2 class="title">{{ achievement.title }}</h2>
         <p class="subtitle">{{ achievement.description }}</p>
@@ -144,12 +143,19 @@ try {
 </script>
 <style>
 .achievementpage{
-display: flex;
+  display: flex;
 flex-direction: column;
-width: 100%;
-height: 1000vh;
-background: #4D003C;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 0;
+  padding: 0;
+  font-family: "DM Sans", sans-serif;
+  background-color: #4d003c;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+height: 100vh;
+  z-index: 1;
 }
 #SignOut{
   float: right;
@@ -182,6 +188,7 @@ margin-left: 35vw;
 margin-right: auto;
 }
 #viewallcontainer{
+  margin-top: -1vw;
   margin-left: auto;
   margin-right: 5vw;
 }
@@ -221,6 +228,9 @@ margin-bottom: 10px;
 #AchievementsCompletedHeader{
 width: 586px;
 height: 62px;
+text-align: left;
+margin-left: 15px;
+margin-bottom: -30px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
@@ -232,6 +242,7 @@ color: #FFFFFF;
 #Achievementunlocked {
   display: flex;
   align-items: center;
+  margin-top: 10px;
 width: 100%; 
 background-color: #B857A1; 
 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
@@ -250,6 +261,8 @@ flex-direction: column;
 .title{
 width: 700px;
 height: 53px;
+margin-right: auto;
+text-align: left ;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
@@ -259,7 +272,7 @@ text-transform: capitalize;
 color: #FFFFFF;
 }
 .subtitle{
-margin-top: -15px;
+margin-top: -40px;
 width: 700px;
 height: 53px;
 font-family: 'Lucida Sans';
@@ -287,7 +300,7 @@ text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 #AchievementsInProgContainer {
   width: 90vw;
-  height: 50vh;
+  height: 40vh;
   margin-left: auto;
   margin-right: auto;
   background: #CDAEC7;
@@ -296,6 +309,9 @@ text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 #AchievementsInProgHeader{
 height: 62px;
+text-align: left;
+margin-left: 15px;
+margin-bottom: -30px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
@@ -308,7 +324,7 @@ color: #FFFFFF;
   display: flex;
   align-items: center;
 flex-direction: row;
-
+margin-bottom: -20px;
 }
 .achievementinprog-icon{
   width: 100px; 
@@ -330,6 +346,7 @@ margin-left: 1vw;
 .greytitle {
 width: 700px;
 height: 53px;
+text-align: left;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 700;
@@ -340,7 +357,7 @@ color: #474242;
 .greysubtitle {
 width: 700px;
 height: 53px;
-margin-top: -15px;
+margin-top: -35px;
 font-family: 'Lucida Sans';
 font-style: normal;
 font-weight: 400;
