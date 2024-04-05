@@ -88,6 +88,11 @@ export default {
               alert("Username is required to proceed.");
               continue;
             }
+            // Check for spaces in username
+            if (/\s/.test(username)) {
+              alert("Username must not contain spaces. Please try again.");
+              continue;
+            }
             // Check if the username already exists
             const doc = await firebase
               .firestore()
@@ -98,7 +103,7 @@ export default {
             if (usernameExists) {
               alert("Username already taken, please try another one.");
             }
-          } while (!username || usernameExists);
+          } while (!username || usernameExists || /\s/.test(username));
 
           // Update user's profile with the username
           await user.updateProfile({
@@ -120,6 +125,10 @@ export default {
     },
     async signUp() {
       this.errorMessage = "";
+      if (/\s/.test(this.credentials.username)) {
+        this.errorMessage = "Username must not contain spaces.";
+        return; // Exit the function if validation fails
+      }
       try {
         const usernameExists = await firebase
           .firestore()
@@ -211,20 +220,23 @@ export default {
 }
 
 .login-form {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
   padding-left: 50px;
   padding-right: 50px;
 }
 
-.login-form h1 {
+.login-form h1,
+.login-form p {
+  text-align: left;
   color: #2b3674;
+  font-family: "DM Sans", sans-serif;
+}
+.login-form h1 {
   margin-bottom: 10px;
 }
 
 .login-form p {
-  color: #2b3674;
-  font-family: "DM Sans", sans-serif;
   font-size: 0.9em;
   margin-bottom: 20px;
   width: 100%;

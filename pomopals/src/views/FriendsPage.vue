@@ -10,16 +10,16 @@
       <div class="header-content">
         <h1 class="header-title">My Friends</h1>
         <div class="header-controls">
-          <AddFriendButton/>
+          <AddFriendButton />
           <input
             type="search"
+            class="search-input"
             placeholder="Search Friends"
             v-model="searchQuery"
           />
         </div>
       </div>
     </div>
-
     <FriendsList :searchQuery="searchQuery"/>
   </div>
 </template>
