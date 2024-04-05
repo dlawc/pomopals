@@ -1,9 +1,9 @@
 <template>
   <div class="achievementpage">
-    <NavBar id = "navbar"/>
+    <NavBar/>
   <button id = "SignOut" type = "button">Sign Out</button> 
   <div id = "headercontainer">
-      <h1 id = "myachievementsheader">My Achievements</h1>
+      <h1 id = "myachievementsheader">All Achievements</h1>
   </div>  
   <div id = "viewallcontainer">
     <select id="viewallbutton" v-model="selectedTimeframe" @change = "redirectToAllAchievements">
@@ -22,20 +22,7 @@
       </div>
       <span class="progresscompleted-text">Challenge Completed</span>
   </div>
-</div>
-  <div id="AchievementsInProgContainer" class="achievement-tab">
-    <h1 id="AchievementsInProgHeader">Achievements In-Progress</h1>
-    <div class="achievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
-      <img :src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
-      <div class="achievement-details">
-        <h2 class="greytitle">{{ achievement.title }}</h2>
-        <p class="greysubtitle">{{ achievement.description }}</p>
-      </div>
-      <div id = "progresscontainer">
-      <span class="inprogress-text">({{ achievement.current }}/{{ achievement.goal }})</span>
-    <ProgressBar :value="achievement.progress" id = "inprogressbar" />
-  </div>
-    </div>
+
   </div>
 </div>
 </div>
@@ -53,7 +40,7 @@ export default {
   data() {
     return {
       userName: "Edwin ho",
-      selectedTimeframe: 'progress',
+      selectedTimeframe: 'all',
       achievements: [
         { 
           id: 1,
@@ -63,6 +50,7 @@ export default {
           current: 200,
           goal: 200,
           conditionType: 'xp',
+          currentTest: 0,
         },
         {
           id: 2,
@@ -72,6 +60,7 @@ export default {
           current: 4,
           goal: 1,
           conditionType: 'top3',
+          currentTest: 0,
         },{
           id: 3,
           title: 'Leaderboard Competitor',
@@ -80,6 +69,7 @@ export default {
           current: 2,
           goal: 5,
           conditionType: 'top3',
+          currentTest: 0,
         },
         {
           id: 4,
@@ -89,6 +79,7 @@ export default {
           current: 5,
           goal: 10,
           conditionType: 'top3',
+          currentTest: 0,
         }
 
       ]
@@ -106,15 +97,15 @@ try {
       let currentProgress;
       switch (achievement.conditionType) {
         case 'xp':
-          currentProgress = userData.xp || 0;
+          currentProgress = userData.xp;
           break;
         case 'top3':
-          currentProgress = userData.top3Placements || 0;
+          currentProgress = userData.top3Placements;
           break;
       }
       return {
         ...achievement,
-        current: currentProgress
+        currentTest: currentProgress
       };
     });
     this.achievements = updatedAchievements;
@@ -126,20 +117,20 @@ try {
 }
 },
   redirectToAllAchievements() {
-        this.$router.push('/allachievements');
+        this.$router.push('/achievements');
   }
 },
   computed: {
   inProgressAchievements() {
-    return this.achievements.filter(achievement => achievement.current < achievement.goal).map(achievement => ({
+    return this.achievements.filter(achievement => achievement.currentTest < achievement.goal).map(achievement => ({
       ...achievement,
-      progress: (achievement.current / achievement.goal) * 100,
+      progress: (achievement.currentTest / achievement.goal) * 100,
     }));
   },
   completedAchievements() {
-    return this.achievements.filter(achievement => achievement.current >= achievement.goal).map(achievement => ({
+    return this.achievements.filter(achievement => achievement.currentTest >= achievement.goal).map(achievement => ({
       ...achievement,
-      progress: (achievement.current / achievement.goal) * 100,
+      progress: (achievement.currentTest / achievement.goal) * 100,
     }));
   },
 },
@@ -160,9 +151,6 @@ flex-direction: column;
   width: 100%;
 height: 100vh;
   z-index: 1;
-}
-#navbar{
-  
 }
 #SignOut{
   float: right;
@@ -373,4 +361,4 @@ font-size: 20px;
 text-transform: capitalize;
 color: #474242;
 }
-</style>./Achievements.vue/index.js./AllAchievements.vue/index.js
+</style>./AllAchievements.vue/index.js./Achievements.vue/index.js./AllAchievements.vue/index.js
