@@ -26,21 +26,25 @@ export default {
     let currentUser = firebaseAuth.currentUser;
     let username = currentUser.displayName; // username as primary key
     let userRef = firestore.collection("users").doc(username);
-
-    try {
-      let doc = await userRef.get();
-      if (doc.exists) {
-        if (doc.data().xp !== undefined) {
-          this.totalXP = doc.data().xp;
+    userRef.onSnapshot(
+      (doc) => {
+        if (doc.exists) {
+          // if doc data exists
+          if (doc.data().xp) {
+            // if xp is not null
+            this.totalXP = doc.data().xp;
+          } else {
+            this.totalXP = 0;
+          }
         } else {
-          this.totalXP = "xp unavailable";
+          // if doc doesnt exist
+          this.totalXP = "user data unavailable";
         }
-      } else {
-        this.totalXP = "user data unavailable";
+      },
+      (error) => {
+        this.totalXP = "error fetching data";
       }
-    } catch (error) {
-      this.totalXP = "error fetching data";
-    }
+    );
   },
 };
 </script>
