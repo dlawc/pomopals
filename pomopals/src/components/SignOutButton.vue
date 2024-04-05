@@ -1,5 +1,5 @@
 <template>
-    <button class="button" @click="signOut">Sign Out</button>
+  <button @click="confirmAndSignOut" class="button">Sign Out</button>
 </template>
 
 <script>
@@ -7,7 +7,13 @@ import firebase from "@/firebase";
 
 export default {
   methods: {
-    signOut() {
+    confirmAndSignOut() {
+      const confirmed = window.confirm("Are you sure you want to sign out?");
+      if (confirmed) {
+        this.signOut();
+      }
+    },
+    async signOut() {
       firebase.auth().signOut().then(() => {
         alert('User signed out successfully');
         this.$router.push('/');

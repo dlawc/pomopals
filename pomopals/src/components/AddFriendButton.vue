@@ -1,22 +1,45 @@
 <template>
-  <button class="button" @click="togglePopup">+ Add Friends</button>
-  <div v-if="showPopup" class="popup">
-    <input v-model="friend_username" placeholder="Enter friend's username" />
-    <button @click="sendRequest">Send Request</button>
-    <div class="friend-requests-container"> 
-      <div
-      v-for="request in pendingRequests"
-      :key="request.id"
-      class="friend-request"
-    >
-      <p>{{ request.senderID }}</p>
-      <button @click="acceptRequest(request.id, request.senderID)">
-        Accept
-      </button>
-      <button @click="declineRequest(request.id)">Decline</button>
+  <div class="button-container">
+    <button class="button" @click="togglePopup">
+      + Add Friends
+      <span v-if="pendingRequests.length" class="badge">{{
+        pendingRequests.length
+      }}</span>
+    </button>
+    <div v-if="showPopup" class="popup" @click.self="closePopup">
+      <div class="input-container">
+        <input
+          v-model="friend_username"
+          class="input-field"
+          placeholder="Enter friend's username"
+        />
+        <button class="send-request-btn" @click="sendRequest">
+          Send Request
+        </button>
+      </div>
+      <div class="friend-requests-section">
+        <h2 class="pending-requests-title">Pending Friend Requests</h2>
+        <div v-if="pendingRequests.length" class="friend-requests-container">
+          <div
+            v-for="request in pendingRequests"
+            :key="request.id"
+            class="friend-request"
+          >
+            <p>{{ request.senderID }}</p>
+            <button
+              @click="acceptRequest(request.id, request.senderID)"
+              class="accept-btn"
+            >
+              Accept
+            </button>
+            <button @click="declineRequest(request.id)" class="decline-btn">
+              Decline
+            </button>
+          </div>
+        </div>
+        <p v-else class="no-requests-message">You have no pending friend requests.</p>
+      </div>
     </div>
-    </div>
-    
   </div>
 </template>
 
@@ -47,6 +70,7 @@ export default {
     togglePopup() {
       this.showPopup = !this.showPopup;
     },
+
     sendRequest() {
       const db = firebase.firestore();
       const friend_username = this.friend_username;
@@ -152,59 +176,65 @@ export default {
       db.collection("FriendRequests")
         .where("receiverID", "==", username)
         .where("status", "==", "pending")
-        .onSnapshot((snapshot) => {
-          const requests = [];
-          snapshot.forEach((doc) =>
-            requests.push({ id: doc.id, ...doc.data() })
-          );
-          this.pendingRequests = requests; 
-        }, (error) => {
-          console.error("Error fetching pending friend requests:", error)
-        });
+        .onSnapshot(
+          (snapshot) => {
+            const requests = [];
+            snapshot.forEach((doc) =>
+              requests.push({ id: doc.id, ...doc.data() })
+            );
+            this.pendingRequests = requests;
+          },
+          (error) => {
+            console.error("Error fetching pending friend requests:", error);
+          }
+        );
     },
     acceptRequest(requestId, senderID) {
-    const db = firebase.firestore();
-    const username = this.username;
+      const db = firebase.firestore();
+      const username = this.username;
 
-    const batch = db.batch();
+      const batch = db.batch();
 
-    const currentUserRef = db.collection("users").doc(username);
-    batch.update(currentUserRef, {
-      [`friends.${senderID}`]: true
-    });
-
-    // Add current user to sender's friends list
-    const senderRef = db.collection("users").doc(senderID);
-    batch.update(senderRef, {
-      [`friends.${username}`]: true
-    });
-
-    // Delete the friend request
-    const requestRef = db.collection("FriendRequests").doc(requestId);
-    batch.delete(requestRef);
-
-    // Commit the transaction
-    batch.commit()
-      .then(() => {
-        alert("Friend request accepted.");
-      })
-      .catch((error) => {
-        console.error("Error accepting friend request:", error);
-        alert("An error occurred. Please try again later.");
+      const currentUserRef = db.collection("users").doc(username);
+      batch.update(currentUserRef, {
+        [`friends.${senderID}`]: true,
       });
-  },
-  declineRequest(requestId) {
-    const db = firebase.firestore();
 
-    db.collection("FriendRequests").doc(requestId).delete()
-      .then(() => {
-        alert("Friend request declined.");
-      })
-      .catch((error) => {
-        console.error("Error declining friend request:", error);
-        alert("An error occurred. Please try again later.");
+      // Add current user to sender's friends list
+      const senderRef = db.collection("users").doc(senderID);
+      batch.update(senderRef, {
+        [`friends.${username}`]: true,
       });
-  },
+
+      // Delete the friend request
+      const requestRef = db.collection("FriendRequests").doc(requestId);
+      batch.delete(requestRef);
+
+      // Commit the transaction
+      batch
+        .commit()
+        .then(() => {
+          alert("Friend request accepted.");
+        })
+        .catch((error) => {
+          console.error("Error accepting friend request:", error);
+          alert("An error occurred. Please try again later.");
+        });
+    },
+    declineRequest(requestId) {
+      const db = firebase.firestore();
+
+      db.collection("FriendRequests")
+        .doc(requestId)
+        .delete()
+        .then(() => {
+          alert("Friend request declined.");
+        })
+        .catch((error) => {
+          console.error("Error declining friend request:", error);
+          alert("An error occurred. Please try again later.");
+        });
+    },
   },
 };
 </script>
@@ -228,55 +258,155 @@ export default {
   background-color: #878787; /* Darker shade on hover for feedback */
 }
 
+.button-container {
+  position: relative;
+  display: inline-block; /* Or use 'inline-flex' if needed */
+}
+
+.badge {
+  position: absolute;
+  top: -10px; /* Adjust as needed */
+  right: -10px; /* Adjust as needed */
+  background-color: red;
+  color: white;
+  width: 20px; /* You might need to adjust this based on content */
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.75em;
+  font-weight: bold;
+  border: 2px solid white; /* This helps the badge stand out against backgrounds */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centralize the input and button */
+  margin-bottom: 20px;
+}
+
+.input-field {
+  width: 90%; /* Smaller width to allow padding space */
+  padding: 12px;
+  margin-bottom: 10px; /* Space between input and button */
+  border: 2px solid #dbdbdb; /* Thicker border with theme color */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
-  background-color: white;
-  border: 1px solid #ccc;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  width: 300px; /* Set a fixed width for your popup */
-  max-height: 400px; /* Set a max height for your popup */
+  transform: translate(-50%, -50%); /* Centers the popup perfectly */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; /* Rounded corners for the popup */
+  width: 300px;
+  max-height: 400px;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* This ensures the popup respects max-height */
+  overflow: hidden;
   z-index: 100;
+  transition: all 0.3s ease; /* Smooth transition for popup */
+}
+.popup input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Consistent rounded corners for input fields */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease; /* Transition for focus effect */
 }
 
-.popup input[type="text"] {
-  width: calc(100% - 20px);
+.popup input[type="text"]:focus {
+  border-color: #ae76a1; /* Highlight color when input is focused */
+  outline: none; /* Removes the default focus outline */
+}
+
+.send-request-btn {
+  width: 50%; /* Width relative to its parent container */
   padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 20px; /* More pronounced rounded corners for the button */
+  border: none;
+  background-color: #ae76a1;
+  color: white;
+  font-weight: bold; /* Bold text for the button */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.send-request-btn:hover {
+  background-color: #9c6891; /* Darker shade on hover */
+}
+
+.pending-requests-title {
+  text-align: center;
+  color: #2b3674;
+  font-size: 1.1em;
+  margin-bottom: 15px; /* Space before the requests list starts */
 }
 
 .friend-requests-container {
-  overflow-y: auto; /* Enables scrolling for the friend requests */
+  overflow-y: auto;
   margin-top: 10px;
-  padding-right: 5px; /* Prevents the scrollbar from overlapping content */
+  padding-right: 5px;
+  max-height: 220px; /* Set a max-height to ensure scrolling */
+  transition: max-height 0.3s ease; /* Smooth transition for scrolling */
 }
 
 .friend-request {
+  display: flex;
+  align-items: center;
+  color: black;
+  justify-content: space-between;
+  padding: 10px;
   margin-bottom: 10px;
-  color: black; /* Add space between friend requests */
+  background-color: #f7f7f7;
+  border: 1px solid #eee;
+  border-radius: 6px; /* Slightly rounded corners for friend requests */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.no-requests-message {
+  text-align: center;
+  color: #757575; /* A neutral, informational color */
+  font-size: 1em;
+  margin-top: 20px; /* Gives some space from the title */
 }
 
-/* You may also want to adjust the button styles for better usability */
-.button {
-  background-color: black;
-  color: white;
-  padding: 10px 15px;
+.accept-btn {
+  padding: 5px 10px;
+  margin-left: 10px;
   border: none;
   border-radius: 4px;
+  background-color: #ae76a1;
+  color: white;
   cursor: pointer;
-  font-size: 1em;
-  outline: none;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
-.button:hover {
-  background-color: #878787;
+.accept-btn:hover {
+  background-color: #9c6891; /* Darker shade on hover for accept button */
+}
+
+.decline-btn {
+  padding: 5px 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #89959e; /* Grey color for decline */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.decline-btn:hover {
+  background-color: #5a6268; /* Darker shade on hover for decline button */
 }
 </style>

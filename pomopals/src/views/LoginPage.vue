@@ -84,6 +84,10 @@ export default {
               alert("Username is required to proceed.");
               continue;
             }
+            if (/\s/.test(username)) {
+              alert("Username must not contain spaces. Please try again.");
+              continue;
+            }
             // Check if the username already exists
             const doc = await firebase
               .firestore()
@@ -94,8 +98,8 @@ export default {
             if (usernameExists) {
               alert("Username already taken, please try another one.");
             }
-          } while (!username || usernameExists);
-          
+          } while (!username || usernameExists || /\s/.test(username));
+
           // Update user's profile with the username
           await user.updateProfile({
             displayName: username,
@@ -160,20 +164,23 @@ export default {
 }
 
 .login-form {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
   padding-left: 50px;
   padding-right: 50px;
 }
 
-.login-form h1 {
+.login-form h1,
+.login-form p {
+  text-align: left;
   color: #2b3674;
+  font-family: "DM Sans", sans-serif;
+}
+.login-form h1 {
   margin-bottom: 10px;
 }
 
 .login-form p {
-  color: #2b3674;
-  font-family: "DM Sans", sans-serif;
   font-size: 0.9em;
   margin-bottom: 20px;
   width: 100%;
@@ -207,7 +214,6 @@ export default {
 
 .divider span {
   white-space: nowrap;
-  /* Keep the 'or' on the same line */
 }
 
 .forgot-password {
@@ -253,11 +259,11 @@ export default {
   margin: 1rem 0;
   padding: 1rem;
   border-radius: 4px;
-  background-color: #ffdddd; 
-  border: 1px solid #ffcccc; 
-  color: #d8000c; 
+  background-color: #ffdddd;
+  border: 1px solid #ffcccc;
+  color: #d8000c;
   text-align: center;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-in-out;
 }

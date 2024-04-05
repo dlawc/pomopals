@@ -35,10 +35,10 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.5); 
   background-image: url('/bg.jpeg');
-  background-size: cover; 
-  background-repeat: no-repeat; 
+  background-size: cover;
+  background-repeat: no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -68,26 +68,30 @@ export default {
 h1 {
   font-family: 'DM Sans', sans-serif;
   margin-bottom: 1rem;
+  margin-top: 1rem;
+  color:#333;
+  font-weight: 600;
 }
 
 p {
   font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
   margin-bottom: 2rem;
   color: #333;
 }
 
 .landing-button {
-    background-color: #AE76A1; /* Use your theme color */
+    background-color: #AE76A1; 
     color: white;
-    padding: 15px 30px; /* Adjust padding as needed */
+    padding: 15px 30px; 
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    margin: 10px auto; /* Auto margins for horizontal centering */
-    width: 80%; /* Adjust width as needed or use max-width for larger viewports */
+    margin: 10px auto; 
+    width: 80%; 
     font-size: 1em;
-    display: block; /* This will stack the buttons */
-    text-align: center; /* Align the text in the center of the button */
+    display: block; 
+    text-align: center; 
 }
 
 .landing-button:hover {
