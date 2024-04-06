@@ -9,8 +9,8 @@
     <div class = center>
         <h2>Block sites <u>distracting</u> you:</h2>
         <div id = form> 
-            <input type = "text" id = "url" required = "true" placeholder = "Enter URL of website here"> 
-            <button id = "save" type = "button" onclick="saveurl()">Save</button>
+            <input type = "text" v-model = "url" required = "true" placeholder = "Enter URL of website here"> 
+            <button id = "save" type = "button" @click="saveurl()">Save</button>
         </div>
         <h1>My Blocklist</h1>
         <table id = urls>
@@ -33,25 +33,30 @@ export default {
         SignOutButton, 
         URLDisplay
     }, 
+    data() {
+        return {
+            url: ''
+        }
+    }, 
     methods: {
         saveurl() {
             const db = firebase.firestore(); 
-            const username = this.username; 
-            let url = document.getElementById("save").value
-
-            //const batch = db.batch();
-            const currentUserRef = db.collection("users").doc(username);
-
-            try{
-                const urlRef = db.collection("urls").doc(url); //check if this saves to username.. smthg seems missing
-                document.getElementById("url").reset(); 
-                this.$emit("added") //took from cpp idk
-            }
-            catch(error){
-                console.error("Error adding document: ", error); 
-            }
-
-            
+            const username = firebase.auth().currentUser.displayName;
+            const userRef = db.collection("users").doc(username);
+            userRef.get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    const existingUrlBlocklist = data.urlblocklist || [];
+                    // Append the new URL to the existing list
+                    const updatedUrlBlocklist = [...existingUrlBlocklist, this.url.trim()];
+                    // Update the user document with the updated urlblocklist
+                    userRef.update({ urlblocklist: updatedUrlBlocklist });
+                } else {
+                    console.log("No such document!");
+                }
+            }).catch(error => {
+                console.log("Error getting document:", error);
+            });
         }
     }
 }

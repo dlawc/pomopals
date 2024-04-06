@@ -113,6 +113,7 @@ export default {
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
             friends: {},
+            urlblocklist: [],
           });
           this.$router.push("/home");
         } else {
@@ -159,6 +160,7 @@ export default {
           .set({
             email: this.credentials.email,
             friends: {},
+            urlblocklist: [], 
             // Include any other user information here
           });
         console.log(
