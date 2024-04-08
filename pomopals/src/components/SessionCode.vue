@@ -1,12 +1,20 @@
 <template>
   <div class="sessionCodeContainer">
-    <div class="generateSession">
-      <button @click="generateCode">Generate Session Code</button>
-      <input type="text" v-model="sessionCode" readonly />
+    <div v-if="viewState == 'start'">
+      <button @click="setViewState('host')">Host</button>
+      <button @click="setViewState('join')">Join</button>
     </div>
-    <div class="inputSession">
+    <div v-if="viewState == 'host'">
+      <button id="generateButton" @click="generateCode">
+        Generate Session Code
+      </button>
+      <input type="text" v-model="sessionCode" readonly />
+      <button @click="setViewState('start')">Back</button>
+    </div>
+    <div v-if="viewState == 'join'">
       <input type="text" v-model="inputCode" placeholder="Input Group Code" />
       <button @click="enterCode">Enter</button>
+      <button @click="setViewState('start')">Back</button>
     </div>
   </div>
 </template>
@@ -20,17 +28,21 @@ export default {
     return {
       sessionCode: "",
       inputCode: "",
+      viewState: "start",
     };
   },
   methods: {
     generateCode() {
-      // Implement code generation logic here
-      // For now, just simulating a generated code
-      this.sessionCode = Math.random().toString(36).substring(2, 8);
+      this.sessionCode =
+        Date.now().toString(36) + Math.random().toString(36).substring(2);
     },
     enterCode() {
-      // Implement code to handle the inputCode, such as joining a session
-      console.log("Entered code:", this.inputCode);
+      alert("Joined Group Study Session");
+      this.viewState = "start";
+    },
+    setViewState(state) {
+      this.viewState = state;
+      this.sessionCode = "";
     },
   },
 };
@@ -40,26 +52,30 @@ export default {
 .sessionCodeContainer {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Align items to the right */
-  justify-content: center; /* Center items vertically */
+  align-items: flex-end;
+  justify-content: center;
   position: fixed;
   top: 0;
   bottom: 0;
-  right: 20px; /* Adjust based on preference */
+  right: 20px;
   z-index: 10;
 }
 
-.generateSession,
-.inputSession {
-  margin-bottom: 20px; /* Space between the two sections */
-}
-
-.generateSession button,
-.inputSession button,
-.generateSession input,
-.inputSession input {
+.sessionCodeContainer button {
   display: block;
   margin: 5px 0;
+  margin-top: 10px;
+  width: 200px;
+  height: 68px;
+  background: white;
+  border-radius: 20px;
+  font-size: 36px;
+  border: none;
+  cursor: pointer;
+}
+
+#generateButton {
+  font-size: 25px;
 }
 
 input[type="text"] {
