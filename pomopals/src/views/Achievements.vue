@@ -1,7 +1,9 @@
 <template>
   <div class="achievementpage">
     <NavBar id = "navbar"/>
-  <button id = "SignOut" type = "button">Sign Out</button> 
+    <div class = "signout">
+    <SignOutButton/>
+  </div>
   <div id = "headercontainer">
       <h1 id = "myachievementsheader">My Achievements</h1>
   </div>  
@@ -44,11 +46,13 @@
 import ProgressBar from '@/components/ProgressBar.vue';
 import firebase from '../firebase.js';
 import {  doc, getDoc } from "firebase/firestore";
-import NavBar from "@/components/NavBar.vue"
+import NavBar from "@/components/NavBar.vue";
+import SignOutButton from "@/components/SignOutButton.vue";
 export default {
   components: {
     ProgressBar, 
     NavBar,
+    SignOutButton,
   },
   data() {
     return {
@@ -57,38 +61,111 @@ export default {
       achievements: [
         { 
           id: 1,
-          title: 'Master User',
-          description: 'Total EXP Reached 200 XP',
+          title: 'Novice User',
+          description: 'Total EXP Reached 50 XP',
           icon: 'useraward.png', 
-          current: 200,
-          goal: 200,
+          current: 0,
+          goal: 50,
+          conditionType: 'xp',
+        },
+        { 
+          id: 2,
+          title: 'Master User',
+          description: 'Total EXP Reached 1000 XP',
+          icon: 'useraward.png', 
+          current: 0,
+          goal: 1000,
+          conditionType: 'xp',
+        },
+        { 
+          id: 3,
+          title: 'Legendary User',
+          description: 'Total EXP Reached 10000 XP',
+          icon: 'useraward.png', 
+          current: 0,
+          goal: 10000,
           conditionType: 'xp',
         },
         {
-          id: 2,
+          id: 4,
           title: 'Leaderboard Novice',
           description: 'Place Top 3 in Your Monthly Leaderboard Once',
           icon: 'leaderaward.png', 
-          current: 4,
+          current: 0,
           goal: 1,
           conditionType: 'top3',
-        },{
-          id: 3,
-          title: 'Leaderboard Competitor',
-          description: 'Place Top 3 in Your Monthly Leaderboard 5 times',
+        },
+        {
+          id: 5,
+          title: 'Leaderboard Master',
+          description: 'Place Top 3 in Your Monthly Leaderboard 5 Times',
           icon: 'leaderaward.png', 
-          current: 2,
+          current: 0,
           goal: 5,
           conditionType: 'top3',
         },
         {
-          id: 4,
+          id: 6,
           title: 'Leaderboard Legend',
-          description: 'Place Top 3 in Your Monthly LeaderBoard 10 times',
+          description: 'Place Top 3 in Your Monthly Leaderboard 10 Times',
           icon: 'leaderaward.png', 
-          current: 5,
+          current: 0,
           goal: 10,
           conditionType: 'top3',
+        },
+        {
+          id: 7,
+          title: 'Socializer Newbie',
+          description: 'Add 5 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 5,
+          conditionType: 'friends',
+        },
+        {
+          id: 8,
+          title: 'Socializer Master',
+          description: 'Add 10 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 10,
+          conditionType: 'friends',
+        },
+        {
+          id: 9,
+          title: 'Socializer Legend',
+          description: 'Add 20 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 20,
+          conditionType: 'friends',
+        },
+        {
+          id: 10,
+          title: 'Groupstudy Novice',
+          description: 'Study in Group Session 3 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 3,
+          conditionType: 'groupstudy',
+        },
+        {
+          id: 11,
+          title: 'Groupstudy Master',
+          description: 'Study in Group Session 9 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 9,
+          conditionType: 'groupstudy',
+        },
+        {
+          id: 12,
+          title: 'Groupstudy Legend',
+          description: 'Study in Group Session 20 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 20,
+          conditionType: 'groupstudy',
         }
 
       ]
@@ -110,6 +187,12 @@ try {
           break;
         case 'top3':
           currentProgress = userData.top3Placements || 0;
+          break;
+        case 'friends':
+        currentProgress = userData.friends ? Object.keys(userData.friends).length : 0;
+        break;
+        case 'groupstudy':
+          currentProgress = userData.groupstudy || 0;
           break;
       }
       return {
@@ -133,13 +216,13 @@ try {
   inProgressAchievements() {
     return this.achievements.filter(achievement => achievement.current < achievement.goal).map(achievement => ({
       ...achievement,
-      progress: (achievement.current / achievement.goal) * 100,
+      progress: parseFloat(((achievement.current / achievement.goal) * 100).toFixed(1)),
     }));
   },
   completedAchievements() {
     return this.achievements.filter(achievement => achievement.current >= achievement.goal).map(achievement => ({
       ...achievement,
-      progress: (achievement.current / achievement.goal) * 100,
+      progress: parseFloat(((achievement.current / achievement.goal) * 100).toFixed(1)),
     }));
   },
 },
@@ -164,20 +247,12 @@ height: 100vh;
 #navbar{
   
 }
-#SignOut{
-  float: right;
-  width: 162px;
-  height: 49px;
-margin-left: auto;
-font-family: 'Space Grotesk';
-font-style: normal;
-font-weight: 700;
-font-size: 24px;
-line-height: 31px;
-text-align: center;
-background-color: transparent;
-border: none;
-color: #FFFFFF;
+
+.signout {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
 }
 #myachievementsheader{
 width: 700px;
@@ -193,9 +268,10 @@ color: #FFFFFF;
 display:flex;
 margin-left: 35vw;
 margin-right: auto;
+margin-bottom: -5px;
 }
 #viewallcontainer{
-  margin-top: -1vw;
+  margin-top: 30px;
   margin-left: auto;
   margin-right: 5vw;
 }
@@ -204,7 +280,6 @@ width: 200px;
 height: 33px;
 margin-bottom: 10px;
 background: #AE76A1;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 50px;
 font-family: 'Lucida Sans';
 font-style: normal;
@@ -224,10 +299,10 @@ background-size: 25px ;
 }
 #AchievementCompletedContainer{
 width: 90vw;
+max-height: 35vh;
 margin-left:auto;
 margin-right: auto;
 background: #B857A1;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 10px;
 overflow-y: auto;
 overflow-x: auto;
@@ -253,7 +328,7 @@ color: #FFFFFF;
   margin-top: 10px;
 width: 100%; 
 background-color: #B857A1; 
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+box-shadow: none;
 flex-direction: row;
 }
 .achievementcompleted-icon{
@@ -309,6 +384,7 @@ text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 #AchievementsInProgContainer {
   width: 90vw;
   height: 40vh;
+  max-height: 35vh;
   margin-left: auto;
   margin-right: auto;
   background: #CDAEC7;
@@ -373,4 +449,4 @@ font-size: 20px;
 text-transform: capitalize;
 color: #474242;
 }
-</style>./Achievements.vue/index.js./AllAchievements.vue/index.js
+</style>
