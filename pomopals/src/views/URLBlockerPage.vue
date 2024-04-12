@@ -12,12 +12,7 @@
             <input type = "text" v-model = "url" required = "true" placeholder = "Enter URL of website here"> 
             <button id = "save" type = "button" @click="saveurl()">Save</button>
         </div>
-        <h1>My Blocklist</h1>
-        <table id = urls>
-            <tr>
-                <td></td>
-            </tr>
-        </table>
+        <URLDisplay/>
     </div>
 </template>
 <script>
@@ -31,7 +26,7 @@ export default {
     components: {
         NavBar, 
         SignOutButton, 
-        URLDisplay
+        URLDisplay,
     }, 
     data() {
         return {
@@ -52,21 +47,16 @@ export default {
                     // Update the user document with the updated urlblocklist
                     userRef.update({ urlblocklist: updatedUrlBlocklist });
                 } else {
-                    console.log("No such document!");
+                    console.log("No such user!");
                 }
             }).catch(error => {
-                console.log("Error getting document:", error);
+                console.log("Error getting user:", error);
             });
         }
     }
 }
 </script>
 <style>
-    h1{
-        text-align: center;
-        color: white;
-        font-size: 60px;
-    }
     h2{
         text-align: center;
         color: white;
