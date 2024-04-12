@@ -4,9 +4,6 @@
         <NavBar/>
       </div>
       <div class="header">
-        <button class="home-button" @click="redirectToHome">
-            <font-awesome-icon icon="home" />
-        </button>
         <div class="signout">
           <SignOutButton />
         </div>
@@ -127,20 +124,6 @@
   height: 100vh;
   z-index: 1;
 }
-.home-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  border: none;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
 .signout {
   position: absolute;
   top: 10px;
@@ -180,6 +163,8 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 1rem;
   width: 70%;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-header {
@@ -205,8 +190,39 @@
 }
 
 .leaderboard-item.highlighted {
-  background-color: orange; /* Highlight color */
+  background-color: orange; 
   font-weight: bold;
+}
+
+.header-rank, .header-username, .header-points, 
+.item-rank, .item-username, .item-points, .item-button {
+  flex: 1;
+  text-align: left;
+}
+
+.header-rank, .item-rank {
+  flex: 0 0 275px;
+}
+
+.header-username, .item-username {
+  flex: 2; 
+  text-align: left;
+}
+
+.item-button {
+  flex: 1; 
+  display: flex;
+  justify-content: center; 
+}
+
+.header-points, .item-points {
+  flex: 1;
+  text-align: right;
+}
+
+.item-button {
+  display: flex;
+  justify-content: flex-end; 
 }
 
 .add-friend-btn {
@@ -242,8 +258,8 @@
 }
 
 .active-tab {
-  color: #FFD700; /* Gold color for the active tab */
-  border-bottom: 2px solid #FFD700; /* Underline effect for the active tab */
+  color: #FFD700; 
+  border-bottom: 2px solid #FFD700; 
 }
 
 </style>

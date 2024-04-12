@@ -1,9 +1,6 @@
 <template>
     <div class="leaderboard-page">
       <div class="header">
-        <button class="home-button" @click="redirectToHome">
-            <font-awesome-icon icon="home" />
-        </button>
         <div class="signout">
           <SignOutButton />
         </div>
@@ -114,21 +111,6 @@
   height: 100vh;
   z-index: 1;
 }
-
-.home-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  border: none;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
 .signout {
   position: absolute;
   top: 10px;

@@ -1,21 +1,22 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
-import NavBar from "@/components/NavBar.vue"
+import NavBar from "@/components/NavBar.vue";
+import SessionCode from "/src/components/SessionCode.vue";
 
 export default {
   name: "HomePage",
-  components: { XpBar, Timer, NavBar },
-  methods: {
-  },
+  components: { XpBar, Timer, NavBar, SessionCode },
+  methods: {},
 };
 </script>
 
 <template>
   <div class="home">
-    <div><NavBar/></div>
+    <div><NavBar /></div>
     <div><XpBar /></div>
     <div><Timer /></div>
+    <div><SessionCode /></div>
   </div>
 </template>
 
