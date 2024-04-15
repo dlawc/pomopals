@@ -43,8 +43,8 @@
             </div>
             <div class="item-username">{{ item.username }}</div>
             <div class="item-button">
-              <button v-if="item.showButton" class="add-friend-btn" :class="{ added: item.added }" @click="toggleAdd(item, index)">
-                {{ item.added ? 'Added' : '+ Add Friend' }}
+              <button v-if="item.showButton" class="add-friend-btn" :class="{ 'add-friend-btn': true, added: item.friendStatus === 'added', pending: item.friendStatus === 'pending' }" @click="toggleAdd(item)">
+                {{ item.friendStatus === 'none' ? '+ Add Friend' : item.friendStatus === 'pending' ? 'Pending...' : 'Added!' }}
               </button>
             </div>
             <div class="item-points">{{ item.points }}</div>
@@ -70,23 +70,33 @@
       return {
         selectedTimeframe: 'all',
         leaderboardItems: [
-        { username: 'Josh123', points: 1793, medal: '🥇', showButton: true, added: true },
-        { username: 'elli065', points: 1652, medal: '🥈', showButton: true, added: false },
-        { username: 'johnappleseed', points: 1574, medal: '🥉', showButton: true, added: true },
-        { username: 'YourUsername (You)', points: 1502, medal: '4', showButton: false, added: false },
-        { username: 'imthebest01', points: 1496, medal: '5', showButton: true, added: false },
-        { username: 'tricia!', points: 1493, medal: '6', showButton: true, added: false },
-        { username: 'studying567', points: 1421, medal: '7', showButton: true, added: true },
-        { username: 'eddie', points: 1400, medal: '8', showButton: true, added: false },
-        { username: 'ilove2study462', points: 1357, medal: '9', showButton: true, added: false },
-        { username: 'penelope', points: 1244, medal: '10', showButton: true, added: false }
+        { username: 'Josh123', points: 1793, medal: '🥇', showButton: true, friendStatus: 'added' },
+        { username: 'elli065', points: 1652, medal: '🥈', showButton: true, friendStatus: 'none' },
+        { username: 'johnappleseed', points: 1574, medal: '🥉', showButton: true, friendStatus: 'added' },
+        { username: 'YourUsername (You)', points: 1502, medal: '4', showButton: false, friendStatus: 'none' },
+        { username: 'imthebest01', points: 1496, medal: '5', showButton: true, friendStatus: 'none' },
+        { username: 'tricia!', points: 1493, medal: '6', showButton: true, friendStatus: 'none' },
+        { username: 'studying567', points: 1421, medal: '7', showButton: true, friendStatus: 'added' },
+        { username: 'eddie', points: 1400, medal: '8', showButton: true, friendStatus: 'pending' },
+        { username: 'ilove2study462', points: 1357, medal: '9', showButton: true, friendStatus: 'none' },
+        { username: 'penelope', points: 1244, medal: '10', showButton: true, friendStatus: 'pending' }
         ],
         currentLeaderboard: 'global'
       };
     },
     methods: {
-      toggleAdd(item, index) {
-        this.leaderboardItems[index].added = !this.leaderboardItems[index].added;
+      toggleAdd(item) {
+        switch (item.friendStatus) {
+          case 'none':
+            item.friendStatus = 'pending';
+            break;
+          case 'pending':
+            item.friendStatus = 'added';
+            break;
+          case 'added':
+            item.friendStatus = 'none';
+            break;
+        }
       },
       changeTimeframe() {
         console.log(timeframe + ' leaderboard selected');
@@ -237,6 +247,10 @@
 
 .add-friend-btn:hover {
   background-color: #47a83e;
+}
+
+.add-friend-btn.pending {
+  background-color: #a4a0a0; 
 }
 
 .add-friend-btn.added {
