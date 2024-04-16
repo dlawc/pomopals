@@ -148,6 +148,15 @@ export default {
             this.credentials.password
           );
         const user = userCredential.user;
+
+        // Send verification email
+        await user.sendEmailVerification()
+          .then(() => {
+            console.log("Verification email sent.");
+          })
+          .catch(verificationError => {
+            console.error("Error sending verification email:", verificationError);
+          });
         await user.updateProfile({
           displayName: this.credentials.username,
         });
@@ -168,8 +177,8 @@ export default {
           this.credentials.username
         );
         alert(
-          "Signup successful! You will now be redirected to the login page."
-        );
+      "Signup successful! A verification email has been sent to your email address. Please verify your email to log in."
+    );
         this.$router.push("/login");
       } catch (error) {
         console.error("Error signing up:", error);
