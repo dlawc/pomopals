@@ -70,6 +70,21 @@ export default {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
 
+        // Check if user is new or hasn't verified their email
+        if (
+          user.metadata.creationTime === user.metadata.lastSignInTime ||
+          !user.emailVerified
+        ) {
+          user
+            .sendEmailVerification()
+            .then(() => {
+              console.log("Verification email sent.");
+            })
+            .catch((error) => {
+              console.error("Error sending verification email:", error);
+            });
+        }
+
         const usersRef = firebase.firestore().collection("users");
         const query = usersRef.where("email", "==", user.email);
         const querySnapshot = await query.get();
@@ -128,6 +143,15 @@ export default {
             this.credentials.password
           );
         const user = userCredential.user;
+        // Check if the user's email is not verified
+
+        if (!user.emailVerified) {
+          this.errorMessage = "Please verify your email before signing in.";
+          firebase.auth().signOut(); // Optionally sign out the user
+          return; // Prevent login
+        }
+        // Continue with the sign-in process
+        console.log("Email has been verified, proceed with login.");
         this.$router.push("/home");
       } catch (error) {
         console.error(error);
