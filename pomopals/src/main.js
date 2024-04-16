@@ -14,3 +14,24 @@ app.config.globalProperties.$firebase = firebase
 // This is not strictly necessary, but can make accessing Firebase easier within your components, using `this.$firebase`
 
 app.mount('#app')
+
+
+firebase.auth().onAuthStateChanged(user => {
+    if (!app) {
+      app = new Vue({
+        router,
+        render: h => h(App)
+      }).$mount('#app');
+    }
+  
+    // Optional: Add logic here to handle user state (e.g., setting Vuex state, redirecting, etc.)
+    if (user) {
+      // User is signed in.
+      console.log('User is signed in:', user);
+      Vue.prototype.$currentUser = user;
+    } else {
+      // User is signed out.
+      console.log('User is signed out');
+      router.push('/login');
+    }
+  });

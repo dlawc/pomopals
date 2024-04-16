@@ -23,15 +23,34 @@ export default {
   data() {
     return {
       friendsMap: {},
+      isLoading: true,
+      error: null,
+      currentUser: null, // Store the currentUser in data
+      username: null, 
     };
   },
-  created() {
-    this.currentUser = firebase.auth().currentUser;
-    if (this.currentUser) {
-      this.username = this.currentUser.displayName;
-      console.log("username:", this.username);
-    }
-    this.fetchFriends(this.username);
+  watch: {
+    // Watch the username for changes and fetch friends when it is set
+    username(newVal) {
+      if (newVal) {
+        this.fetchFriends(newVal);
+      }
+    },
+  },
+  mounted() {
+    this.isLoading = true;
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.currentUser = user;
+        this.username = user.displayName;
+        console.log("Authenticated username:", this.username);
+      } else {
+        this.currentUser = null;
+        this.username = null;
+        this.isLoading = false;
+        console.log("No user is logged in");
+      }
+    });
   },
   props: {
     searchQuery: String,
@@ -47,7 +66,6 @@ export default {
   methods: {
     fetchFriends(username) {
       const db = firebase.firestore();
-
       db.collection("users")
         .doc(username)
         .onSnapshot(
@@ -57,9 +75,11 @@ export default {
             } else {
               this.friendsMap = {};
             }
+            this.isLoading = false;
           },
           (error) => {
             console.error("Error fetching friends:", error);
+            this.isLoading = false;
           }
         );
     },
