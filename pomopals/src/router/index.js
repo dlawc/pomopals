@@ -33,41 +33,66 @@ const router = createRouter({
       path: "/home",
       name: "HomePage",
       component: HomePage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/friends",
       name: "FriendsPage",
       component: FriendsPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/leaderboard",
       name: "LeaderboardPage",
       component: LeaderboardPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/friendsleaderboard",
       name: "FriendsLeaderboardPage",
       component: FriendsLeaderboardPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/urlblocker",
       name: "URLBlockerPage",
       component: URLBlockerPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/achievements", 
       name: "AchievementPage", 
       component: AchievementPage,
+      meta: {
+        requiresAuth: true
+      }
     }, 
     {
       path: "/allachievements", 
       name: "AllAchievementPage", 
       component: AllAchievementPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "/blocked", 
       name: "BlockedPage", 
-      component: BlockedPage
+      component: BlockedPage,
+      meta: {
+        requiresAuth: true
+      }
+      
     }, 
   ],
 });

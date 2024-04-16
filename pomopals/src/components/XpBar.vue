@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { firebaseAuth, firestore, db } from "../firebase.js";
+import { firebaseAuth, firestore } from "../firebase.js";
+
 export default {
   name: "XpBar",
   data() {
@@ -20,33 +21,45 @@ export default {
       totalXP: null,
     };
   },
-  async mounted() {
-    let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
-    let currentUser = firebaseAuth.currentUser;
-    let username = currentUser.displayName; // username as primary key
-    let userRef = firestore.collection("users").doc(username);
-    userRef.onSnapshot(
-      (doc) => {
-        if (doc.exists) {
-          // if doc data exists
-          if (doc.data().xp) {
-            // if xp is not null
-            this.totalXP = doc.data().xp;
-          } else {
-            this.totalXP = 0;
-          }
+  mounted() {
+    this.handleAuthStateChanged();
+  },
+  methods: {
+    handleAuthStateChanged() {
+      firebaseAuth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in, fetch the data
+          this.fetchUserData(user.displayName);
         } else {
-          // if doc doesnt exist
-          this.totalXP = "user data unavailable";
+          // No user is signed in
+          this.totalXP = "User not logged in";
         }
-      },
-      (error) => {
-        this.totalXP = "error fetching data";
-      }
-    );
+      });
+    },
+    fetchUserData(username) {
+      let userRef = firestore.collection("users").doc(username);
+      userRef.onSnapshot(
+        (doc) => {
+          if (doc.exists && doc.data().xp !== undefined) {
+            // Checks if the document exists and xp is not undefined
+            this.totalXP = doc.data().xp;
+          } else if (doc.exists) {
+            // Document exists but xp might be undefined
+            this.totalXP = 0;
+          } else {
+            // Document does not exist
+            this.totalXP = "User data unavailable";
+          }
+        },
+        (error) => {
+          console.error("Error fetching XP data:", error);
+          this.totalXP = "Error fetching data";
+        }
+      );
+    }
   },
 };
+
 </script>
 
 <style scoped>
