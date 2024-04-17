@@ -37,6 +37,7 @@ export default {
     };
   },
   methods: {
+    // generates unique code upon click; if time is still running, clicking this button will auto cancel the timer
     generateCode() {
       this.sessionCode =
         Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -55,6 +56,7 @@ export default {
       userRef.set(data);
       this.$router.push("/host");
     },
+    // adds user to the members array of the group session document
     enterCode() {
       this.viewState = "start";
       let sessionCode = this.$refs.groupCodeInput.value;
