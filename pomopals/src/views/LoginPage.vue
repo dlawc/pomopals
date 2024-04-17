@@ -145,11 +145,11 @@ export default {
         const user = userCredential.user;
         // Check if the user's email is not verified
 
-        if (!user.emailVerified) {
-          this.errorMessage = "Please verify your email before signing in.";
-          firebase.auth().signOut(); // Optionally sign out the user
-          return; // Prevent login
-        }
+        // if (!user.emailVerified) {
+        //   this.errorMessage = "Please verify your email before signing in.";
+        //   firebase.auth().signOut(); // Optionally sign out the user
+        //   return; // Prevent login
+        // }
         // Continue with the sign-in process
         console.log("Email has been verified, proceed with login.");
         this.$router.push("/home");
