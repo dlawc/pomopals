@@ -42,7 +42,6 @@ export default {
       this.sessionCode =
         Date.now().toString(36) + Math.random().toString(36).substring(2);
       this.$emit("cancelDurationEvent");
-      this.$emit("updateSessionCode", this.sessionCode);
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
       let userRef = firestore.collection("groupSession").doc(this.sessionCode);
@@ -53,8 +52,18 @@ export default {
         restDuration: 0,
         timerDuration: 0,
       };
-      userRef.set(data);
-      this.$router.push("/host");
+      userRef
+        .set(data)
+        .then(() => {
+          // Only navigate once the Firestore set is successful
+          this.$router.push({
+            path: "/host",
+            query: { sessionCode: this.sessionCode },
+          });
+        })
+        .catch((error) => {
+          console.error("Error setting session data:", error);
+        });
     },
     // adds user to the members array of the group session document
     enterCode() {

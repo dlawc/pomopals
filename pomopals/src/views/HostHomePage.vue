@@ -1,43 +1,58 @@
+<template>
+  <div>
+    <span id="sessionCode">Session Code: {{ sessionCode }}</span>
+  </div>
+  <div class="home">
+    <NavBar />
+    <XpBar />
+    <Timer ref="timerRef" />
+  </div>
+</template>
+
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import NavBar from "@/components/NavBar.vue";
-import SessionCode from "@/components/SessionCode.vue";
 
 export default {
   name: "HostHomePage",
-  components: { XpBar, Timer, NavBar, SessionCode },
+  components: {
+    Timer,
+    XpBar,
+    NavBar,
+  },
   data() {
     return {
       sessionCode: "",
     };
   },
-  methods: {
-    handleDisplaySessionCode(code) {
-      this.sessionCode = code;
-    },
+  created() {
+    // Set the sessionCode based on the router query parameter
+    this.sessionCode = this.$route.query.sessionCode;
+    console.log("Received session code:", this.sessionCode);
   },
 };
 </script>
 
-<template>
-  <div class="home">
-    <div><NavBar /></div>
-    <div>
-      <SessionCode
-        v-if="false"
-        @displaySessionCode="handleDisplaySessionCode"
-      />
-    </div>
-    <div><XpBar /></div>
-    <div><Timer ref="timerRef" /></div>
-    <p1 id="groupStudy">
-      {{ sessionCode }}
-    </p1>
-  </div>
-</template>
-
 <style scoped>
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+#sessionCode {
+  left: auto;
+  right: auto;
+  top: 0px;
+  position: absolute;
+  margin-top: 20px; /* Add more space above the session code display */
+  font-size: 24px;
+  color: white;
+  font-weight: 700;
+  font: "lucida sans";
+}
 #friendsButton,
 #leaderboardButton {
   position: absolute;
