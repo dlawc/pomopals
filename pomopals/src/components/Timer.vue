@@ -259,7 +259,7 @@ export default {
             [`xpWithTime.${key}`]: value,
           })
           .catch(async (error) => {
-            // if map not exist, create it with the map
+            // if map does not exist, populate it with the map
             if (error.code === "not-found") {
               await userRef.set({
                 xpWithTime: { [key]: value },
