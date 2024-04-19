@@ -22,7 +22,7 @@
         </div>
       </div>
       <div id="memberCount">
-        {{ members.length }} members in this group session
+        {{ members.length }} member(s) in this group session
       </div>
     </div>
   </div>

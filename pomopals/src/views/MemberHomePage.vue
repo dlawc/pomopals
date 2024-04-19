@@ -2,6 +2,8 @@
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import firebase from "@/firebase";
+import leaveIcon from '@/components/icons/leave.svg';
+ 
 
 export default {
   name: "MemberHomePage",
@@ -20,7 +22,6 @@ export default {
         (doc) => {
           if (doc.exists) {
             const data = doc.data();
-            // Create a new array from the proxy to ensure reactivity
             const membersArray = [data.host, ...(data.members || [])];
             this.members = [...membersArray];
             console.log(this.members);
@@ -34,6 +35,13 @@ export default {
         }
       );
     },
+    leaveSession() {
+    if (window.confirm("Are you sure you want to leave the session?")) {
+      // Handle the logic to remove the user from the session if necessary
+      // Then redirect to the home page
+      this.$router.push('/home');
+    }
+  },
   },
   data() {
     return {
@@ -63,6 +71,7 @@ export default {
     <div><Timer :isHost="false"/></div>
     <div id="sessionInfo">
       <span id="sessionCode">Session Code: {{ sessionCode }}</span>
+      
       <div id="groupMembers">
         <div
           v-for="(member, index) in members"
@@ -71,10 +80,12 @@ export default {
         >
           {{ member }}
         </div>
+        <img src="@/components/icons/leave.svg" alt="Leave" class="leave-icon" @click="leaveSession" />
       </div>
       <div id="memberCount">
         {{ members.length }} members in this group session
       </div>
+      
     </div>
   </div>
 </template>
@@ -106,6 +117,7 @@ body {
   color: white;
   font-weight: 500;
   z-index: 10;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 #friendsButton,
@@ -124,12 +136,12 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
   margin: 0;
   width: 80vw; /* Use viewport width for responsive control */
   max-width: 600px; /* Adjust based on your design preference */
   flex-wrap: wrap;
-  gap: 3px; 
+  gap: 1px; 
 }
 
 .member-badge {
@@ -137,7 +149,7 @@ body {
   color: black; /* Black text for readability */
   border-radius: 35px;
   padding: 0.5rem 1rem;
-  margin: 0.5rem;
+  margin: 0.5rem 0.2rem;
   margin-bottom: 3px;
   font-weight: bold;
   text-align: center;
@@ -162,5 +174,19 @@ body {
   font-size: 1.15rem; /* Adjust the font size as needed */
   margin-top: 1px; /* Add some space above the text */
   font-weight: 500;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
+
+.leave-icon {
+  cursor: pointer;
+  width: 40px; /* or the size you prefer */
+  height: 40px; /* or the size you prefer */
+  margin-top: 5px; /* adjust as needed */
+  cursor: pointer;
+  fill: white;
+}
+
+
+
+
 </style>
