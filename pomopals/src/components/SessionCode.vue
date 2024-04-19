@@ -101,7 +101,7 @@ export default {
                     alert("Group joined successfully");
                     this.$router.push({
             path: "/member",
-            query: { sessionCode: this.sessionCode },
+            query: { sessionCode: sessionCode },
           });
                   })
                   .catch((error) => {
