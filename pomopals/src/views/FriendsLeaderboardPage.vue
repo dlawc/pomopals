@@ -53,7 +53,7 @@ import SignOutButton from "@/components/SignOutButton.vue";
 import NavBar from "@/components/NavBar.vue";
 
 export default {
-  name: 'LeaderboardPage',
+  name: 'FriendsLeaderboardPage',
   data() {
     return {
       selectedTimeframe: 'all',
@@ -126,8 +126,8 @@ export default {
           }
 
             return {
-              username: doc.id === this.currentUser.displayName ? 'You' : doc.id,
-              points: points, // This should now be a number
+              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
+              points: points, 
               isUser: doc.id === this.currentUser.displayName
             };
           });
@@ -248,6 +248,8 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 1rem;
   width: 70%;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .table-header {
@@ -258,6 +260,9 @@ export default {
   padding: 0.5rem 1rem;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Higher z-index ensures the header stays above the content */
 }
 
 .leaderboard-item {

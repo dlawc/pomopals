@@ -1,3 +1,4 @@
+
 <template>
     <div class="leaderboard-page">
       <div class = "navbar">
@@ -36,79 +37,144 @@
           <div class="leaderboard-item" 
             v-for="(item, index) in leaderboardItems" 
             :key="index"
-            :class="{ 'highlighted': item.username === 'YourUsername (You)' }">
+            :class="{ 'highlighted': item.isUser }">
             <div class="item-rank">
-              <span class="rank-medal">{{ item.medal }}</span>
+              <span class="rank-medal">{{ item.displayRank }}</span>
             </div>
             <div class="item-username">{{ item.username }}</div>
-            <div class="item-button">
-              <button v-if="item.showButton" class="add-friend-btn" :class="{ 'add-friend-btn': true, added: item.friendStatus === 'added', pending: item.friendStatus === 'pending' }" @click="toggleAdd(item)">
-                {{ item.friendStatus === 'none' ? '+ Add Friend' : item.friendStatus === 'pending' ? 'Pending...' : 'Added!' }}
-              </button>
-            </div>
+            
             <div class="item-points">{{ item.points }}</div>
           </div>
         </div>
       </div>
     </div>
   </template>
-  
-  <script>
-  import SignOutButton from "@/components/SignOutButton.vue";
-  import NavBar from "@/components/NavBar.vue"
 
-  export default {
-    name: 'LeaderboardPage',
-    data() {
-      return {
-        selectedTimeframe: 'all',
-        leaderboardItems: [
-        { username: 'Josh123', points: 1793, medal: '🥇', showButton: true, friendStatus: 'added' },
-        { username: 'elli065', points: 1652, medal: '🥈', showButton: true, friendStatus: 'none' },
-        { username: 'johnappleseed', points: 1574, medal: '🥉', showButton: true, friendStatus: 'added' },
-        { username: 'YourUsername (You)', points: 1502, medal: '4', showButton: false, friendStatus: 'none' },
-        { username: 'imthebest01', points: 1496, medal: '5', showButton: true, friendStatus: 'none' },
-        { username: 'tricia!', points: 1493, medal: '6', showButton: true, friendStatus: 'none' },
-        { username: 'studying567', points: 1421, medal: '7', showButton: true, friendStatus: 'added' },
-        { username: 'eddie', points: 1400, medal: '8', showButton: true, friendStatus: 'pending' },
-        { username: 'ilove2study462', points: 1357, medal: '9', showButton: true, friendStatus: 'none' },
-        { username: 'penelope', points: 1244, medal: '10', showButton: true, friendStatus: 'pending' }
-        ],
-        currentLeaderboard: 'global'
-      };
+<script>
+import firebase from "@/firebase";
+import SignOutButton from "@/components/SignOutButton.vue";
+import NavBar from "@/components/NavBar.vue";
+
+export default {
+  name: 'LeaderboardPage',
+  data() {
+    return {
+      selectedTimeframe: 'all',
+      leaderboardItems: [],
+      currentUser: null,
+      isLoading: true
+    };
+  },
+  watch: {
+  currentUser: {
+    handler(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.fetchLeaderboard();
+      }
     },
-    methods: {
-      toggleAdd(item) {
-        switch (item.friendStatus) {
-          case 'none':
-            item.friendStatus = 'pending';
-            break;
-          case 'pending':
-            item.friendStatus = 'added';
-            break;
-          case 'added':
-            item.friendStatus = 'none';
-            break;
+    immediate: true, // This will trigger the handler immediately on mount
+  },
+},
+mounted() {
+    this.isLoading = true;
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.currentUser = user;
+        this.fetchLeaderboard();
+      } else {
+        this.currentUser = null;
+        this.isLoading = false;
+      }
+    });
+  },
+  methods: {
+    getStartOfCurrentMonth() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), 1);
+    },
+    fetchLeaderboard() {
+    this.isLoading = true;
+    const db = firebase.firestore();
+
+    const getStartOfCurrentMonth = () => {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), 1);
+    };
+
+    // Helper function to check if a date is within the current month
+    const isDateInCurrentMonth = (date) => {
+      const startOfCurrentMonth = getStartOfCurrentMonth();
+      const endOfCurrentMonth = new Date(new Date(startOfCurrentMonth).setMonth(startOfCurrentMonth.getMonth() + 1));
+      return date >= startOfCurrentMonth && date < endOfCurrentMonth;
+    };
+
+    db.collection("users").get().then(querySnapshot => {
+      let leaderboardData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        let points = 0;
+
+        if (this.selectedTimeframe === 'all') {
+          points = data.xp || 0;
+        } else if (this.selectedTimeframe === 'monthly') {
+          Object.entries(data.xpWithTime || {}).forEach(([dateString, xpRecord]) => {
+            const date = new Date(dateString);
+            if (isDateInCurrentMonth(date)) {
+              points += Object.values(xpRecord).reduce((sum, xp) => sum + xp, 0);
+            }
+          });
         }
-      },
-      changeTimeframe() {
-        console.log(timeframe + ' leaderboard selected');
-      }, 
-      redirectToGlobal() {
-      },
-      redirectToFriends() {
-        this.$router.push('/friendsleaderboard');
-      },
-      redirectToHome() {
-        this.$router.push('/home');
-      },
+
+        return {
+              username: doc.id === this.currentUser.displayName ? 'You' : doc.id,
+              points: points, 
+              isUser: doc.id === this.currentUser.displayName
+            };
+          });
+
+      // Sort and assign ranks
+      leaderboardData.sort((a, b) => b.points - a.points);
+      let rank = 1;
+      let prevPoints = null;
+      leaderboardData.forEach((item, index) => {
+        if (prevPoints !== item.points) {
+          rank = index + 1;
+          prevPoints = item.points;
+        }
+        item.rank = rank;
+      });
+
+      this.leaderboardItems = leaderboardData.map(item => ({
+        ...item,
+        displayRank: item.rank <= 3 ? ['🥇', '🥈', '🥉'][item.rank - 1] : item.rank.toString()
+      }));
+
+      this.isLoading = false;
+    }).catch(error => {
+      console.error("Error getting documents:", error);
+      this.isLoading = false;
+    });
+  },
+    changeTimeframe() {
+      console.log(this.selectedTimeframe + ' leaderboard selected');
+      this.fetchLeaderboard();
     },
-    components: {
-        SignOutButton,
-        NavBar, 
+    redirectToGlobal() {
     },
+    redirectToFriends() {
+      this.$router.push('/friendsleaderboard');
+    },
+    redirectToHome() {
+      this.$router.push('/home');
+    },
+    // Additional methods if needed
+  },
+  components: {
+    SignOutButton,
+    NavBar,
   }
-  </script>
+}
+</script>
+
   
 <style scoped>
 .leaderboard-page {
@@ -166,7 +232,10 @@
   width: 70%;
   display: flex;
   flex-direction: column;
+  max-height: 60vh;
+  overflow-y: auto;
 }
+
 
 .table-header {
   background-color: #000000;
@@ -176,6 +245,9 @@
   padding: 0.5rem 1rem;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Higher z-index ensures the header stays above the content */
 }
 
 .leaderboard-item {
