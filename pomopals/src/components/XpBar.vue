@@ -76,7 +76,6 @@ export default {
   /* transform: translateY(65px); */
   width: 60%;
   border-collapse: collapse;
-  /* margin-top: 10vh; */
   background-color: white;
 }
 
@@ -92,7 +91,7 @@ export default {
   background-color: #f2f2f2;
   color: black;
 }
-#xpBar span {
+.xpBar span {
   font-size: 1.6rem;
   color: white;
   font-weight: 600;

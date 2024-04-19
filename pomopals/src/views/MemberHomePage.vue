@@ -1,17 +1,14 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
-import firebase from "@/firebase";
+import { firebaseAuth, db, firestore } from "@/firebase";
 import leaveIcon from '@/components/icons/leave.svg';
+import firebase from "@/firebase";
  
 
 export default {
   name: "MemberHomePage",
   components: {Timer, XpBar},
-  props: {
-    sessionCode: String,
-    currentUser: Object
-  },
   methods: {
     fetchSessionDetails() {
       const sessionRef = firebase
@@ -22,6 +19,7 @@ export default {
         (doc) => {
           if (doc.exists) {
             const data = doc.data();
+            // Create a new array from the proxy to ensure reactivity
             const membersArray = [data.host, ...(data.members || [])];
             this.members = [...membersArray];
             console.log(this.members);
@@ -36,10 +34,38 @@ export default {
       );
     },
     leaveSession() {
+      
+    },
+    leaveSession() {
+      
     if (window.confirm("Are you sure you want to leave the session?")) {
-      // Handle the logic to remove the user from the session if necessary
-      // Then redirect to the home page
-      this.$router.push('/home');
+      const username = firebaseAuth.currentUser.displayName;
+      const sessionRef = db.collection("groupSession").doc(this.sessionCode);
+      
+
+      sessionRef.get().then((doc) => {
+        if (doc.exists) {
+          let data = doc.data();
+          let members = data.members || [];
+
+          if (members.includes(username)) {
+            // Remove the user from the members array
+            members = members.filter(member => member !== username);
+            sessionRef.update({ members: members })
+              .then(() => {
+                console.log(username + " has left the session.");
+                this.$router.push('/home');
+              })
+              .catch((error) => {
+                console.error("Error removing member from session: ", error);
+              });
+          }
+        } else {
+          console.error("No such session exists!");
+        }
+      }).catch((error) => {
+        console.error("Error getting document:", error);
+      });
     }
   },
   },
@@ -71,7 +97,6 @@ export default {
     <div><Timer :isHost="false"/></div>
     <div id="sessionInfo">
       <span id="sessionCode">Session Code: {{ sessionCode }}</span>
-      
       <div id="groupMembers">
         <div
           v-for="(member, index) in members"
@@ -85,7 +110,6 @@ export default {
       <div id="memberCount">
         {{ members.length }} members in this group session
       </div>
-      
     </div>
   </div>
 </template>
