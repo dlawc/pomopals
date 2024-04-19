@@ -8,8 +8,10 @@
       <button id="generateButton" @click="generateCode">
         Generate Session Code
       </button>
-      <input type="text" v-model="sessionCode" readonly />
-      <button @click="setViewState('start')">Back</button>
+
+      <button id="leaveButton" @click="setViewState('start')">
+        <img src="@/assets/leave.png" width="20" alt="Leave" />
+      </button>
     </div>
     <div v-if="viewState == 'join'">
       <input
@@ -19,7 +21,9 @@
         ref="groupCodeInput"
       />
       <button @click="enterCode">Enter</button>
-      <button @click="setViewState('start')">Back</button>
+      <button id="leaveButton" @click="setViewState('start')">
+        <img src="@/assets/leave.png" width="20" alt="Leave" />
+      </button>
     </div>
   </div>
 </template>
@@ -73,12 +77,12 @@ export default {
 
       if (currentUser) {
         let username = currentUser.displayName;
-        let docRef = db.collection("groupSession").doc(sessionCode);
+        let userRef = db.collection("groupSession").doc(sessionCode);
 
         // Start a batch
         let batch = db.batch();
 
-        docRef
+        userRef
           .get()
           .then((doc) => {
             if (doc.exists) {
@@ -93,16 +97,17 @@ export default {
               } else if (!members.includes(username)) {
                 // Check if user is not already in member array
                 members.push(username);
-                batch.update(docRef, { members: members });
+                batch.update(userRef, { members: members });
                 batch
                   .commit()
                   .then(() => {
                     console.log("Members updated successfully!");
                     alert("Group joined successfully");
+                    // Only navigate once the Firestore set is successful
                     this.$router.push({
-            path: "/member",
-            query: { sessionCode: sessionCode },
-          });
+                      path: "/member",
+                      query: { sessionCode: this.sessionCode },
+                    });
                   })
                   .catch((error) => {
                     console.error("Error updating members: ", error);
@@ -138,34 +143,46 @@ export default {
 <style scoped>
 .sessionCodeContainer {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 20px;
-  z-index: 10;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally in the container */
+  justify-content: center; /* Center children vertically in the container */
+  position: fixed; /* Fix position relative to the viewport */
+  left: 50%; /* Position the left edge of the container in the middle of the viewport */
+  bottom: 0; /* Align the container to the bottom of the viewport */
+  transform: translateX(
+    -50%
+  ); /* Shift the container left by half its width to center it */
+  z-index: 1000; /* Ensure it sits above other content; adjust as necessary */
 }
 
+/* You may want to add styles for the buttons and inputs to ensure they look good when centered */
+.sessionCodeContainer button,
+.sessionCodeContainer input[type="text"] {
+  margin: 0.5rem; /* Spacing around buttons and input */
+  /* Additional styles for buttons and input */
+}
+
+/* Styles for buttons */
 .sessionCodeContainer button {
-  display: block;
-  margin: 5px 0;
-  margin-top: 10px;
-  width: 200px;
-  height: 68px;
-  background: white;
-  border-radius: 20px;
-  font-size: 36px;
+  padding: 10px 20px;
   border: none;
+  background-color: #f4f7fa; /* Example background color, change as desired */
+  border-radius: 5px;
   cursor: pointer;
 }
 
-#generateButton {
-  font-size: 25px;
+/* Styles for inputs */
+.sessionCodeContainer input[type="text"] {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
 }
 
-input[type="text"] {
-  margin-top: 10px; /* Additional margin for text inputs */
+#leaveButton {
+  width: 100%;
+  max-width: 20px;
+  height: auto;
+  background: transparent;
+  border: 0;
 }
 </style>
