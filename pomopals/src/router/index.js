@@ -12,6 +12,7 @@ import AllAchievementPage from "@/views/AllAchievements.vue";
 import BlockedPage from "@/views/BlockedPage.vue";
 import HostHomePage from "@/views/HostHomePage.vue";
 import MemberHomePage from "@/views/MemberHomePage.vue";
+import VerifyEmailPage from "@/views/VerifyEmailPage.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,11 @@ const router = createRouter({
       path: "/signup",
       name: "SignUpPage",
       component: SignUpPage,
+    },
+    {
+      path: "/verifyemail",
+      name: "VerifyEmailPage",
+      component: VerifyEmailPage,
     },
     {
       path: "/home",
