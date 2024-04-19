@@ -23,7 +23,6 @@
           <select id="timeframe-dropdown" v-model="selectedTimeframe" @change="changeTimeframe">
             <option value="all">All Time</option>
             <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
           </select>
         </div>
   
@@ -34,11 +33,11 @@
             <div class="header-points">Points</div>
           </div>
           <div class="leaderboard-item" 
-                v-for="(item, index) in leaderboardItems" 
+                v-for="(item, index) in leaderboardWithMedals" 
                 :key="index"
                 :class="{ 'highlighted': item.isUser }">
                 <div class="item-rank">
-                <div class="item-rank">{{ item.rank }}</div>
+                <div class="item-rank">{{ item.displayRank }}</div>
                 </div>
                 <div class="item-username">{{ item.username }}</div>
                 <div class="item-points">{{ item.points }}</div>
@@ -46,113 +45,155 @@
         </div>
       </div>
     </div>
-  </template>
- 
-  <script>
-  import firebase from "@/firebase";
-  import SignOutButton from "@/components/SignOutButton.vue";
-  import NavBar from "@/components/NavBar.vue";
-  
-  export default {
-    name: 'LeaderboardPage',
-    data() {
-      return {
-        selectedTimeframe: 'all',
-        leaderboardItems: [],
-        currentUser: null,
-        isLoading: true
-      };
-    },
-    mounted() {
+</template>
+
+<script>
+import firebase from "@/firebase";
+import SignOutButton from "@/components/SignOutButton.vue";
+import NavBar from "@/components/NavBar.vue";
+
+export default {
+  name: 'LeaderboardPage',
+  data() {
+    return {
+      selectedTimeframe: 'all',
+      leaderboardItems: [],
+      currentUser: null,
+      isLoading: true
+    };
+  },
+  mounted() {
+    this.isLoading = true;
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.currentUser = user;
+        this.fetchLeaderboard();
+      } else {
+        this.currentUser = null;
+        this.isLoading = false;
+      }
+    });
+  },
+  methods: {
+    fetchLeaderboard() {
       this.isLoading = true;
-      firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-          this.currentUser = user;
-          this.fetchLeaderboard();
-        } else {
-          this.currentUser = null;
-          this.isLoading = false;
-        }
-      });
-    },
-    methods: {
-      fetchLeaderboard() {
-        const db = firebase.firestore();
-  
-        if (!this.currentUser) {
-          console.error('No current user set');
+      const db = firebase.firestore();
+
+      function getStartOfCurrentMonth() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+
+      if (!this.currentUser) {
+        console.error('No current user set');
+        this.isLoading = false;
+        return;
+      }
+
+      const startOfCurrentMonth = getStartOfCurrentMonth();
+      const currentUserRef = db.collection("users").doc(this.currentUser.displayName);
+
+      currentUserRef.get().then(doc => {
+        if (!doc.exists) {
+          console.error('Current user document does not exist');
           this.isLoading = false;
           return;
         }
-  
-        const currentUserRef = db.collection("users").doc(this.currentUser.displayName);
-        currentUserRef.get().then(doc => {
-          if (!doc.exists) {
-            console.error('Current user document does not exist');
-            this.isLoading = false;
-            return;
+
+        const friends = doc.data().friends || {};
+        const leaderboardPromises = Object.keys(friends)
+          .filter(friendKey => friends[friendKey] === true)
+          .map(friendKey => db.collection("users").doc(friendKey).get());
+
+        leaderboardPromises.push(currentUserRef.get());
+
+        Promise.all(leaderboardPromises).then(docs => {
+          let leaderboardData = docs.map(doc => {
+            const xpEntries = doc.data().xpWithTime || {};
+            let points = 0;
+
+            if (this.selectedTimeframe === 'all') {
+              points = doc.data().xp || 0; 
+            } else if (this.selectedTimeframe === 'monthly') {
+              points = Object.entries(xpEntries)
+              .filter(([date, _]) => {
+                const entryDate = new Date(date.split('T')[0]);
+                return entryDate >= startOfCurrentMonth && entryDate < new Date();
+              })
+              .reduce((total, [_, timesXP]) => {
+                return total + Object.values(timesXP).reduce((sum, xp) => sum + xp, 0);
+              }, 0);
           }
-  
-          const friends = doc.data().friends || {};
-          const leaderboardPromises = Object.keys(friends)
-            .filter(friendKey => friends[friendKey] === true)
-            .map(friendKey => db.collection("users").doc(friendKey).get());
-  
-          leaderboardPromises.push(currentUserRef.get());
-  
-          Promise.all(leaderboardPromises).then(docs => {
-      let leaderboardData = docs.map(doc => {
+
+            return {
+              username: doc.id === this.currentUser.displayName ? 'You' : doc.id,
+              points: points, // This should now be a number
+              isUser: doc.id === this.currentUser.displayName
+            };
+          });
+
+          leaderboardData.sort((a, b) => b.points - a.points);
+
+          let rank = 1;
+          let prevPoints = null;
+          leaderboardData.forEach((item, index) => {
+            if (prevPoints !== item.points) {
+              rank = index + 1;
+              prevPoints = item.points;
+            }
+            item.rank = rank;
+          });
+
+          this.leaderboardItems = leaderboardData;
+          this.isLoading = false;
+        }).catch(error => {
+          console.error("Error getting leaderboard data:", error);
+          this.isLoading = false;
+        });
+      });
+    },
+    changeTimeframe() {
+      console.log(this.selectedTimeframe + ' leaderboard selected');
+      this.fetchLeaderboard();
+    },
+    redirectToGlobal() {
+      this.$router.push('/leaderboard');
+    },
+    redirectToFriends() {
+      this.fetchLeaderboard();
+    },
+    redirectToHome() {
+      this.$router.push('/home');
+    },
+  },
+  computed: {
+    leaderboardWithMedals() {
+      return this.leaderboardItems.map(item => {
+        let displayRank;
+        if (item.rank === 1) {
+          displayRank = '🥇';
+        } else if (item.rank === 2) {
+          displayRank = '🥈';
+        } else if (item.rank === 3) {
+          displayRank = '🥉';
+        } else {
+          displayRank = item.rank;
+        }
+
         return {
-          username: doc.id === this.currentUser.displayName ? 'You' : doc.id,
-          points: doc.data().xp || 0,
-          isUser: doc.id === this.currentUser.displayName
+          ...item,
+          displayRank
         };
       });
-
-      // Sort by points in descending order
-      leaderboardData.sort((a, b) => b.points - a.points);
-
-      // Assign ranks
-      let rank = 1;
-      let prevPoints = null;
-      leaderboardData.forEach((item, index) => {
-        if (prevPoints !== item.points) {
-          rank = index + 1;
-          prevPoints = item.points;
-        }
-        item.rank = rank; // assign the calculated rank
-      });
-
-      this.leaderboardItems = leaderboardData;
-      this.isLoading = false;
-          }).catch(error => {
-            console.error("Error getting leaderboard data:", error);
-            this.isLoading = false;
-          });
-        });
-      },
-      changeTimeframe() {
-        console.log(this.selectedTimeframe + ' leaderboard selected');
-      },
-      redirectToGlobal() {
-        this.$router.push('/leaderboard');
-      },
-      redirectToFriends() {
-        this.fetchLeaderboard(); // Refresh leaderboard data
-      },
-      redirectToHome() {
-        this.$router.push('/home');
-      },
-    },
-    components: {
-      SignOutButton,
-      NavBar, 
     }
+  },
+  components: {
+    SignOutButton,
+    NavBar,
   }
-  </script>
-  
+}
+</script>
 
-  
 <style scoped>
 .leaderboard-page {
   margin: 0;
