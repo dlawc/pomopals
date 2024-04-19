@@ -465,8 +465,14 @@ p {
 }
 #inputDurationBox,
 #inputRestDurationBox {
-  width: auto;
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-bottom: 5px;
 }
+
 #changingButton,
 #startButton,
 #resumeButton,
@@ -482,13 +488,12 @@ p {
 }
 
 #updateButton {
-  margin-top: 30px;
-  width: 200px;
-  height: 50px;
-  border-radius: 20px;
-  background-color: white;
-  font-size: 36px;
+  padding: 0;
   border: none;
+  background: transparent;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 25px;
+  color: white;
 }
 </style>
