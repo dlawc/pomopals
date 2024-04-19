@@ -1,4 +1,3 @@
-
 <template>
     <div class="leaderboard-page">
       <div class = "navbar">
@@ -125,7 +124,7 @@ mounted() {
         }
 
         return {
-              username: doc.id === this.currentUser.displayName ? 'You' : doc.id,
+              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
               points: points, 
               isUser: doc.id === this.currentUser.displayName
             };
