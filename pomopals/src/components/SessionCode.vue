@@ -2,6 +2,7 @@
   <div class="sessionCodeContainer">
     <div v-if="viewState == 'start'">
       <button @click="setViewState('host')">Host</button>
+      <p1>|</p1>
       <button @click="setViewState('join')">Join</button>
     </div>
     <div v-if="viewState == 'host'">
@@ -162,13 +163,20 @@ export default {
   /* Additional styles for buttons and input */
 }
 
+p1 {
+  color: white;
+  font-size: 25px;
+}
+
 /* Styles for buttons */
 .sessionCodeContainer button {
-  padding: 10px 20px;
+  padding: 0;
   border: none;
-  background-color: #f4f7fa; /* Example background color, change as desired */
+  background: transparent;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 25px;
+  color: white;
 }
 
 /* Styles for inputs */

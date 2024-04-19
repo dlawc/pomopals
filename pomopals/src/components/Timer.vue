@@ -435,7 +435,6 @@ export default {
   top: 25px;
   left: 0;
 }
-
 .time {
   position: absolute;
   top: 50%;
@@ -446,31 +445,28 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 #timeDisplay {
   font-size: 64px;
   color: white;
 }
-
 p {
   font-size: 48px;
   line-height: 48px;
   text-align: center;
   color: white;
 }
-
 .buttons {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 20px;
+  margin-top: 10px;
+  transform: translate(-6%, 20%);
 }
-
 #inputDurationBox,
 #inputRestDurationBox {
   width: auto;
 }
-
 #changingButton,
 #startButton,
 #resumeButton,
