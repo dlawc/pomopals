@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     handleFriendRequest(username) {
-      this.showAddFriendModal = false; // Hide the modal after sending the request
+      this.showAddFriendModal = false; 
     },
     deleteFriend(friend) {
       this.friends = this.friends.filter((f) => f !== friend);
