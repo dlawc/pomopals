@@ -2,61 +2,70 @@
     <div class="overlay">
       <div class="login-container">
         <div class="landing-page">
-          <img
-            src="@/assets/pomopals_icon.png"
-            alt="PomoPals Icon"
-            class="landing-icon"
-          />
+          <img src="@/assets/pomopals_icon.png" alt="PomoPals Icon" class="landing-icon"/>
           <h1>Email Verification</h1>
           <p>
             Hey {{ displayName }}, you're almost ready to start enjoying PomoPals. Click on
             the button below to verify your email address!
           </p>
-          <button type="button" class="landing-button" @click="verifyEmail">Verify my Email Address</button>
+          <button type="button" class="landing-button" @click="verifyEmail">{{ buttonLabel }}</button>
+          <p v-if="emailSent">
+            Once verified, you can <router-link to="/login">return to login.</router-link>
+          </p>
         </div>
       </div>
     </div>
   </template>
   
+  
 
-<script>
-import { firebaseAuth, firestore } from "../firebase.js";
-
-export default {
-  name: "VerifyEmailPage",
-  data() {
-    return {
-      displayName: '',  // Initialize displayName as empty
-    };
-  },
-  created() {
-    this.fetchUserData();
-  },
-  methods: {
-    async fetchUserData() {
-      const user = firebaseAuth.currentUser;
-      if (user) {
-        this.displayName = user.displayName || 'there'; // Set displayName or default to 'there'
-      }
+  <script>
+  import { firebaseAuth } from "../firebase.js";
+  import { RouterLink } from 'vue-router';
+  
+  export default {
+    name: "VerifyEmailPage",
+    components: {
+      RouterLink,
     },
-    async verifyEmail() {
-      // Send verification email
-      const user = firebaseAuth.currentUser; // Get the current user from Firebase Auth
-      if (user) { // Check if the user object exists
-        try {
-          await user.sendEmailVerification();
-          console.log("Verification email sent.");
-          alert("Verification email sent!");
-        } catch (verificationError) {
-          console.error("Error sending verification email:", verificationError);
+    data() {
+      return {
+        displayName: '',  // Initialize displayName as empty
+        emailSent: false, // Track if the verification email has been sent
+        buttonLabel: 'Verify my Email Address', // Dynamic button label
+      };
+    },
+    created() {
+      this.fetchUserData();
+    },
+    methods: {
+      async fetchUserData() {
+        const user = firebaseAuth.currentUser;
+        if (user) {
+          this.displayName = user.displayName || 'there'; // Set displayName or default to 'there'
         }
-      } else {
-        console.error("No user logged in.");
-      }
+      },
+      async verifyEmail() {
+        const user = firebaseAuth.currentUser; // Get the current user from Firebase Auth
+        if (user) { // Check if the user object exists
+          try {
+            await user.sendEmailVerification();
+            console.log("Verification email sent! Redirecting you to the log in page.");
+            alert("Verification email sent! Redirecting you to the log in page.");
+            this.$router.push("/login");
+          } catch (verificationError) {
+            console.error("Error sending verification email:", verificationError);
+            alert("Failed to send verification email. Please try again.");
+          }
+        } else {
+          console.error("No user logged in.");
+          alert("No user logged in. Please login to send verification.");
+        }
+      },
     },
-  },
-};
-</script>
+  };
+  </script>
+  
 
 <style scoped>
 .overlay {

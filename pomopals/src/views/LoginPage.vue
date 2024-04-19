@@ -31,8 +31,9 @@
             {{ errorMessage }}
           </div>
           <div class="forgot-password">
-            <router-link to="/forgot-password">Forgot password?</router-link>
-          </div>
+  <a href="#" @click="sendPasswordResetEmail">Forgot password?</a>
+</div>
+
           <button type="submit" class="sign-in-button">Sign In</button>
         </form>
 
@@ -161,6 +162,21 @@ export default {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
+    async sendPasswordResetEmail() {
+  if (!this.credentials.email) {
+    this.errorMessage = "Please enter your email address to reset your password.";
+    return;
+  }
+  try {
+    await firebase.auth().sendPasswordResetEmail(this.credentials.email);
+    alert("Password reset email sent. Please check your inbox.");
+    this.errorMessage = '';
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    this.errorMessage = error.message;
+  }
+}
+
   },
   computed: {
     passwordFieldType() {
