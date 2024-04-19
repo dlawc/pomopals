@@ -1,13 +1,17 @@
 <script>
+import Timer from "/src/components/Timer.vue";
+
 export default {
   name: "MemberHomePage",
-  components: {},
+  components: {Timer},
   methods: {},
 };
 </script>
 
 <template>
-  <div class="home"></div>
+  <div class="home">
+    <div><Timer :isHost="false"/></div>
+  </div>
 </template>
 
 <style scoped>

@@ -6,7 +6,7 @@ import SessionCode from "/src/components/SessionCode.vue";
 
 export default {
   name: "HomePage",
-  components: { XpBar, Timer, NavBar, SessionCode },
+  components: { XpBar, Timer, NavBar, SessionCode},
   methods: {},
 };
 </script>

@@ -91,7 +91,8 @@
       </div>
     </div>
 
-    <div class="buttons">
+    <div v-if="isHost">
+      <div class="buttons">
       <button
         v-if="!isSettingTime && this.pomodoroDuration != 0"
         @click="click"
@@ -127,7 +128,11 @@
       <button v-if="!isSettingTime" @click="showInputBox" id="settingButton">
         Settings
       </button>
+
+      
     </div>
+  </div>
+    
   </div>
 </template>
 
@@ -163,6 +168,13 @@ export default {
       isSettingTime: false,
     };
   },
+  props: {
+  isHost: {
+    type: Boolean,
+    default: true
+  }
+},
+
   mounted: function () {
     this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
     this.topRight.set(1);
