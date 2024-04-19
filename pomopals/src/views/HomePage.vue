@@ -21,6 +21,8 @@ export default {
 </template>
 
 <style scoped>
+
+
 #friendsButton,
 #leaderboardButton {
   position: absolute;

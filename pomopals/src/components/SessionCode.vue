@@ -99,7 +99,10 @@ export default {
                   .then(() => {
                     console.log("Members updated successfully!");
                     alert("Group joined successfully");
-                    this.$router.push("/member")
+                    this.$router.push({
+            path: "/member",
+            query: { sessionCode: this.sessionCode },
+          });
                   })
                   .catch((error) => {
                     console.error("Error updating members: ", error);

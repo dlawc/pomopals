@@ -67,15 +67,15 @@ export default {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 #table {
-  transform: translateY(65px);
+  /* transform: translateY(65px); */
   width: 60%;
   border-collapse: collapse;
-  margin-top: 10vh;
+  /* margin-top: 10vh; */
   background-color: white;
 }
 
