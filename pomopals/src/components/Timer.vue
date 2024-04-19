@@ -392,7 +392,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   text-align: center;
 }
 .timer {
@@ -461,7 +461,7 @@ p {
 #cancelButton,
 #settingButton,
 #updateButton {
-  margin-top: 50px;
+  margin-top: 10px;
   width: 200px;
   height: 68px;
   background: white;
