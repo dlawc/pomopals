@@ -24,7 +24,6 @@
           <select id="timeframe-dropdown" v-model="selectedTimeframe" @change="changeTimeframe">
             <option value="all">All Time</option>
             <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
           </select>
         </div>
   
@@ -55,14 +54,8 @@
   </template>
   
   <script>
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { faHome } from '@fortawesome/free-solid-svg-icons';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-
   import SignOutButton from "@/components/SignOutButton.vue";
   import NavBar from "@/components/NavBar.vue"
-
-  library.add(faHome);
 
   export default {
     name: 'LeaderboardPage',
@@ -102,7 +95,6 @@
         console.log(timeframe + ' leaderboard selected');
       }, 
       redirectToGlobal() {
-      // logic to stay on this page or refresh
       },
       redirectToFriends() {
         this.$router.push('/friendsleaderboard');
@@ -113,7 +105,6 @@
     },
     components: {
         SignOutButton,
-        FontAwesomeIcon,
         NavBar, 
     },
   }
