@@ -26,7 +26,7 @@ export default {
       isLoading: true,
       error: null,
       currentUser: null, // Store the currentUser in data
-      username: null, 
+      username: null,
     };
   },
   watch: {
@@ -39,7 +39,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.currentUser = user;
         this.username = user.displayName;
