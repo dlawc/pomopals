@@ -91,22 +91,38 @@
       </div>
     </div>
 
-    <div v-if="isHost">
-      <div class="buttons">
+    <div class="buttons">
       <button
         v-if="!isSettingTime && this.pomodoroDuration != 0"
         @click="click"
-        id="startButton"
+        id="changingButton"
       >
-        {{ buttonText }}
+        <img
+          v-show="buttonText == 'Start!'"
+          src="@/assets/start.png"
+          id="startButton"
+          alt="Start!"
+        />
+        <img
+          v-show="buttonText == 'Pause'"
+          src="@/assets/pause.png"
+          id="pauseButton"
+          alt="Pause"
+        />
+        <img
+          v-show="buttonText == 'Resume'"
+          src="@/assets/resume.png"
+          id="resumeButton"
+          alt="Resume"
+        />
       </button>
 
       <button
-        v-if="!isSettingTime && this.pomodoroDuration != 0"
-        id="cancelButton"
-        @click="cancelDuration"
+        v-if="!isSettingTime && this.pomodoroDuration != 0 && !isResting"
+        id="restartButton"
+        @click="restartDuration"
       >
-        Cancel
+        <img src="@/assets/restart.png" alt="Restart" />
       </button>
 
       <div v-if="isSettingTime">
@@ -125,14 +141,14 @@
         <button id="updateButton" @click="updateDuration">Update</button>
       </div>
 
-      <button v-if="!isSettingTime" @click="showInputBox" id="settingButton">
-        Settings
+      <button
+        v-if="!isSettingTime && !isResting"
+        @click="showInputBox"
+        id="settingButton"
+      >
+        <img src="@/assets/settings.png" alt="Settings" />
       </button>
-
-      
     </div>
-  </div>
-    
   </div>
 </template>
 
@@ -144,13 +160,13 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
-    let pomodoroDuration = 0;
+    let pomodoroDuration = 25 * 60;
 
     return {
       inputDuration: "",
       inputRestDuration: "",
       pomodoroDuration,
-      restDuration: 0,
+      restDuration: 5 * 60,
       currentTimeInSeconds: pomodoroDuration,
       currentSegment: 1,
       buttonText: "Start!",
@@ -168,13 +184,6 @@ export default {
       isSettingTime: false,
     };
   },
-  props: {
-  isHost: {
-    type: Boolean,
-    default: true
-  }
-},
-
   mounted: function () {
     this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
     this.topRight.set(1);
@@ -194,10 +203,13 @@ export default {
       if (this.buttonText === "Start!" || this.buttonText === "Resume") {
         this.animateBar();
         this.buttonText = "Pause";
+        this.$emit("clickOnButtonEvent", this.buttonText);
       } else if (this.buttonText === "Pause") {
         this.pauseBar();
         this.buttonText = "Resume";
+        this.$emit("clickOnButtonEvent", this.buttonText);
       }
+      this.$emit("clickOnButtonEvent", this.buttonText);
     },
 
     pauseBar() {
@@ -243,6 +255,7 @@ export default {
 
           this.startRest();
         }, 4100);
+        console.log("button is now", this.buttonText);
 
         let userId = firebaseAuth.currentUser.uid; // userId as primary key
 
@@ -301,6 +314,7 @@ export default {
         this.buttonText = "Start!";
         this.isResting = false;
       }, this.restDuration * 1000);
+      this.$emit("clickOnButtonEvent", this.buttonText);
     },
 
     animateBar() {
@@ -352,7 +366,7 @@ export default {
       }
     },
 
-    cancelDuration() {
+    restartDuration() {
       clearInterval(this.interval);
 
       if (this.topRight) this.topRight.stop();
@@ -364,6 +378,7 @@ export default {
 
       this.isResting = false;
       this.buttonText = "Start!";
+      this.$emit("clickOnButtonEvent", this.buttonText);
 
       this.currentSegment = 1;
 
@@ -392,80 +407,86 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* min-height: 100vh; */
+  min-height: 70vh;
   text-align: center;
 }
 .timer {
   position: relative;
   width: 330px;
   height: 330px;
-  margin-top: -0;
 }
 #first-segment {
   position: absolute;
-  top: 0;
+  top: 25px;
   right: 0;
 }
 #second-segment {
   position: absolute;
-  bottom: 0;
+  bottom: -25px;
   right: 0;
 }
 #third-segment {
   position: absolute;
-  bottom: 0;
+  bottom: -25px;
   left: 0;
 }
 #fourth-segment {
   position: absolute;
-  top: 0;
+  top: 25px;
   left: 0;
 }
-
 .time {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -25%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-
 #timeDisplay {
   font-size: 64px;
   color: white;
 }
-
 p {
   font-size: 48px;
   line-height: 48px;
   text-align: center;
   color: white;
 }
-
 .buttons {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 20px;
+  margin-top: 10px;
+  transform: translate(-6%, 20%);
 }
-
 #inputDurationBox,
 #inputRestDurationBox {
   width: auto;
 }
-
+#changingButton,
 #startButton,
-#cancelButton,
+#resumeButton,
+#pauseButton,
 #settingButton,
+#restartButton {
+  width: 100%;
+  max-width: 100px;
+  height: auto;
+  background: transparent;
+  border: 0;
+  width: 70px;
+}
+
 #updateButton {
-  margin-top: 10px;
+  margin-top: 30px;
   width: 200px;
-  height: 68px;
-  background: white;
+  height: 50px;
   border-radius: 20px;
+  background-color: white;
   font-size: 36px;
   border: none;
   cursor: pointer;
