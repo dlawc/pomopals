@@ -31,8 +31,8 @@
             {{ errorMessage }}
           </div>
           <div class="forgot-password">
-  <a href="#" @click="sendPasswordResetEmail">Forgot password?</a>
-</div>
+            <a href="#" @click="sendPasswordResetEmail">Forgot password?</a>
+          </div>
 
           <button type="submit" class="sign-in-button">Sign In</button>
         </form>
@@ -124,6 +124,11 @@ export default {
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
             friends: {},
+            // initialise home page data tracking
+            xp: 0,
+            currentSegment: 1,
+            restDuration: 300,
+            pomodoroDuration: 1500,
           });
           this.$router.push("/home");
         } else {
@@ -163,20 +168,20 @@ export default {
       this.passwordVisible = !this.passwordVisible;
     },
     async sendPasswordResetEmail() {
-  if (!this.credentials.email) {
-    this.errorMessage = "Please enter your email address to reset your password.";
-    return;
-  }
-  try {
-    await firebase.auth().sendPasswordResetEmail(this.credentials.email);
-    alert("Password reset email sent. Please check your inbox.");
-    this.errorMessage = '';
-  } catch (error) {
-    console.error("Error sending password reset email:", error);
-    this.errorMessage = error.message;
-  }
-}
-
+      if (!this.credentials.email) {
+        this.errorMessage =
+          "Please enter your email address to reset your password.";
+        return;
+      }
+      try {
+        await firebase.auth().sendPasswordResetEmail(this.credentials.email);
+        alert("Password reset email sent. Please check your inbox.");
+        this.errorMessage = "";
+      } catch (error) {
+        console.error("Error sending password reset email:", error);
+        this.errorMessage = error.message;
+      }
+    },
   },
   computed: {
     passwordFieldType() {
