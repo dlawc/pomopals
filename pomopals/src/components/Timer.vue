@@ -369,6 +369,7 @@ export default {
 
     showInputBox() {
       this.isSettingTime = true;
+      this.restartDuration();
     },
 
     async updateDuration() {
