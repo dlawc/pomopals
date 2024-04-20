@@ -1,14 +1,12 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
-import { firebaseAuth, db, firestore } from "@/firebase";
-import leaveIcon from '@/components/icons/leave.svg';
+import { firebaseAuth, db } from "@/firebase";
 import firebase from "@/firebase";
- 
 
 export default {
   name: "MemberHomePage",
-  components: {Timer, XpBar},
+  components: { Timer, XpBar },
   methods: {
     fetchSessionDetails() {
       const sessionRef = firebase
@@ -34,40 +32,42 @@ export default {
       );
     },
     leaveSession() {
-      
+      if (window.confirm("Are you sure you want to leave the session?")) {
+        const username = firebaseAuth.currentUser.displayName;
+        const sessionRef = db.collection("groupSession").doc(this.sessionCode);
+
+        sessionRef
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              let data = doc.data();
+              let members = data.members || [];
+
+              if (members.includes(username)) {
+                // Remove the user from the members array
+                members = members.filter((member) => member !== username);
+                sessionRef
+                  .update({ members: members })
+                  .then(() => {
+                    console.log(username + " has left the session.");
+                    this.$router.push("/home");
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Error removing member from session: ",
+                      error
+                    );
+                  });
+              }
+            } else {
+              console.error("No such session exists!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting document:", error);
+          });
+      }
     },
-    leaveSession() {
-      
-    if (window.confirm("Are you sure you want to leave the session?")) {
-      const username = firebaseAuth.currentUser.displayName;
-      const sessionRef = db.collection("groupSession").doc(this.sessionCode);
-      
-
-      sessionRef.get().then((doc) => {
-        if (doc.exists) {
-          let data = doc.data();
-          let members = data.members || [];
-
-          if (members.includes(username)) {
-            // Remove the user from the members array
-            members = members.filter(member => member !== username);
-            sessionRef.update({ members: members })
-              .then(() => {
-                console.log(username + " has left the session.");
-                this.$router.push('/home');
-              })
-              .catch((error) => {
-                console.error("Error removing member from session: ", error);
-              });
-          }
-        } else {
-          console.error("No such session exists!");
-        }
-      }).catch((error) => {
-        console.error("Error getting document:", error);
-      });
-    }
-  },
   },
   data() {
     return {
@@ -94,7 +94,7 @@ export default {
     <div id="xpBar">
       <XpBar />
     </div>
-    <div><Timer :isHost="false"/></div>
+    <div><Timer :isHost="false" /></div>
     <div id="sessionInfo">
       <span id="sessionCode">Session Code: {{ sessionCode }}</span>
       <div id="groupMembers">
@@ -105,7 +105,12 @@ export default {
         >
           {{ member }}
         </div>
-        <img src="@/components/icons/leave.svg" alt="Leave" class="leave-icon" @click="leaveSession" />
+        <img
+          src="@/components/icons/leave.svg"
+          alt="Leave"
+          class="leave-icon"
+          @click="leaveSession"
+        />
       </div>
       <div id="memberCount">
         {{ members.length }} members in this group session
@@ -131,10 +136,9 @@ body {
   position: absolute;
   bottom: 10px;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   transform: translateX(-50%);
-  left: 50%; 
-
+  left: 50%;
 }
 #sessionCode {
   font-size: 1.15rem;
@@ -165,7 +169,7 @@ body {
   width: 80vw; /* Use viewport width for responsive control */
   max-width: 600px; /* Adjust based on your design preference */
   flex-wrap: wrap;
-  gap: 1px; 
+  gap: 1px;
 }
 
 .member-badge {
@@ -209,8 +213,4 @@ body {
   cursor: pointer;
   fill: white;
 }
-
-
-
-
 </style>
