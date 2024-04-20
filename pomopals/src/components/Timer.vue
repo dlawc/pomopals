@@ -313,6 +313,8 @@ export default {
           this.currentSegment = 1;
         }
 
+        // add update current segment to firebase
+
         clearInterval(this.interval);
 
         this.boopAudio.play();
@@ -334,7 +336,7 @@ export default {
           await userRef.update({ xp: currXP + this.pomodoroDuration });
           console.log("xp updated");
         } else {
-          await userRef.set({ xp: this.pomodoroDuration });
+          await userRef.set({ xp: this.pomodoroDuration }, { merge: true });
           console.log("xp created");
         }
 
@@ -348,9 +350,12 @@ export default {
           .catch(async (error) => {
             // if map does not exist, populate it with the map
             if (error.code === "not-found") {
-              await userRef.set({
-                xpWithTime: { [key]: value },
-              });
+              await userRef.set(
+                {
+                  xpWithTime: { [key]: value },
+                },
+                { merge: true }
+              );
             } else {
               console.error(error);
             }
@@ -401,7 +406,7 @@ export default {
         {
           duration: (this.currentTimeInSeconds + 1) * 1000,
         },
-        this.onFinish()
+        this.onFinish
       );
     },
 
@@ -426,7 +431,6 @@ export default {
         this.isSettingTime = false;
 
         let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
         let currentUser = firebaseAuth.currentUser;
         let username = currentUser.displayName; // username as primary key
         console.log(username);
@@ -440,7 +444,10 @@ export default {
           await userRef.update({ pomodoroDuration: this.pomodoroDuration });
           console.log("pomodoroDuration updated");
         } else {
-          await userRef.set({ pomodoroDuration: this.pomodoroDuration });
+          await userRef.set(
+            { pomodoroDuration: this.pomodoroDuration },
+            { merge: true }
+          );
           console.log("pomodoroDuration created");
         }
 
@@ -451,7 +458,10 @@ export default {
           await userRef.update({ restDuration: this.restDuration });
           console.log("restDuration updated");
         } else {
-          await userRef.set({ restDuration: this.restDuration });
+          await userRef.set(
+            { restDuration: this.restDuration },
+            { merge: true }
+          );
           console.log("restDuration created");
         }
       } else {
