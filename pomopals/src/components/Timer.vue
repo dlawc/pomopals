@@ -160,20 +160,12 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
-    let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
-    let currentUser = firebaseAuth.currentUser;
-    let username = currentUser.displayName; // username as primary key
-    console.log(username);
-    let userRef = firestore.collection("users").doc(username);
-    let pomodoroDuration = 25 * 60;
-
     return {
       inputDuration: "",
       inputRestDuration: "",
-      pomodoroDuration,
-      restDuration: 5 * 60,
-      currentTimeInSeconds: pomodoroDuration,
+      pomodoroDuration: 25 * 60, // Default initialization
+      restDuration: 5 * 60, // Default initialization
+      currentTimeInSeconds: 25 * 60, // Updated to default pomodoroDuration
       currentSegment: 1,
       buttonText: "Start!",
       topRight: null,
@@ -182,13 +174,26 @@ export default {
       topLeft: null,
       pathOptions: {
         easing: "linear",
-        duration: (pomodoroDuration + 1) * 1000,
+        duration: 25 * 60 * 1000 + 1000, // Updated dynamically below in fetched data
       },
       interval: null,
       boopAudio: new Audio(boop),
       isResting: false,
       isSettingTime: false,
     };
+  },
+  created() {
+    this.fetchData();
+  },
+  watch: {
+    pomodoroDuration(newVal) {
+      this.pathOptions.duration = (newVal + 1) * 1000;
+      this.currentTimeInSeconds = newVal; // Update current time as well
+      this.savePomodoroDuration();
+    },
+    restDuration(newVal) {
+      this.saveRestDuration(); // Implement saveRestDuration similarly to savePomodoroDuration
+    },
   },
   mounted: function () {
     this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
@@ -203,8 +208,57 @@ export default {
     this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
     this.topLeft.set(1);
   },
-
   methods: {
+    fetchData() {
+      const userRef = firestore
+        .collection("users")
+        .doc(firebaseAuth.currentUser.displayName);
+
+      userRef
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            let data = doc.data();
+            this.pomodoroDuration =
+              data.pomodoroDuration || this.pomodoroDuration;
+            this.restDuration = data.restDuration || this.restDuration;
+            // Adjust pathOptions and currentTimeInSeconds if needed
+            this.pathOptions.duration = (this.pomodoroDuration + 1) * 1000;
+            this.currentTimeInSeconds = this.pomodoroDuration;
+          } else {
+            console.log("No such document!");
+            // Consider whether to save defaults if no document exists
+            this.savePomodoroDuration();
+            this.saveRestDuration();
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting document:", error);
+        });
+    },
+    savePomodoroDuration() {
+      const userRef = firestore
+        .collection("users")
+        .doc(firebaseAuth.currentUser.displayName);
+      userRef
+        .set({ pomodoroDuration: this.pomodoroDuration }, { merge: true })
+        .then(() => console.log("Pomodoro duration successfully written!"))
+        .catch((error) =>
+          console.error("Error writing pomodoro duration: ", error)
+        );
+    },
+    saveRestDuration() {
+      const userRef = firestore
+        .collection("users")
+        .doc(firebaseAuth.currentUser.displayName);
+      userRef
+        .set({ restDuration: this.restDuration }, { merge: true })
+        .then(() => console.log("Rest duration successfully written!"))
+        .catch((error) =>
+          console.error("Error writing rest duration: ", error)
+        );
+    },
+
     click() {
       if (this.buttonText === "Start!" || this.buttonText === "Resume") {
         this.animateBar();
@@ -248,16 +302,6 @@ export default {
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
-          // update currentSegment
-          if (doc.exists && doc.data().xp) {
-            // xp already has value
-            let currXP = doc.data().xp;
-            await userRef.update({ xp: currXP + this.pomodoroDuration });
-            console.log("xp updated");
-          } else {
-            await userRef.set({ xp: this.pomodoroDuration });
-            console.log("xp created");
-          }
         } else {
           this.topRight.set(1);
           this.topLeft.set(1);
