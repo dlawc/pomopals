@@ -162,13 +162,14 @@ export default {
   data: function () {
     let pomodoroDuration = 25 * 60;
     let restDuration = 5 * 60;
+    let currentSegment = 1;
     return {
       inputDuration: "",
       inputRestDuration: "",
       pomodoroDuration,
       restDuration,
       currentTimeInSeconds: pomodoroDuration,
-      currentSegment: 1,
+      currentSegment,
       buttonText: "Start!",
       topRight: null,
       bottomRight: null,
@@ -227,6 +228,7 @@ export default {
             this.pomodoroDuration =
               data.pomodoroDuration || this.pomodoroDuration;
             this.restDuration = data.restDuration || this.restDuration;
+            this.currentSegment = data.currentSegment || this.currentSegment;
             // Adjust pathOptions and currentTimeInSeconds if needed
             this.pathOptions.duration = (this.pomodoroDuration + 1) * 1000;
             this.currentTimeInSeconds = this.pomodoroDuration;
