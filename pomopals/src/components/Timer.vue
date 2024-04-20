@@ -162,13 +162,14 @@ export default {
   data: function () {
     let pomodoroDuration = 25 * 60;
     let restDuration = 5 * 60;
+    let currentSegment = 1;
     return {
       inputDuration: "",
       inputRestDuration: "",
       pomodoroDuration,
       restDuration,
       currentTimeInSeconds: pomodoroDuration,
-      currentSegment: 1,
+      currentSegment,
       buttonText: "Start!",
       topRight: null,
       bottomRight: null,
@@ -194,7 +195,10 @@ export default {
       this.savePomodoroDuration();
     },
     restDuration(newVal) {
-      this.saveRestDuration(); // Implement saveRestDuration similarly to savePomodoroDuration
+      this.saveRestDuration();
+    },
+    currentSegment(newVal) {
+      this.saveCurrentSegment();
     },
   },
   mounted: function () {
@@ -224,6 +228,7 @@ export default {
             this.pomodoroDuration =
               data.pomodoroDuration || this.pomodoroDuration;
             this.restDuration = data.restDuration || this.restDuration;
+            this.currentSegment = data.currentSegment || this.currentSegment;
             // Adjust pathOptions and currentTimeInSeconds if needed
             this.pathOptions.duration = (this.pomodoroDuration + 1) * 1000;
             this.currentTimeInSeconds = this.pomodoroDuration;
@@ -232,6 +237,7 @@ export default {
             // Consider whether to save defaults if no document exists
             this.savePomodoroDuration();
             this.saveRestDuration();
+            this.saveCurrentSegment();
           }
         })
         .catch((error) => {
@@ -258,6 +264,17 @@ export default {
         .then(() => console.log("Rest duration successfully written!"))
         .catch((error) =>
           console.error("Error writing rest duration: ", error)
+        );
+    },
+    saveCurrentSegment() {
+      const userRef = firestore
+        .collection("users")
+        .doc(firebaseAuth.currentUser.displayName);
+      userRef
+        .set({ currentSegment: this.currentSegment }, { merge: true })
+        .then(() => console.log("currentSegment successfully written!"))
+        .catch((error) =>
+          console.error("Error writing currentSegment: ", error)
         );
     },
 
@@ -314,6 +331,17 @@ export default {
         }
 
         // add update current segment to firebase
+        if (doc.exists && doc.data().currentSegment) {
+          // currentSegment already has value
+          await userRef.update({ currentSegment: this.currentSegment });
+          console.log("currentSegment updated");
+        } else {
+          await userRef.set(
+            { currentSegment: this.currentSegment },
+            { merge: true }
+          );
+          console.log("currentSegment created");
+        }
 
         clearInterval(this.interval);
 
