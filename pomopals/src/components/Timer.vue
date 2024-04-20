@@ -160,6 +160,12 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
+    let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+    let currentUser = firebaseAuth.currentUser;
+    let username = currentUser.displayName; // username as primary key
+    console.log(username);
+    let userRef = firestore.collection("users").doc(username);
     let pomodoroDuration = 25 * 60;
 
     return {
@@ -231,9 +237,27 @@ export default {
     },
 
     async onFinish() {
+      let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+      let currentUser = firebaseAuth.currentUser;
+      let username = currentUser.displayName; // username as primary key
+      console.log(username);
+      let userRef = firestore.collection("users").doc(username);
+      let doc = await userRef.get();
+
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
+          // update currentSegment
+          if (doc.exists && doc.data().xp) {
+            // xp already has value
+            let currXP = doc.data().xp;
+            await userRef.update({ xp: currXP + this.pomodoroDuration });
+            console.log("xp updated");
+          } else {
+            await userRef.set({ xp: this.pomodoroDuration });
+            console.log("xp created");
+          }
         } else {
           this.topRight.set(1);
           this.topLeft.set(1);
@@ -345,9 +369,10 @@ export default {
 
     showInputBox() {
       this.isSettingTime = true;
+      this.restartDuration();
     },
 
-    updateDuration() {
+    async updateDuration() {
       let duration = Number(this.inputDuration);
       let restDuration = Number(this.inputRestDuration);
       if (
@@ -361,8 +386,38 @@ export default {
         this.pathOptions.duration = (this.pomodoroDuration + 1) * 1000;
         this.restDuration = restDuration * 60;
         this.isSettingTime = false;
+
+        let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+        let currentUser = firebaseAuth.currentUser;
+        let username = currentUser.displayName; // username as primary key
+        console.log(username);
+        let userRef = firestore.collection("users").doc(username);
+        let doc = await userRef.get();
+
+        // update pomodoro time
+        if (doc.exists && doc.data().pomodoroDuration) {
+          // pomodoroDuration already has value
+          let currPomodoroDuration = doc.data().pomodoroDuration;
+          await userRef.update({ pomodoroDuration: this.pomodoroDuration });
+          console.log("pomodoroDuration updated");
+        } else {
+          await userRef.set({ pomodoroDuration: this.pomodoroDuration });
+          console.log("pomodoroDuration created");
+        }
+
+        // update rest time
+        if (doc.exists && doc.data().restDuration) {
+          // restDuration already has value
+          let currRestDuration = doc.data().restDuration;
+          await userRef.update({ restDuration: this.restDuration });
+          console.log("restDuration updated");
+        } else {
+          await userRef.set({ restDuration: this.restDuration });
+          console.log("restDuration created");
+        }
       } else {
-        alert("Please enter valid durations");
+        alert("Please input valid timings!");
       }
     },
 
