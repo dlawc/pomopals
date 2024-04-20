@@ -160,12 +160,14 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
+    let pomodoroDuration = 25 * 60;
+    let restDuration = 5 * 60;
     return {
       inputDuration: "",
       inputRestDuration: "",
-      pomodoroDuration: 25 * 60, // Default initialization
-      restDuration: 5 * 60, // Default initialization
-      currentTimeInSeconds: 25 * 60, // Updated to default pomodoroDuration
+      pomodoroDuration,
+      restDuration,
+      currentTimeInSeconds: pomodoroDuration,
       currentSegment: 1,
       buttonText: "Start!",
       topRight: null,
@@ -174,7 +176,7 @@ export default {
       topLeft: null,
       pathOptions: {
         easing: "linear",
-        duration: 25 * 60 * 1000 + 1000, // Updated dynamically below in fetched data
+        duration: (pomodoroDuration + 1) * 1000, // Updated dynamically below in fetched data
       },
       interval: null,
       boopAudio: new Audio(boop),
@@ -325,14 +327,6 @@ export default {
         }, 4100);
         console.log("button is now", this.buttonText);
 
-        let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
-        let currentUser = firebaseAuth.currentUser;
-        let username = currentUser.displayName; // username as primary key
-        console.log(username);
-        let userRef = firestore.collection("users").doc(username);
-        let doc = await userRef.get();
-
         // update total xp
         if (doc.exists && doc.data().xp) {
           // xp already has value
@@ -373,7 +367,7 @@ export default {
     },
 
     startRest() {
-      // Set new interval
+      // set new interval
       this.reduceTime();
       setTimeout(() => {
         clearInterval(this.interval);
@@ -407,7 +401,7 @@ export default {
         {
           duration: (this.currentTimeInSeconds + 1) * 1000,
         },
-        this.onFinish
+        this.onFinish()
       );
     },
 
