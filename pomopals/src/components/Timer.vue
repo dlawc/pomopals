@@ -160,12 +160,14 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
+    let pomodoroDuration = 25 * 60;
+    let restDuration = 5 * 60;
     return {
       inputDuration: "",
       inputRestDuration: "",
-      pomodoroDuration: 25 * 60, // Default initialization
-      restDuration: 5 * 60, // Default initialization
-      currentTimeInSeconds: 25 * 60, // Updated to default pomodoroDuration
+      pomodoroDuration,
+      restDuration,
+      currentTimeInSeconds: pomodoroDuration,
       currentSegment: 1,
       buttonText: "Start!",
       topRight: null,
@@ -174,7 +176,7 @@ export default {
       topLeft: null,
       pathOptions: {
         easing: "linear",
-        duration: 25 * 60 * 1000 + 1000, // Updated dynamically below in fetched data
+        duration: (pomodoroDuration + 1) * 1000, // Updated dynamically below in fetched data
       },
       interval: null,
       boopAudio: new Audio(boop),
@@ -311,6 +313,8 @@ export default {
           this.currentSegment = 1;
         }
 
+        // add update current segment to firebase
+
         clearInterval(this.interval);
 
         this.boopAudio.play();
@@ -325,14 +329,6 @@ export default {
         }, 4100);
         console.log("button is now", this.buttonText);
 
-        let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
-        let currentUser = firebaseAuth.currentUser;
-        let username = currentUser.displayName; // username as primary key
-        console.log(username);
-        let userRef = firestore.collection("users").doc(username);
-        let doc = await userRef.get();
-
         // update total xp
         if (doc.exists && doc.data().xp) {
           // xp already has value
@@ -340,7 +336,7 @@ export default {
           await userRef.update({ xp: currXP + this.pomodoroDuration });
           console.log("xp updated");
         } else {
-          await userRef.set({ xp: this.pomodoroDuration });
+          await userRef.set({ xp: this.pomodoroDuration }, { merge: true });
           console.log("xp created");
         }
 
@@ -354,9 +350,12 @@ export default {
           .catch(async (error) => {
             // if map does not exist, populate it with the map
             if (error.code === "not-found") {
-              await userRef.set({
-                xpWithTime: { [key]: value },
-              });
+              await userRef.set(
+                {
+                  xpWithTime: { [key]: value },
+                },
+                { merge: true }
+              );
             } else {
               console.error(error);
             }
@@ -373,7 +372,7 @@ export default {
     },
 
     startRest() {
-      // Set new interval
+      // set new interval
       this.reduceTime();
       setTimeout(() => {
         clearInterval(this.interval);
@@ -432,7 +431,6 @@ export default {
         this.isSettingTime = false;
 
         let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
         let currentUser = firebaseAuth.currentUser;
         let username = currentUser.displayName; // username as primary key
         console.log(username);
@@ -446,7 +444,10 @@ export default {
           await userRef.update({ pomodoroDuration: this.pomodoroDuration });
           console.log("pomodoroDuration updated");
         } else {
-          await userRef.set({ pomodoroDuration: this.pomodoroDuration });
+          await userRef.set(
+            { pomodoroDuration: this.pomodoroDuration },
+            { merge: true }
+          );
           console.log("pomodoroDuration created");
         }
 
@@ -457,7 +458,10 @@ export default {
           await userRef.update({ restDuration: this.restDuration });
           console.log("restDuration updated");
         } else {
-          await userRef.set({ restDuration: this.restDuration });
+          await userRef.set(
+            { restDuration: this.restDuration },
+            { merge: true }
+          );
           console.log("restDuration created");
         }
       } else {
