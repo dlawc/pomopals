@@ -155,7 +155,7 @@
 <script>
 import ProgressBar from "progressbar.js";
 import boop from "../assets/boop.mp3";
-import { firebaseAuth, firestore, db } from "../firebase.js";
+import { firebaseAuth, firestore } from "../firebase.js";
 
 export default {
   name: "Home",
