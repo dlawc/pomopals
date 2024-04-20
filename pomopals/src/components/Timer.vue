@@ -160,6 +160,12 @@ import { firebaseAuth, firestore, db } from "../firebase.js";
 export default {
   name: "Home",
   data: function () {
+    let userId = firebaseAuth.currentUser.uid; // userId as primary key
+
+    let currentUser = firebaseAuth.currentUser;
+    let username = currentUser.displayName; // username as primary key
+    console.log(username);
+    let userRef = firestore.collection("users").doc(username);
     let pomodoroDuration = 25 * 60;
 
     return {
