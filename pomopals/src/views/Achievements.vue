@@ -48,6 +48,8 @@ import firebase from '../firebase.js';
 import {  doc, getDoc } from "firebase/firestore";
 import NavBar from "@/components/NavBar.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
+import { onSnapshot } from "firebase/firestore";
+
 export default {
   components: {
     ProgressBar, 
@@ -56,7 +58,7 @@ export default {
   },
   data() {
     return {
-      userName: "Edwin ho",
+      userName: firebase.auth().currentUser.displayName,
       selectedTimeframe: 'progress',
       achievements: [
         { 
@@ -174,43 +176,48 @@ export default {
     this.fetchUserProgress();
   },
   methods: {
-    async fetchUserProgress() {
-try {
-  const docSnapshot = await firebase.firestore().collection('users').doc(this.userName).get();
-  if (docSnapshot.exists) {
-    const userData = docSnapshot.data();
-    const updatedAchievements = this.achievements.map(achievement => {
-      let currentProgress;
-      switch (achievement.conditionType) {
-        case 'xp':
-          currentProgress = userData.xp || 0;
-          break;
-        case 'top3':
-          currentProgress = userData.top3Placements || 0;
-          break;
-        case 'friends':
-        currentProgress = userData.friends ? Object.keys(userData.friends).length : 0;
-        break;
-        case 'groupstudy':
-          currentProgress = userData.groupstudy || 0;
-          break;
+    fetchUserProgress() {
+    const userRef = firebase.firestore().collection('users').doc(this.userName);
+    this.unsubscribe = onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        const userData = doc.data();
+        const updatedAchievements = this.achievements.map(achievement => {
+          let currentProgress = 0; 
+          switch (achievement.conditionType) {
+            case 'xp':
+              currentProgress = userData.xp || 0;
+              break;
+            case 'top3':
+              currentProgress = userData.top3Placements || 0;
+              break;
+            case 'friends':
+              currentProgress = userData.friends ? Object.keys(userData.friends).length : 0;
+              break;
+            case 'groupstudy':
+              currentProgress = userData.groupstudy || 0;
+              break;
+          }
+          return {
+            ...achievement,
+            current: currentProgress
+          };
+        });
+        this.achievements = updatedAchievements;
+      } else {
+        console.log("No such document!");
       }
-      return {
-        ...achievement,
-        current: currentProgress
-      };
+    }, error => {
+      console.error("Error listening to the document:", error);
     });
-    this.achievements = updatedAchievements;
-  } else {
-    console.log("No such document!");
-  }
-} catch (error) {
-  console.error("Error getting document:", error);
-}
-},
+  },
   redirectToAllAchievements() {
         this.$router.push('/allachievements');
+  },
+  beforeUnmount() { 
+  if (this.unsubscribe) {
+    this.unsubscribe(); 
   }
+}
 },
   computed: {
   inProgressAchievements() {
@@ -300,6 +307,7 @@ background-size: 25px ;
 #AchievementCompletedContainer{
 width: 90vw;
 max-height: 35vh;
+min-height: 20vh;
 margin-left:auto;
 margin-right: auto;
 background: #B857A1;
@@ -385,6 +393,7 @@ text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   width: 90vw;
   height: 40vh;
   max-height: 35vh;
+  min-height: 20vh;
   margin-left: auto;
   margin-right: auto;
   background: #CDAEC7;
