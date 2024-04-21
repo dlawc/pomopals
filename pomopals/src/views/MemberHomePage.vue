@@ -90,7 +90,8 @@ export default {
 </script>
 
 <template>
-  <div class="home">
+  <div class="overlay">
+    <div class="home">
     <div id="xpBar">
       <XpBar />
     </div>
@@ -117,6 +118,8 @@ export default {
       </div>
     </div>
   </div>
+  </div>
+  
 </template>
 
 <style scoped>
@@ -164,7 +167,6 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
   margin: 0;
   width: 80vw; /* Use viewport width for responsive control */
   max-width: 600px; /* Adjust based on your design preference */
@@ -181,7 +183,7 @@ body {
   margin-bottom: 3px;
   font-weight: bold;
   text-align: center;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
   cursor: pointer; /* Cursor pointer to indicate button functionality */
   transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
@@ -198,18 +200,18 @@ body {
 
 #memberCount {
   text-align: center;
-  color: white; /* Set the text color */
-  font-size: 1.15rem; /* Adjust the font size as needed */
-  margin-top: 1px; /* Add some space above the text */
+  color: white; 
+  font-size: 1.15rem; 
+  margin-top: 1px; 
   font-weight: 500;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .leave-icon {
   cursor: pointer;
-  width: 40px; /* or the size you prefer */
-  height: 40px; /* or the size you prefer */
-  margin-top: 5px; /* adjust as needed */
+  width: 40px; 
+  height: 40px; 
+  margin-top: 5px; 
   cursor: pointer;
   fill: white;
 }

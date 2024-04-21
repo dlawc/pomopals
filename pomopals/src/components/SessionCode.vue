@@ -174,8 +174,10 @@ p1 {
   background: transparent;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 25px;
+  font-size: 1.6rem;
   color: white;
+  font-weight: 600;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
 
 /* Styles for inputs */

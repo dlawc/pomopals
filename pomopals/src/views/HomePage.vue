@@ -23,7 +23,8 @@ export default {
 </script>
 
 <template>
-  <div class="home">
+  <div class="overlay"> 
+    <div class="home">
     <div><SignOutButton class="signout" /></div>
     <div v-show="buttonText == 'Start!'"><NavBar /></div>
     <div><XpBar /></div>
@@ -32,6 +33,8 @@ export default {
     </div>
     <div><SessionCode /></div>
   </div>
+  </div>
+  
 </template>
 
 <style scoped>
@@ -67,4 +70,6 @@ export default {
   right: 10px;
   padding: 10px;
 }
+
+
 </style>
