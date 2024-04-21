@@ -1,7 +1,9 @@
 <template>
   <div class="achievementpage">
     <NavBar/>
-  <button id = "SignOut" type = "button">Sign Out</button> 
+    <div class = "signout">
+    <SignOutButton/>
+  </div>
   <div id = "headercontainer">
       <h1 id = "myachievementsheader">All Achievements</h1>
   </div>  
@@ -11,75 +13,153 @@
       <option value="progress">View Progress</option>
     </select>
   </div>
-  <div class = "achievements-container">
-  <div id = "AchievementCompletedContainer">
-  <h1 id = "AchievementsCompletedHeader"> Achievements Unlocked</h1>
-  <div id = "Achievementunlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
+  <div id = "AllAchievementContainer">
+    <h1 id = "AchievementsCompletedHeader"> Achievements Unlocked</h1>
+    <div id = "Achievementunlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
       <img :src=" achievement.icon" alt="achievement.title" class="achievementcompleted-icon">
       <div class="achievementcompleted-details">
         <h2 class="title">{{ achievement.title }}</h2>
         <p class="subtitle">{{ achievement.description }}</p>
       </div>
       <span class="progresscompleted-text">Challenge Completed</span>
+    </div>
+    <div class="allachievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
+      <img :src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
+      <div class="achievement-details">
+        <h2 class="greytitle">{{ achievement.title }}</h2>
+        <p class="greysubtitle">{{ achievement.description }}</p>
+      </div>
+      <span class="incompleted-text">LOCKED</span>
+    </div>
   </div>
+</div>
 
-  </div>
-</div>
-</div>
 </template>
 <script>
 import ProgressBar from '@/components/ProgressBar.vue';
 import firebase from '../firebase.js';
 import {  doc, getDoc } from "firebase/firestore";
-import NavBar from "@/components/NavBar.vue"
+import NavBar from "@/components/NavBar.vue";
+import SignOutButton from "@/components/SignOutButton.vue";
+import { onSnapshot } from "firebase/firestore";
 export default {
   components: {
     ProgressBar, 
     NavBar,
+    SignOutButton,
   },
   data() {
     return {
-      userName: "Edwin ho",
+      userName: firebase.auth().currentUser.displayName,
       selectedTimeframe: 'all',
       achievements: [
         { 
           id: 1,
-          title: 'Master User',
-          description: 'Total EXP Reached 200 XP',
+          title: 'Novice User',
+          description: 'Total EXP Reached 50 XP',
           icon: 'useraward.png', 
-          current: 200,
-          goal: 200,
+          current: 0,
+          goal: 50,
           conditionType: 'xp',
-          currentTest: 0,
         },
-        {
+        { 
           id: 2,
-          title: 'Leaderboard Novice',
-          description: 'Place Top 3 in Your Monthly Leaderboard Once',
-          icon: 'leaderaward.png', 
-          current: 4,
-          goal: 1,
-          conditionType: 'top3',
-          currentTest: 0,
-        },{
+          title: 'Master User',
+          description: 'Total EXP Reached 1000 XP',
+          icon: 'useraward.png', 
+          current: 0,
+          goal: 1000,
+          conditionType: 'xp',
+        },
+        { 
           id: 3,
-          title: 'Leaderboard Competitor',
-          description: 'Place Top 3 in Your Monthly Leaderboard 5 times',
-          icon: 'leaderaward.png', 
-          current: 2,
-          goal: 5,
-          conditionType: 'top3',
-          currentTest: 0,
+          title: 'Legendary User',
+          description: 'Total EXP Reached 10000 XP',
+          icon: 'useraward.png', 
+          current: 0,
+          goal: 10000,
+          conditionType: 'xp',
         },
         {
           id: 4,
-          title: 'Leaderboard Legend',
-          description: 'Place Top 3 in Your Monthly LeaderBoard 10 times',
+          title: 'Leaderboard Novice',
+          description: 'Place Top 3 in Your Monthly Leaderboard Once',
           icon: 'leaderaward.png', 
-          current: 5,
+          current: 0,
+          goal: 1,
+          conditionType: 'top3',
+        },
+        {
+          id: 5,
+          title: 'Leaderboard Master',
+          description: 'Place Top 3 in Your Monthly Leaderboard 5 Times',
+          icon: 'leaderaward.png', 
+          current: 0,
+          goal: 5,
+          conditionType: 'top3',
+        },
+        {
+          id: 6,
+          title: 'Leaderboard Legend',
+          description: 'Place Top 3 in Your Monthly Leaderboard 10 Times',
+          icon: 'leaderaward.png', 
+          current: 0,
           goal: 10,
           conditionType: 'top3',
-          currentTest: 0,
+        },
+        {
+          id: 7,
+          title: 'Socializer Newbie',
+          description: 'Add 5 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 5,
+          conditionType: 'friends',
+        },
+        {
+          id: 8,
+          title: 'Socializer Master',
+          description: 'Add 10 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 10,
+          conditionType: 'friends',
+        },
+        {
+          id: 9,
+          title: 'Socializer Legend',
+          description: 'Add 20 friends',
+          icon: 'friendicon.png', 
+          current: 0,
+          goal: 20,
+          conditionType: 'friends',
+        },
+        {
+          id: 10,
+          title: 'Groupstudy Novice',
+          description: 'Study in Group Session 3 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 3,
+          conditionType: 'groupstudy',
+        },
+        {
+          id: 11,
+          title: 'Groupstudy Master',
+          description: 'Study in Group Session 9 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 9,
+          conditionType: 'groupstudy',
+        },
+        {
+          id: 12,
+          title: 'Groupstudy Legend',
+          description: 'Study in Group Session 20 times',
+          icon: 'studyicon.png', 
+          current: 0,
+          goal: 20,
+          conditionType: 'groupstudy',
         }
 
       ]
@@ -88,37 +168,48 @@ export default {
     this.fetchUserProgress();
   },
   methods: {
-    async fetchUserProgress() {
-try {
-  const docSnapshot = await firebase.firestore().collection('users').doc(this.userName).get();
-  if (docSnapshot.exists) {
-    const userData = docSnapshot.data();
-    const updatedAchievements = this.achievements.map(achievement => {
-      let currentProgress;
-      switch (achievement.conditionType) {
-        case 'xp':
-          currentProgress = userData.xp;
-          break;
-        case 'top3':
-          currentProgress = userData.top3Placements;
-          break;
+    fetchUserProgress() {
+    const userRef = firebase.firestore().collection('users').doc(this.userName);
+    this.unsubscribe = onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        const userData = doc.data();
+        const updatedAchievements = this.achievements.map(achievement => {
+          let currentProgress = 0; 
+          switch (achievement.conditionType) {
+            case 'xp':
+              currentProgress = userData.xp || 0;
+              break;
+            case 'top3':
+              currentProgress = userData.top3Placements || 0;
+              break;
+            case 'friends':
+              currentProgress = userData.friends ? Object.keys(userData.friends).length : 0;
+              break;
+            case 'groupstudy':
+              currentProgress = userData.groupstudy || 0;
+              break;
+          }
+          return {
+            ...achievement,
+            currentTest: currentProgress
+          };
+        });
+        this.achievements = updatedAchievements;
+      } else {
+        console.log("No such document!");
       }
-      return {
-        ...achievement,
-        currentTest: currentProgress
-      };
+    }, error => {
+      console.error("Error listening to the document:", error);
     });
-    this.achievements = updatedAchievements;
-  } else {
-    console.log("No such document!");
-  }
-} catch (error) {
-  console.error("Error getting document:", error);
-}
-},
+  },
   redirectToAllAchievements() {
         this.$router.push('/achievements');
+  },
+  beforeUnmount() { 
+  if (this.unsubscribe) {
+    this.unsubscribe(); 
   }
+}
 },
   computed: {
   inProgressAchievements() {
@@ -152,21 +243,7 @@ flex-direction: column;
 height: 100vh;
   z-index: 1;
 }
-#SignOut{
-  float: right;
-  width: 162px;
-  height: 49px;
-margin-left: auto;
-font-family: 'Space Grotesk';
-font-style: normal;
-font-weight: 700;
-font-size: 24px;
-line-height: 31px;
-text-align: center;
-background-color: transparent;
-border: none;
-color: #FFFFFF;
-}
+
 #myachievementsheader{
 width: 700px;
 height: 82px;
@@ -210,8 +287,9 @@ left: 1445px;
 top: 145px;
 background-size: 25px ;
 }
-#AchievementCompletedContainer{
+#AllAchievementContainer{
 width: 90vw;
+height: 70vh;
 margin-left:auto;
 margin-right: auto;
 background: #B857A1;
@@ -220,6 +298,7 @@ border-radius: 10px;
 overflow-y: auto;
 overflow-x: auto;
 margin-bottom: 10px;
+
 }
 #AchievementsCompletedHeader{
 width: 586px;
@@ -241,7 +320,7 @@ color: #FFFFFF;
   margin-top: 10px;
 width: 100%; 
 background-color: #B857A1; 
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+
 flex-direction: row;
 }
 .achievementcompleted-icon{
@@ -294,6 +373,19 @@ text-transform: uppercase;
 color: #11DD11;
 text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+.incompleted-text{
+  margin-left: auto;
+width: 450px;
+height: 39px;
+font-family: 'Lucida Sams';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 38px;
+text-align: center;
+text-transform: uppercase;
+color: #2a2828;
+}
 #AchievementsInProgContainer {
   width: 90vw;
   height: 40vh;
@@ -316,7 +408,7 @@ line-height: 41px;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-.achievement-in-progress{
+.allachievement-in-progress{
   display: flex;
   align-items: center;
 flex-direction: row;
