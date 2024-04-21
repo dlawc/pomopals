@@ -1,13 +1,19 @@
 <template>
   <div class="container">
     <div class="stateBanner">
-      <div id="studyBox">
+      <div
+        id="studyBox"
+        :class="{
+          enlarge: this.buttonText === 'Pause' || this.buttonText === 'Resume',
+        }"
+      >
         <span id="study">Study</span>
       </div>
-      <div id="restBox">
+      <div id="restBox" :class="{ highlight: isResting, enlarge: isResting }">
         <span id="rest">Rest</span>
       </div>
     </div>
+
     <div class="timer">
       <svg
         width="163"
@@ -682,6 +688,11 @@ p {
   border: 3px solid #ffffff;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 50px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.enlarge {
+  transform: scale(1.35);
 }
 
 #studyBox {
