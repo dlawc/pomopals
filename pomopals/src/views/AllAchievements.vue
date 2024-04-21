@@ -453,4 +453,4 @@ font-size: 20px;
 text-transform: capitalize;
 color: #474242;
 }
-</style>./AllAchievements.vue/index.js./Achievements.vue/index.js./AllAchievements.vue/index.js
+</style>
