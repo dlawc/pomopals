@@ -86,19 +86,19 @@
         />
       </svg>
       <div class="time">
-        <p v-if="isResting">Rest!</p>
         <div id="timeDisplay">{{ timeDisplay }}</div>
       </div>
     </div>
 
     <div class="buttons">
       <button
-        v-if="!isSettingTime && this.pomodoroDuration != 0"
+        v-if="!isSettingTime"
+        :disabled="isResting"
         @click="click"
         id="changingButton"
       >
         <img
-          v-show="buttonText == 'Start!'"
+          v-show="buttonText == 'Start!' || isResting"
           src="@/assets/start.png"
           id="startButton"
           alt="Start!"
@@ -118,7 +118,8 @@
       </button>
 
       <button
-        v-if="!isSettingTime && this.pomodoroDuration != 0 && !isResting"
+        v-if="!isSettingTime && this.pomodoroDuration != 0"
+        :disabled="isResting"
         id="restartButton"
         @click="restartDuration"
       >
@@ -142,7 +143,8 @@
       </div>
 
       <button
-        v-if="!isSettingTime && !isResting"
+        v-if="!isSettingTime"
+        :disabled="isResting"
         @click="showInputBox"
         id="settingButton"
       >
@@ -367,8 +369,6 @@ export default {
 
         clearInterval(this.interval);
 
-        this.boopAudio.play();
-
         this.isResting = true;
         this.buttonText = "Rest";
 
@@ -376,7 +376,7 @@ export default {
           this.currentTimeInSeconds = this.restDuration;
 
           this.startRest();
-        }, 4005);
+        });
         console.log("button is now", this.buttonText);
 
         // update total xp
@@ -426,12 +426,11 @@ export default {
       this.reduceTime();
       setTimeout(() => {
         clearInterval(this.interval);
-        this.boopAudio.play();
         this.currentTimeInSeconds = this.pomodoroDuration;
+        this.buttonText = "Start!";
+        this.isResting = false;
+        this.$emit("clickOnButtonEvent", this.buttonText);
       }, this.restDuration * 1000);
-      this.buttonText = "Start!";
-      this.isResting = false;
-      this.$emit("clickOnButtonEvent", this.buttonText);
     },
 
     animateBar() {
