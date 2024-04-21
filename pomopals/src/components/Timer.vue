@@ -378,7 +378,7 @@ export default {
           this.currentTimeInSeconds = this.restDuration;
 
           this.startRest();
-        }, 4100);
+        }, 4005);
         console.log("button is now", this.buttonText);
 
         // update total xp

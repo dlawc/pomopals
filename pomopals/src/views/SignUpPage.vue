@@ -110,7 +110,7 @@ export default {
             displayName: username,
           });
 
-          // initialise fields after signing up
+          // initialize fields after signing up
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
             friends: {},
