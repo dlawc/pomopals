@@ -1,14 +1,6 @@
 <template>
   <div class="xpBar">
     <span>⌁₊˚⊹   Total XP: {{ totalXP }}  ⊹˚₊⌁</span>
-    <!-- <table id="table">
-      <tr>
-        <th id="totalXPHeader">Total XP</th>
-      </tr>
-      <tr>
-        <td id="totalXP">{{ totalXP }}</td>
-      </tr>
-    </table> -->
   </div>
 </template>
 
@@ -72,29 +64,10 @@ export default {
   text-align: center;
 }
 
-#table {
-  /* transform: translateY(65px); */
-  width: 60%;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-#table th,
-#table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-  color: black;
-}
-
-#table th {
-  background-color: #f2f2f2;
-  color: black;
-}
 .xpBar span {
   font-size: 1.6rem;
   color: white;
   font-weight: 600;
-  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.8);
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
 </style>

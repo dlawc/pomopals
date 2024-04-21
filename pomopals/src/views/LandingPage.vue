@@ -35,8 +35,8 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); 
-  background-image: url('/bg.jpeg');
+  background-color: rgba(0, 0, 0, 0.3); 
+  background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/bg.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   display: flex;

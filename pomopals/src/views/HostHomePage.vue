@@ -1,8 +1,7 @@
 <template>
-    <div id="xpBar">
-      <XpBar />
-    </div>
+  <div class="overlay">
     <div id="timerWrapper">
+      <XpBar />
       <Timer ref="timerRef" :isHost="true" />
     </div>
     <div id="sessionInfo">
@@ -26,12 +25,13 @@
         {{ members.length }} member(s) in this group session
       </div>
     </div>
+  </div>
+    
 </template>
 
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
-import NavBar from "@/components/NavBar.vue";
 import firebase from "@/firebase";
 import { firebaseAuth, db } from "@/firebase";
 
@@ -123,8 +123,7 @@ body {
   width: 100%;
   height: 100vh; /* Use viewport height to ensure full height */
   overflow: hidden; /* Prevent scrolling */
-  background-color: #f0f0f0; /* Background color if needed */
-  font-family: "Lucida Sans", Arial, sans-serif; /* Define the font family once */
+  font-family: "DM Sans", sans-serif;
 }
 #sessionInfo {
   display: flex;
@@ -160,7 +159,6 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
   margin: 0;
   width: 80vw; /* Use viewport width for responsive control */
   max-width: 600px; /* Adjust based on your design preference */
@@ -177,7 +175,7 @@ body {
   margin-bottom: 3px;
   font-weight: bold;
   text-align: center;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
   cursor: pointer; /* Cursor pointer to indicate button functionality */
   transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
@@ -186,8 +184,6 @@ body {
   background-color: #e8e8e8; /* Slightly darker background on hover */
 }
 
-#navBar,
-#xpBar,
 #timerWrapper {
   margin-bottom: 2vh; /* This provides spacing between your components */
 }

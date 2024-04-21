@@ -1,5 +1,6 @@
 <template>
-    <div class="signout">
+    <div class="overlay">
+        <div class="signout">
         <SignOutButton />
       </div>
     <div class = navbar>
@@ -14,6 +15,8 @@
         </div>
         <URLDisplay/>
     </div>
+    </div>
+    
 </template>
 <script>
 import firebase from "@/firebase";
