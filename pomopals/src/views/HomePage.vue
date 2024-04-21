@@ -4,19 +4,19 @@ import XpBar from "/src/components/XpBar.vue";
 import NavBar from "@/components/NavBar.vue";
 import SessionCode from "/src/components/SessionCode.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
-import StateBanner from "/src/components/StateBanner.vue";
 
 export default {
   name: "HomePage",
-  components: { SignOutButton, XpBar, StateBanner, Timer, NavBar, SessionCode },
+  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode },
+
   data() {
     return {
       buttonText: "Start!",
     };
   },
   methods: {
-    updateNavBar(data) {
-      console.log("home page received buttonText from Timer", this.buttonText);
+    updateButtonText(data) {
+      console.log("home page received buttonText from Timer:", this.buttonText);
       this.buttonText = data;
     },
   },
@@ -26,12 +26,14 @@ export default {
 <template>
   <div class="overlay">
     <div class="home">
-      <div><SignOutButton class="signout" /></div>
+      <div v-show="buttonText == 'Start!'">
+        <SignOutButton class="signout" />
+      </div>
       <div v-show="buttonText == 'Start!'"><NavBar /></div>
       <div><XpBar /></div>
-      <div><StateBanner /></div>
+
       <div>
-        <Timer @clickOnButtonEvent="updateNavBar" />
+        <Timer @clickOnButtonEvent="updateButtonText" />
       </div>
       <div><SessionCode /></div>
     </div>
