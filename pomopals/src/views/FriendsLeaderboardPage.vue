@@ -1,5 +1,8 @@
 <template>
     <div class="leaderboard-page">
+      <div class = "navbar">
+          <NavBar/>
+        </div>
       <div class="header">
         <div class="signout">
           <SignOutButton />
@@ -7,9 +10,7 @@
         <div class="header-content">
             <h1 class="header-title">Friends Leaderboard</h1>
         </div>
-        <div class = "navbar">
-          <NavBar/>
-        </div>
+
         <div class="tabs">
             <button class="tab-button" @click="redirectToGlobal">
                 Global Leaderboard
