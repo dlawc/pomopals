@@ -334,8 +334,6 @@ export default {
     },
 
     async onFinish() {
-      let userId = firebaseAuth.currentUser.uid; // userId as primary key
-
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
       console.log(username);
@@ -430,9 +428,9 @@ export default {
         clearInterval(this.interval);
         this.boopAudio.play();
         this.currentTimeInSeconds = this.pomodoroDuration;
-        this.buttonText = "Start!";
-        this.isResting = false;
       }, this.restDuration * 1000);
+      this.buttonText = "Start!";
+      this.isResting = false;
       this.$emit("clickOnButtonEvent", this.buttonText);
     },
 
@@ -482,10 +480,8 @@ export default {
         this.restDuration = restDuration * 60;
         this.isSettingTime = false;
 
-        let userId = firebaseAuth.currentUser.uid; // userId as primary key
         let currentUser = firebaseAuth.currentUser;
         let username = currentUser.displayName; // username as primary key
-        console.log(username);
         let userRef = firestore.collection("users").doc(username);
         let doc = await userRef.get();
 
