@@ -17,12 +17,13 @@ export default {
 
 <style scoped>
 .stateBanner {
-  position: relative; /* This is key for absolutely positioned children */
-  display: flex; /* Makes stateBanner a flex container */
-  justify-content: center; /* Horizontally centers the children */
-  align-items: center; /* Vertically centers the children */
-  width: 100%; /* Adjust this as needed, maybe a fixed width */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   height: 100%;
+  transform: translateY(35px);
 }
 
 #studyBox,
@@ -38,11 +39,11 @@ export default {
 }
 
 #studyBox {
-  left: calc(50% - 246px); /* Shifts left from the center */
+  left: calc(50% - 216px);
 }
 
 #restBox {
-  left: calc(50% + 83px); /* Shifts right from the center */
+  left: calc(50% + 53px);
 }
 
 #study,
@@ -50,13 +51,13 @@ export default {
   position: absolute;
   width: 79px;
   height: 41px;
-  left: 42px; /* Centered within their respective boxes */
+  left: 42px;
   top: 2px;
   font-family: "Space Grotesk";
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
-  line-height: 41px;
+  line-height: 35px;
   text-align: center;
   color: #3a0404;
 }
