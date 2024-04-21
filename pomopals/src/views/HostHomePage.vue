@@ -160,24 +160,24 @@ body {
   justify-content: center;
   border-radius: 10px;
   margin: 0;
-  width: 80vw; /* Use viewport width for responsive control */
-  max-width: 600px; /* Adjust based on your design preference */
+  width: 80vw; 
+  max-width: 600px;
   flex-wrap: wrap;
   gap: 1px;
 }
 
 .member-badge {
-  background-color: white; /* White background for the badge */
-  color: black; /* Black text for readability */
+  background-color: white; 
+  color: black; 
   border-radius: 35px;
   padding: 0.5rem 1rem;
   margin: 0.5rem 0.2rem;
   margin-bottom: 3px;
   font-weight: bold;
   text-align: center;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
-  cursor: pointer; /* Cursor pointer to indicate button functionality */
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer; 
+  transition: background-color 0.3s; 
 }
 
 .member-badge:hover {

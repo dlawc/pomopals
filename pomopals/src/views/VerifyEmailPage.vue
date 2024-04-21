@@ -30,9 +30,9 @@
     },
     data() {
       return {
-        displayName: '',  // Initialize displayName as empty
-        emailSent: false, // Track if the verification email has been sent
-        buttonLabel: 'Verify my Email Address', // Dynamic button label
+        displayName: '',  
+        emailSent: false, 
+        buttonLabel: 'Verify my Email Address', 
       };
     },
     created() {
@@ -42,12 +42,12 @@
       async fetchUserData() {
         const user = firebaseAuth.currentUser;
         if (user) {
-          this.displayName = user.displayName || 'there'; // Set displayName or default to 'there'
+          this.displayName = user.displayName || 'there'; 
         }
       },
       async verifyEmail() {
-        const user = firebaseAuth.currentUser; // Get the current user from Firebase Auth
-        if (user) { // Check if the user object exists
+        const user = firebaseAuth.currentUser; 
+        if (user) { 
           try {
             await user.sendEmailVerification();
             console.log("Verification email sent! Redirecting you to the log in page.");
