@@ -4,7 +4,7 @@
       <div
         id="studyBox"
         :class="{
-          enlarge: this.buttonText === 'Pause' || this.buttonText === 'Resume',
+          enlarge: this.buttonText == 'Pause' || this.buttonText == 'Resume',
         }"
       >
         <span id="study">Study</span>
