@@ -5,7 +5,7 @@
             <img src = "@/assets/home_empty.png" width = 30 class = "default">
             <img src = "@/assets/home_filled.png" width = 30 class = "filled">
         </router-link><br>
-        <router-link to="/leaderboard" class = "nav-btn" id = "leaderboard" active-class="active">
+        <router-link to="/leaderboard" class = "nav-btn" id = "leaderboard" :class="{ 'active': isLeaderboardActive }">
             <img src = "@/assets/leaderboard_empty.png" width = 30 class = "default">
             <img src = "@/assets/leaderboard_filled.png" width = 30 class = "filled">
         </router-link><br>
@@ -31,7 +31,10 @@ export default {
     isAchievementsActive() {
       // Check if the current route is '/achievements' or starts with '/achievements/'
       return this.$route.path === '/achievements' || this.$route.path === '/allachievements';
-    }
+    }, 
+    isLeaderboardActive() {
+      return this.$route.path === '/leaderboard' || this.$route.path === '/friendsleaderboard'; 
+    }, 
   }
 }
 
