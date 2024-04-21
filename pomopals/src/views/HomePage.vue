@@ -4,11 +4,10 @@ import XpBar from "/src/components/XpBar.vue";
 import NavBar from "@/components/NavBar.vue";
 import SessionCode from "/src/components/SessionCode.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
-import StateBanner from "/src/components/StateBanner.vue";
 
 export default {
   name: "HomePage",
-  components: { SignOutButton, XpBar, StateBanner, Timer, NavBar, SessionCode },
+  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode },
 
   data() {
     return {
@@ -32,7 +31,7 @@ export default {
       </div>
       <div v-show="buttonText == 'Start!'"><NavBar /></div>
       <div><XpBar /></div>
-      <div><StateBanner /></div>
+
       <div>
         <Timer @clickOnButtonEvent="updateButtonText" />
       </div>

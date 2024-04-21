@@ -12,6 +12,12 @@
 <script>
 export default {
   name: "StateBanner",
+  props: ["buttonText"],
+  watch: {
+    buttonText(newVal, oldVal) {
+      console.log("buttonText changed from", oldVal, "to", newVal);
+    },
+  },
 };
 </script>
 
