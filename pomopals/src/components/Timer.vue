@@ -239,7 +239,7 @@ export default {
             this.saveRestDuration();
             this.saveCurrentSegment();
           }
-          this.updateCurrentSegment();
+          this.updateCurrentSegment(); // updates current quadrant
         })
         .catch((error) => {
           console.error("Error getting document:", error);
@@ -291,14 +291,14 @@ export default {
         this.bottomLeft.set(1);
       } else if (this.currentSegment == 3) {
         this.topRight.set(0);
-        this.topLeft.set(0);
-        this.bottomRight.set(1);
+        this.topLeft.set(1);
+        this.bottomRight.set(0);
         this.bottomLeft.set(1);
       } else if (this.currentSegment == 4) {
         this.topRight.set(0);
-        this.topLeft.set(0);
+        this.topLeft.set(1);
         this.bottomRight.set(0);
-        this.bottomLeft.set(1);
+        this.bottomLeft.set(0);
       }
     },
 

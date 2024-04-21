@@ -110,9 +110,14 @@ export default {
             displayName: username,
           });
 
+          // initialise fields after signing up
           await firebase.firestore().collection("users").doc(username).set({
             email: user.email,
             friends: {},
+            currentSegment: 1,
+            pomodoroDuration: 1500,
+            restDuration: 300,
+            xp: 0,
             urlblocklist: [],
           });
           this.$router.push("/home");
@@ -161,7 +166,7 @@ export default {
           .set({
             email: this.credentials.email,
             friends: {},
-            urlblocklist: [], 
+            urlblocklist: [],
             // Include any other user information here
           });
         console.log(
@@ -197,7 +202,8 @@ export default {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
-  background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/bg.jpeg");
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("/bg.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   display: flex;
