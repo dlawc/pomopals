@@ -4,10 +4,11 @@ import XpBar from "/src/components/XpBar.vue";
 import NavBar from "@/components/NavBar.vue";
 import SessionCode from "/src/components/SessionCode.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
+import StateBanner from "/src/components/StateBanner.vue";
 
 export default {
   name: "HomePage",
-  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode },
+  components: { SignOutButton, XpBar, StateBanner, Timer, NavBar, SessionCode },
   data() {
     return {
       buttonText: "Start!",
@@ -23,18 +24,18 @@ export default {
 </script>
 
 <template>
-  <div class="overlay"> 
+  <div class="overlay">
     <div class="home">
-    <div><SignOutButton class="signout" /></div>
-    <div v-show="buttonText == 'Start!'"><NavBar /></div>
-    <div><XpBar /></div>
-    <div>
-      <Timer @clickOnButtonEvent="updateNavBar" />
+      <div><SignOutButton class="signout" /></div>
+      <div v-show="buttonText == 'Start!'"><NavBar /></div>
+      <div><XpBar /></div>
+      <div><StateBanner /></div>
+      <div>
+        <Timer @clickOnButtonEvent="updateNavBar" />
+      </div>
+      <div><SessionCode /></div>
     </div>
-    <div><SessionCode /></div>
   </div>
-  </div>
-  
 </template>
 
 <style scoped>
@@ -70,6 +71,4 @@ export default {
   right: 10px;
   padding: 10px;
 }
-
-
 </style>
