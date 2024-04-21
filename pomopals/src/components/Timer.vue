@@ -239,6 +239,7 @@ export default {
             this.saveRestDuration();
             this.saveCurrentSegment();
           }
+          this.updateCurrentSegment();
         })
         .catch((error) => {
           console.error("Error getting document:", error);
@@ -276,6 +277,29 @@ export default {
         .catch((error) =>
           console.error("Error writing currentSegment: ", error)
         );
+    },
+    updateCurrentSegment() {
+      if (this.currentSegment == 1) {
+        this.topRight.set(1);
+        this.topLeft.set(1);
+        this.bottomRight.set(1);
+        this.bottomLeft.set(1);
+      } else if (this.currentSegment == 2) {
+        this.topRight.set(0);
+        this.topLeft.set(1);
+        this.bottomRight.set(1);
+        this.bottomLeft.set(1);
+      } else if (this.currentSegment == 3) {
+        this.topRight.set(0);
+        this.topLeft.set(0);
+        this.bottomRight.set(1);
+        this.bottomLeft.set(1);
+      } else if (this.currentSegment == 4) {
+        this.topRight.set(0);
+        this.topLeft.set(0);
+        this.bottomRight.set(0);
+        this.bottomLeft.set(1);
+      }
     },
 
     click() {
@@ -521,12 +545,20 @@ export default {
   },
   computed: {
     timeDisplay() {
-      const minutes = String(parseInt(this.currentTimeInSeconds / 60));
-      const seconds = String(this.currentTimeInSeconds % 60);
+      const totalSeconds = this.currentTimeInSeconds;
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const paddedHours = ("0" + hours).slice(-2);
       const paddedMinutes = ("0" + minutes).slice(-2);
       const paddedSeconds = ("0" + seconds).slice(-2);
 
-      return `${paddedMinutes}:${paddedSeconds}`;
+      if (hours > 0) {
+        return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
+      } else {
+        return `${paddedMinutes}:${paddedSeconds}`;
+      }
     },
   },
 };
