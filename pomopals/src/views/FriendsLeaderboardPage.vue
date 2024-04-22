@@ -277,6 +277,17 @@ export default {
   background-color: #F3E5F5;
 }
 
+.item-username {
+  white-space: nowrap; /* Prevent the text from wrapping */
+  overflow: hidden; /* Hide text that doesn't fit in the container */
+  text-overflow: ellipsis; /* Add an ellipsis (...) at the end of the cut text */
+  margin-right: 0.5rem; /* Ensure there's a space between the username and the points */
+}
+
+.item-points {
+  min-width: 50px; /* Ensure the points don't shrink below a certain width */
+  text-align: right;
+}
 .leaderboard-item.highlighted {
   background-color: orange; /* Highlight color */
   font-weight: bold;
