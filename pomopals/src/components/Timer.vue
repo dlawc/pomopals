@@ -408,7 +408,7 @@ export default {
 
         // If current page is on HostHomePage, update Xp in groupID document
         if (this.currentPage == "HostHomePage") {
-          await this.updateXpInGroupFirebase();
+          this.updateXpInGroupFirebase();
         }
       }
     },
