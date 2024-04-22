@@ -178,6 +178,11 @@ export default {
   props: {
     sessionCode: String,
   },
+  firestore() {
+    return {
+      session: firestore.collection("groupSession").doc(this.sessionCode),
+    };
+  },
   data: function () {
     let pomodoroDuration = 25 * 60;
     let restDuration = 5 * 60;
@@ -219,6 +224,13 @@ export default {
     sessionCode(newValue) {
       console.log("sessionCode prop changed to:", newValue);
     },
+    // watch for changes in groupSession's XP
+    "session.timeStamp"(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        console.log("timeStamp in groupSession changed");
+        this.handleTimeUpdate();
+      }
+    },
     pomodoroDuration(newVal) {
       this.pathOptions.duration = (newVal + 1) * 1000;
       this.currentTimeInSeconds = newVal; // Update current time as well
@@ -245,6 +257,18 @@ export default {
     this.topLeft.set(1);
   },
   methods: {
+    async handleTimeUpdate() {
+      let currentUser = firebaseAuth.currentUser;
+      let username = currentUser.displayName; // username as primary key
+      let userRef = firestore.collection("users").doc(username);
+      let doc = await userRef.get();
+      const sessionData = this.session;
+      if (sessionData.members.includes(username)) {
+        this.updateXpInUserFirebase(userRef, sessionData.xp);
+        this.updateXpWithTimeInUserFirebase(userRef, sessionData.xp);
+      }
+    },
+
     fetchData() {
       const userRef = firestore
         .collection("users")
@@ -438,7 +462,8 @@ export default {
       }
     },
 
-    async updateXpInUserFirebase(userRef, doc, calculatedXP) {
+    async updateXpInUserFirebase(userRef, calculatedXP) {
+      let doc = await userRef.get();
       if (doc.exists && doc.data().xp) {
         let currXP = doc.data().xp;
         await userRef.update({ xp: currXP + calculatedXP });
