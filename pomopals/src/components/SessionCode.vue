@@ -59,6 +59,7 @@ export default {
         pomodoroDuration: 0,
         xp: 0,
       };
+      console.log(data);
       userRef
         .set(data)
         .then(() => {
