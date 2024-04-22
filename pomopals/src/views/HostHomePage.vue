@@ -7,7 +7,6 @@
       >
       <Timer
         @generatedSessionCode="storeSessionCode"
-        @enteredSessionCode="storeSessionCode"
         ref="timerRef"
         :isHost="true"
       />
@@ -61,7 +60,7 @@ export default {
     // Set the sessionCode based on the router query parameter
     this.sessionCode = this.$route.query.sessionCode;
     this.fetchSessionDetails();
-    console.log("Received session code:", this.sessionCode);
+    console.log("Host page received session code:", this.sessionCode);
   },
   computed: {
     memberCount() {

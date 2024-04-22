@@ -51,6 +51,7 @@ export default {
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
       let userRef = firestore.collection("groupSession").doc(this.sessionCode);
+      let timeStamp = Date.now();
       let data = {
         active: true,
         host: username,
@@ -58,7 +59,9 @@ export default {
         restDuration: 0,
         pomodoroDuration: 0,
         xp: 0,
+        timeStamp: timeStamp,
       };
+      console.log(data);
       userRef
         .set(data)
         .then(() => {
