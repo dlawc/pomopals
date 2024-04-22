@@ -388,7 +388,7 @@ export default {
 
         setTimeout(() => {
           this.currentTimeInSeconds = this.restDuration;
-
+          this.boopAudio.play();
           this.startRest();
         });
         console.log("button is now", this.buttonText);
@@ -440,6 +440,7 @@ export default {
       this.reduceTime();
       setTimeout(() => {
         clearInterval(this.interval);
+        this.boopAudio.play();
         this.currentTimeInSeconds = this.pomodoroDuration;
         this.buttonText = "Start!";
         this.isResting = false;
