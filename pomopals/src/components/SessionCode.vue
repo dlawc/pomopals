@@ -55,7 +55,7 @@ export default {
         host: username,
         members: [],
         restDuration: 0,
-        pomodoroDuration: 0,
+        timerDuration: 0,
       };
       userRef
         .set(data)
@@ -93,9 +93,9 @@ export default {
     },
     // adds user to the members array of the group session document
     enterCode() {
-      this.viewState = "start";
-      let sessionCode = this.$refs.groupCodeInput.value;
-      let currentUser = firebaseAuth.currentUser;
+  this.viewState = "start";
+  let sessionCode = this.$refs.groupCodeInput.value;
+  let currentUser = firebaseAuth.currentUser;
 
   if (currentUser) {
     let username = currentUser.displayName;
@@ -110,7 +110,6 @@ export default {
         let members = data.members || [];
         let host = data.host;
 
-<<<<<<< Updated upstream
         // Check if the current user is the host
         if (username === host) {
           console.log("Host cannot join as a member.");
@@ -132,34 +131,6 @@ export default {
 
               // Update the `groupstudy` field with the new count
               batch.update(userDocRef, { groupstudy: groupstudyCount });
-=======
-              // Check if the current user is the host
-              if (username === host) {
-                console.log("Host cannot join as a member.");
-                alert("You are the host and cannot join as a member.");
-              } else if (!members.includes(username)) {
-                // Check if user is not already in member array
-                members.push(username);
-                batch.update(docRef, { members: members });
-                batch
-                  .commit()
-                  .then(() => {
-                    console.log("Members updated successfully!");
-                    alert("Group joined successfully");
-                    this.$router.push({
-                      path: "/member",
-                      query: { sessionCode: sessionCode },
-                    });
-                  })
-                  .catch((error) => {
-                    console.error("Error updating members: ", error);
-                    alert("Error updating group");
-                  });
-              } else {
-                console.log("User already in group");
-                alert("You are already a member of this group");
-              }
->>>>>>> Stashed changes
             } else {
               // If the user document doesn't exist, initialize `groupstudy` with 1
               batch.set(userDocRef, { groupstudy: 1 });
