@@ -5,7 +5,12 @@
       <span id="boostedXPStatement"
         >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
       >
-      <Timer ref="timerRef" :isHost="true" />
+      <Timer
+        @generatedSessionCode="storeSessionCode"
+        @enteredSessionCode="storeSessionCode"
+        ref="timerRef"
+        :isHost="true"
+      />
     </div>
     <div id="sessionInfo">
       <span id="sessionCode">Session Code: {{ sessionCode }}</span>
@@ -49,6 +54,7 @@ export default {
     return {
       sessionCode: "",
       members: [],
+      groupID: "",
     };
   },
   created() {
@@ -123,9 +129,14 @@ export default {
           });
       }
     },
+    storeSessionCode(sessionCode) {
+      this.sessionCode = sessionCode;
+      console.log("host/member page received:", this.sessionCode);
+    },
   },
 };
 </script>
+
 <style scoped>
 html,
 body {
