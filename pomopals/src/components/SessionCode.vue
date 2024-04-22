@@ -69,106 +69,128 @@ export default {
         .catch((error) => {
           console.error("Error setting session data:", error);
         });
-        const userDocRef = firestore.collection('users').doc(username);
-      userDocRef.get().then(docSnapshot => {
-  if (docSnapshot.exists) {
-    let currentCount = docSnapshot.data().groupstudy;
-    currentCount = currentCount ? currentCount + 1 : 1;
-    userDocRef.update({ groupstudy: currentCount })
-      .then(() => {
-        console.log('groupstudy count incremented successfully');
-      })
-      .catch(error => {
-        console.error('Error incrementing groupstudy count:', error);
+      const userDocRef = firestore.collection("users").doc(username);
+      userDocRef.get().then((docSnapshot) => {
+        if (docSnapshot.exists) {
+          let currentCount = docSnapshot.data().groupstudy;
+          currentCount = currentCount ? currentCount + 1 : 1;
+          userDocRef
+            .update({ groupstudy: currentCount })
+            .then(() => {
+              console.log("groupstudy count incremented successfully");
+            })
+            .catch((error) => {
+              console.error("Error incrementing groupstudy count:", error);
+            });
+        } else {
+          userDocRef
+            .set({ groupstudy: 1 })
+            .then(() => {
+              console.log(
+                "groupstudy attribute added and set to 1 successfully"
+              );
+            })
+            .catch((error) => {
+              console.error("Error setting groupstudy attribute:", error);
+            });
+        }
       });
-  } else {
-    userDocRef.set({ groupstudy: 1 })
-      .then(() => {
-        console.log('groupstudy attribute added and set to 1 successfully');
-      })
-      .catch(error => {
-        console.error('Error setting groupstudy attribute:', error);
-      });
-  }})
     },
     // adds user to the members array of the group session document
     enterCode() {
-  this.viewState = "start";
-  let sessionCode = this.$refs.groupCodeInput.value;
-  let currentUser = firebaseAuth.currentUser;
+      this.viewState = "start";
+      let sessionCode = this.$refs.groupCodeInput.value;
+      let currentUser = firebaseAuth.currentUser;
 
-  if (currentUser) {
-    let username = currentUser.displayName;
-    let docRef = db.collection("groupSession").doc(sessionCode);
+      if (currentUser) {
+        let username = currentUser.displayName;
+        let docRef = db.collection("groupSession").doc(sessionCode);
 
-    // Start a batch
-    let batch = db.batch();
+        // Start a batch
+        let batch = db.batch();
 
-    docRef.get().then((doc) => {
-      if (doc.exists) {
-        let data = doc.data();
-        let members = data.members || [];
-        let host = data.host;
+        docRef
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              let data = doc.data();
+              let members = data.members || [];
+              let host = data.host;
 
-        // Check if the current user is the host
-        if (username === host) {
-          console.log("Host cannot join as a member.");
-          alert("You are the host and cannot join as a member.");
-        } else if (!members.includes(username)) {
-          // User is not the host and is not already a member, proceed to join
-          members.push(username);
-          batch.update(docRef, { members: members });
+              // Check if the current user is the host
+              if (username === host) {
+                console.log("Host cannot join as a member.");
+                alert("You are the host and cannot join as a member.");
+              } else if (!members.includes(username)) {
+                // User is not the host and is not already a member, proceed to join
+                members.push(username);
+                batch.update(docRef, { members: members });
 
-          // Get a reference to the user's document in the users collection
-          const userDocRef = db.collection('users').doc(username);
+                // Get a reference to the user's document in the users collection
+                const userDocRef = db.collection("users").doc(username);
 
-          // Manually increment the `groupstudy` field
-          userDocRef.get().then(userDoc => {
-            if (userDoc.exists) {
-              let userDocData = userDoc.data();
-              let groupstudyCount = userDocData.groupstudy || 0;
-              groupstudyCount += 1; // Manually increment
+                // Manually increment the `groupstudy` field
+                userDocRef
+                  .get()
+                  .then((userDoc) => {
+                    if (userDoc.exists) {
+                      let userDocData = userDoc.data();
+                      let groupstudyCount = userDocData.groupstudy || 0;
+                      groupstudyCount += 1; // Manually increment
 
-              // Update the `groupstudy` field with the new count
-              batch.update(userDocRef, { groupstudy: groupstudyCount });
+                      // Update the `groupstudy` field with the new count
+                      batch.update(userDocRef, { groupstudy: groupstudyCount });
+                    } else {
+                      // If the user document doesn't exist, initialize `groupstudy` with 1
+                      batch.set(userDocRef, { groupstudy: 1 });
+                    }
+
+                    // Commit the batch
+                    batch
+                      .commit()
+                      .then(() => {
+                        console.log(
+                          "Members and groupstudy count updated successfully!"
+                        );
+                        alert("Group joined successfully");
+                        this.$router.push({
+                          path: "/member",
+                          query: { sessionCode: sessionCode },
+                        });
+                      })
+                      .catch((error) => {
+                        console.error(
+                          "Error updating members or groupstudy count: ",
+                          error
+                        );
+                        alert("Error updating group");
+                      });
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Error getting user document for groupstudy count:",
+                      error
+                    );
+                  });
+              } else {
+                console.log("User already in group");
+                alert("You are already a member of this group");
+              }
             } else {
-              // If the user document doesn't exist, initialize `groupstudy` with 1
-              batch.set(userDocRef, { groupstudy: 1 });
+              console.log("No such document!");
+              alert("No such group found");
             }
-
-            // Commit the batch
-            batch.commit().then(() => {
-              console.log("Members and groupstudy count updated successfully!");
-              alert("Group joined successfully");
-              this.$router.push({
-                path: "/member",
-                query: { sessionCode: sessionCode },
-              });
-            }).catch((error) => {
-              console.error("Error updating members or groupstudy count: ", error);
-              alert("Error updating group");
-            });
-          }).catch(error => {
-            console.error("Error getting user document for groupstudy count:", error);
+          })
+          .catch((error) => {
+            console.error("Error getting group session document:", error);
+            alert("Error accessing group");
           });
-        } else {
-          console.log("User already in group");
-          alert("You are already a member of this group");
-        }
       } else {
-        console.log("No such document!");
-        alert("No such group found");
+        console.log("No user logged in!");
+        alert("You need to be logged in to join a group");
       }
-    }).catch((error) => {
-      console.error("Error getting group session document:", error);
-      alert("Error accessing group");
-    });
-  } else {
-    console.log("No user logged in!");
-    alert("You need to be logged in to join a group");
-  }
-},
-setViewState(state) {
+    },
+    setViewState(state) {
       this.viewState = state;
       this.sessionCode = "";
     },

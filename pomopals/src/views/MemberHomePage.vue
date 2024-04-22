@@ -92,12 +92,12 @@ export default {
 <template>
   <div class="overlay">
     <div class="home">
-      <div id="xpBar">
-        <XpBar />
-      </div>
       <span id="boostedXPStatement"
         >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
       >
+      <div id="xpBar">
+        <XpBar />
+      </div>
       <div><Timer :isHost="false" /></div>
       <div id="sessionInfo">
         <span id="sessionCode">Session Code: {{ sessionCode }}</span>
@@ -217,6 +217,9 @@ body {
   cursor: pointer;
   fill: white;
 }
+#xpBar {
+  transform: translateY(100%);
+}
 #boostedXPStatement {
   width: 100%;
   display: flex;
@@ -228,5 +231,6 @@ body {
   font-size: 15px;
   font-weight: 450;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
+  z-index: 100;
 }
 </style>
