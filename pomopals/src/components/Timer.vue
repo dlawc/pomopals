@@ -717,7 +717,7 @@ p {
   align-items: center;
   width: 100%;
   height: 100%;
-  transform: translateY(-25px);
+  transform: translateY(-10px);
 }
 
 #studyBox,

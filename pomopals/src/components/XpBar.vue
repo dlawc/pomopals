@@ -1,6 +1,6 @@
 <template>
   <div class="xpBar">
-    <span>⌁₊˚⊹   Total XP: {{ totalXP }}  ⊹˚₊⌁</span>
+    <span>⌁₊˚⊹ Total XP: {{ totalXP }} ⊹˚₊⌁</span>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     handleAuthStateChanged() {
-      firebaseAuth.onAuthStateChanged(user => {
+      firebaseAuth.onAuthStateChanged((user) => {
         if (user) {
           // User is signed in, fetch the data
           this.fetchUserData(user.displayName);
@@ -49,10 +49,9 @@ export default {
           this.totalXP = "Error fetching data";
         }
       );
-    }
+    },
   },
 };
-
 </script>
 
 <style scoped>
@@ -62,6 +61,7 @@ export default {
   justify-content: center;
   margin-bottom: 20px;
   text-align: center;
+  transform: translateY(-60%);
 }
 
 .xpBar span {

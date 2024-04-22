@@ -231,6 +231,7 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+  transform: translateY(-150%);
   margin-bottom: -50px;
   text-align: center;
   font-size: 1.6rem;
