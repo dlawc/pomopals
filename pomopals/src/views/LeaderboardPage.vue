@@ -41,7 +41,14 @@
               <span class="rank-medal">{{ item.displayRank }}</span>
             </div>
             <div class="item-username">{{ item.username }}</div>
-            
+            <div class="item-button">
+              <LeaderboardAddFriendButton
+                v-if="item.showButton && !item.isUser"
+                :friend-username="item.username"
+                :friend-status="item.friendStatus"
+                @send-friend-request="sendFriendRequest"
+              />
+            </div>
             <div class="item-points">{{ item.points }}</div>
           </div>
         </div>
@@ -52,6 +59,7 @@
 <script>
 import firebase from "@/firebase";
 import SignOutButton from "@/components/SignOutButton.vue";
+import LeaderboardAddFriendButton from '@/components/LeaderboardAddFriendButton.vue';
 import NavBar from "@/components/NavBar.vue";
 
 export default {
@@ -61,24 +69,28 @@ export default {
       selectedTimeframe: 'all',
       leaderboardItems: [],
       currentUser: null,
-      isLoading: true
+      isLoading: true,
+      friendsMap: {}, // Added to store the friends map of the current user
+      friendRequests: {}, // Added to store the friend requests of the current user
     };
   },
   watch: {
-  currentUser: {
-    handler(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        this.fetchLeaderboard();
-      }
+    currentUser: {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.fetchLeaderboard();
+        }
+      },
+      immediate: true, 
     },
-    immediate: true, // This will trigger the handler immediately on mount
   },
-},
-mounted() {
+  mounted() {
     this.isLoading = true;
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.currentUser = user;
+        this.fetchFriends(user.uid);
+        this.fetchFriendRequests(user.uid);
         this.fetchLeaderboard();
       } else {
         this.currentUser = null;
@@ -123,10 +135,19 @@ mounted() {
           });
         }
 
+        let friendStatus = 'none';
+          if (this.currentUser && this.friendsMap[doc.id]) {
+            friendStatus = 'added';
+          } else if (this.friendRequests[doc.id] === 'pending') {
+            friendStatus = 'pending';
+          }
+      
         return {
               username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
               points: points, 
-              isUser: doc.id === this.currentUser.displayName
+              isUser: doc.id === this.currentUser.displayName,
+              showButton: doc.id !== this.currentUser.displayName, // Don't show button for self or already friends
+              friendStatus: friendStatus,
             };
           });
 
@@ -148,11 +169,34 @@ mounted() {
       }));
 
       this.isLoading = false;
-    }).catch(error => {
-      console.error("Error getting documents:", error);
-      this.isLoading = false;
-    });
-  },
+      }).catch(error => {
+        console.error("Error getting documents:", error);
+        this.isLoading = false;
+      });
+    },
+  fetchFriends(userId) {
+      const db = firebase.firestore();
+      db.collection("users").doc(userId).onSnapshot(doc => {
+        if (doc.exists && doc.data().friends) {
+          this.friendsMap = doc.data().friends;
+        } else {
+          this.friendsMap = {};
+        }
+        this.isLoading = false;
+      }, error => {
+        console.error("Error fetching friends:", error);
+        this.isLoading = false;
+      });
+    },
+    updateLocalFriendStatus(friendUsername, status) {
+      this.$set(this.friendRequests, friendUsername, status);
+      this.leaderboardItems = this.leaderboardItems.map(item => {
+        if (item.username === friendUsername) {
+          return { ...item, friendStatus: status };
+        }
+        return item;
+      });
+    },
     changeTimeframe() {
       console.log(this.selectedTimeframe + ' leaderboard selected');
       this.fetchLeaderboard();
@@ -168,6 +212,7 @@ mounted() {
     // Additional methods if needed
   },
   components: {
+    LeaderboardAddFriendButton,
     SignOutButton,
     NavBar,
   }
@@ -186,7 +231,7 @@ mounted() {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   z-index: 1;
 }
@@ -235,7 +280,6 @@ mounted() {
   overflow-y: auto;
 }
 
-
 .table-header {
   background-color: #000000;
   color: white;
@@ -257,6 +301,22 @@ mounted() {
   border-bottom: 1px solid #e0e0e0;
 }
 
+.item-username {
+  flex: 2; /* Adjust flexibility to prioritize username space */
+  text-align: left; /* Keep text alignment consistent */
+  margin-right: 0.5rem; /* Maintain margin for visual spacing */
+  overflow-wrap: break-word; /* Allow words to break and wrap onto the next line */
+  word-wrap: break-word; /* Legacy property for older browsers */
+  overflow: hidden;
+  text-overflow: visible;
+  text-overflow: clip;
+}
+
+.item-points {
+  min-width: 50px; /* Ensure the points don't shrink below a certain width */
+  text-align: right;
+}
+
 .leaderboard-item:nth-child(even) {
   background-color: #F3E5F5;
 }
@@ -273,7 +333,7 @@ mounted() {
 }
 
 .header-rank, .item-rank {
-  flex: 0 0 275px;
+  flex: 0 0 200px;
 }
 
 .header-username, .item-username {
@@ -293,30 +353,9 @@ mounted() {
 }
 
 .item-button {
+  flex: 1;  /* Maintain flex allocation */
   display: flex;
-  justify-content: flex-end; 
-}
-
-.add-friend-btn {
-  background-color: #55bc47;
-  border: none;
-  border-radius: 20px;
-  color: white;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-}
-
-.add-friend-btn:hover {
-  background-color: #47a83e;
-}
-
-.add-friend-btn.pending {
-  background-color: #a4a0a0; 
-}
-
-.add-friend-btn.added {
-  background-color: #7927b0;
+  justify-content: flex-end; /* Align button to the far right */
 }
 
 .tabs {
