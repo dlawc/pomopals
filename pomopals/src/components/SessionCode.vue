@@ -56,7 +56,8 @@ export default {
         host: username,
         members: [],
         restDuration: 0,
-        timerDuration: 0,
+        pomodoroDuration: 0,
+        xp: 0,
       };
       userRef
         .set(data)
