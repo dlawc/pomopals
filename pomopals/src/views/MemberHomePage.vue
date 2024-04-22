@@ -1,5 +1,5 @@
 <script>
-import MemberTimer from "/src/components/MemberTimer.vue";
+import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import { firebaseAuth, db } from "@/firebase";
 import firebase from "@/firebase";
@@ -95,7 +95,10 @@ export default {
       <div id="xpBar">
         <XpBar />
       </div>
-      <div><MemberTimer :isHost="false" /></div>
+      <span id="boostedXPStatement"
+        >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
+      >
+      <div><Timer :isHost="false" /></div>
       <div id="sessionInfo">
         <span id="sessionCode">Session Code: {{ sessionCode }}</span>
         <div id="groupMembers">
@@ -213,5 +216,17 @@ body {
   margin-top: 5px;
   cursor: pointer;
   fill: white;
+}
+#boostedXPStatement {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -50px;
+  text-align: center;
+  font-size: 1.6rem;
+  color: white;
+  font-size: 15px;
+  font-weight: 450;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
 </style>
