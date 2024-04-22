@@ -34,6 +34,9 @@ import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import firebase from "@/firebase";
 import { firebaseAuth, db } from "@/firebase";
+import 'firebase/firestore';
+import 'firebase/auth';
+
 
 export default {
   name: "HostHomePage",
