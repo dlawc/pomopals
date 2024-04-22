@@ -39,11 +39,13 @@ export default {
 
 <style>
 .button {
-  background-color: black;
+  background-color: transparent;
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold; 
+  font-size: medium; 
 }
 </style>
