@@ -42,22 +42,11 @@ import firebase from "@/firebase";
 export default {
     data() {
         return {
-            url: '', 
-            currentUser: null, 
-        }
-    }, 
-    watch : {
-        currentUser : {
-        handler(newValue, oldValue) {
-            if (newValue !== oldValue) {
-                this.display();
-            }
-        },
+            url: ''
         }
     }, 
     async mounted() {
         this.display();
-
         this.isLoading = true;
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
@@ -68,7 +57,7 @@ export default {
                 this.isLoading = false;
             }
         });
-    },
+    }, 
     methods: {
         async display() {
             const db = firebase.firestore();
@@ -114,11 +103,6 @@ export default {
             } catch (error) {
                 console.error("Error getting user:", error);
             }
-            return {
-              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
-              points: points, 
-              isUser: doc.id === this.currentUser.displayName
-            };
         },
         async deleteUrl(url) {
             const db = firebase.firestore();

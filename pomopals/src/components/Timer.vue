@@ -175,6 +175,9 @@ import { firebaseAuth, firestore } from "../firebase.js";
 
 export default {
   name: "Home",
+  props: {
+    sessionCode: String,
+  },
   data: function () {
     let pomodoroDuration = 25 * 60;
     let restDuration = 5 * 60;
@@ -199,15 +202,23 @@ export default {
       boopAudio: new Audio(boop),
       isResting: false,
       isSettingTime: false,
+      currentPage: "",
     };
   },
   created() {
     this.fetchData();
+    this.currentPage = this.$route.name;
   },
   watch: {
+    $route(to, from) {
+      // This will log when the route changes
+      this.currentPage = to.name;
+      console.log("Route changed to:", this.currentPage);
+    },
     pomodoroDuration(newVal) {
       this.pathOptions.duration = (newVal + 1) * 1000;
       this.currentTimeInSeconds = newVal; // Update current time as well
+      console.log("hi");
       this.savePomodoroDuration();
     },
     restDuration(newVal) {
@@ -267,7 +278,12 @@ export default {
         .doc(firebaseAuth.currentUser.displayName);
       userRef
         .set({ pomodoroDuration: this.pomodoroDuration }, { merge: true })
-        .then(() => console.log("Pomodoro duration successfully written!"))
+        .then(() =>
+          console.log(
+            "Pomodoro duration successfully written!",
+            this.currentPage
+          )
+        )
         .catch((error) =>
           console.error("Error writing pomodoro duration: ", error)
         );
@@ -352,7 +368,6 @@ export default {
     async onFinish() {
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
-      console.log(username);
       let userRef = firestore.collection("users").doc(username);
       let doc = await userRef.get();
 
@@ -360,70 +375,96 @@ export default {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
         } else {
-          this.topRight.set(1);
-          this.topLeft.set(1);
-          this.bottomRight.set(1);
-          this.bottomLeft.set(1);
-
+          this.resetSegments();
           this.currentSegment = 1;
         }
+        // Update segment in Firebase
+        this.updateSegmentInUserFirebase(userRef, doc);
 
-        // add update current segment to firebase
-        if (doc.exists && doc.data().currentSegment) {
-          // currentSegment already has value
-          await userRef.update({ currentSegment: this.currentSegment });
-          console.log("currentSegment updated");
-        } else {
-          await userRef.set(
-            { currentSegment: this.currentSegment },
-            { merge: true }
-          );
-          console.log("currentSegment created");
-        }
-
+        // timer animation and stuff
         clearInterval(this.interval);
-
         this.isResting = true;
         this.buttonText = "Rest";
-
         setTimeout(() => {
           this.currentTimeInSeconds = this.restDuration;
           this.boopAudio.play();
           this.startRest();
         });
-        console.log("button is now", this.buttonText);
 
-        // update total xp
-        if (doc.exists && doc.data().xp) {
-          // xp already has value
-          let currXP = doc.data().xp;
-          await userRef.update({ xp: currXP + this.pomodoroDuration });
-          console.log("xp updated");
-        } else {
-          await userRef.set({ xp: this.pomodoroDuration }, { merge: true });
-          console.log("xp created");
+        // Calculate XP based on the current page
+        let calculatedXP = this.pomodoroDuration; // Start with base duration
+        if (
+          this.currentPage === "HostHomePage" ||
+          this.currentPage === "MemberHomePage"
+        ) {
+          calculatedXP *= 1.5; // Apply multiplier if on specific pages
         }
 
-        // update xp with time
-        let key = new Date().toISOString(); // time whenever xp is written
-        let value = this.pomodoroDuration;
-        await userRef
-          .update({
-            [`xpWithTime.${key}`]: value,
-          })
-          .catch(async (error) => {
-            // if map does not exist, populate it with the map
-            if (error.code === "not-found") {
-              await userRef.set(
-                {
-                  xpWithTime: { [key]: value },
-                },
-                { merge: true }
-              );
-            } else {
-              console.error(error);
-            }
-          });
+        // Update XP in Firebase
+        this.updateXpInUserFirebase(userRef, doc, calculatedXP);
+
+        // Update xp with time
+        await this.updateXpWithTimeInUserFirebase(userRef, calculatedXP);
+
+        // If current page is on HostHomePage, update Xp in groupID document
+        if (this.currentPage == "HostHomePage") {
+          this.updateXpInGroupFirebase();
+        }
+      }
+    },
+
+    resetSegments() {
+      this.topRight.set(1);
+      this.topLeft.set(1);
+      this.bottomRight.set(1);
+      this.bottomLeft.set(1);
+    },
+
+    async updateSegmentInUserFirebase(userRef, doc) {
+      if (doc.exists && doc.data().currentSegment) {
+        await userRef.update({ currentSegment: this.currentSegment });
+      } else {
+        await userRef.set(
+          { currentSegment: this.currentSegment },
+          { merge: true }
+        );
+      }
+    },
+
+    async updateXpInUserFirebase(userRef, doc, calculatedXP) {
+      if (doc.exists && doc.data().xp) {
+        let currXP = doc.data().xp;
+        await userRef.update({ xp: currXP + calculatedXP });
+      } else {
+        await userRef.set({ xp: calculatedXP }, { merge: true });
+      }
+    },
+
+    async updateXpWithTimeInUserFirebase(userRef, calculatedXP) {
+      let key = new Date().toISOString();
+      let value = calculatedXP;
+      await userRef
+        .update({ [`xpWithTime.${key}`]: value })
+        .catch(async (error) => {
+          if (error.code === "not-found") {
+            await userRef.set(
+              { xpWithTime: { [key]: value } },
+              { merge: true }
+            );
+          } else {
+            console.error(error);
+          }
+        });
+    },
+
+    async updateXpInGroupFirebase(calculatedXP) {
+      let groupRef = firestore.collection("groupSession").doc(this.sessionCode);
+      let doc = await groupRef.get();
+      if (doc.exists && doc.data().xp) {
+        let currXP = doc.data().xp;
+        await groupRef.update({ xp: currXP + calculatedXP });
+      } else {
+        await groupRef.set({ xp: calculatedXP }, { merge: true });
       }
     },
 
@@ -676,7 +717,7 @@ p {
   align-items: center;
   width: 100%;
   height: 100%;
-  transform: translateY(-25px);
+  transform: translateY(-10px);
 }
 
 #studyBox,

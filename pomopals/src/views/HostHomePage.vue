@@ -2,7 +2,15 @@
   <div class="overlay">
     <div id="timerWrapper">
       <XpBar />
-      <Timer ref="timerRef" :isHost="true" />
+      <span id="boostedXPStatement"
+        >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
+      >
+      <Timer
+        @generatedSessionCode="storeSessionCode"
+        @enteredSessionCode="storeSessionCode"
+        ref="timerRef"
+        :isHost="true"
+      />
     </div>
     <div id="sessionInfo">
       <span id="sessionCode">Session Code: {{ sessionCode }}</span>
@@ -26,7 +34,6 @@
       </div>
     </div>
   </div>
-    
 </template>
 
 <script>
@@ -34,9 +41,8 @@ import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import firebase from "@/firebase";
 import { firebaseAuth, db } from "@/firebase";
-import 'firebase/firestore';
-import 'firebase/auth';
-
+import "firebase/firestore";
+import "firebase/auth";
 
 export default {
   name: "HostHomePage",
@@ -48,6 +54,7 @@ export default {
     return {
       sessionCode: "",
       members: [],
+      groupID: "",
     };
   },
   created() {
@@ -87,37 +94,49 @@ export default {
       );
     },
     leaveSession() {
-  if (window.confirm("Are you sure you want to leave the session and end it for everyone?")) {
-    const username = firebaseAuth.currentUser.displayName;  // Assuming currentUser is always available
-    const sessionRef = db.collection("groupSession").doc(this.sessionCode);
+      if (
+        window.confirm(
+          "Are you sure you want to leave the session and end it for everyone?"
+        )
+      ) {
+        const username = firebaseAuth.currentUser.displayName; // Assuming currentUser is always available
+        const sessionRef = db.collection("groupSession").doc(this.sessionCode);
 
-    sessionRef.get().then((doc) => {
-      if (doc.exists) {
-        // Check if the user is the host
-        if (doc.data().host === username) {
-          sessionRef.update({ active: false })  // Set active to false when the host leaves
-            .then(() => {
-              console.log("Session ended by the host.");
-              this.$router.push("/home");
-            })
-            .catch((error) => {
-              console.error("Error deactivating session: ", error);
-            });
-        } else {
-          console.error("You are not authorized to end this session.");
-        }
-      } else {
-        console.error("No such session exists!");
+        sessionRef
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              // Check if the user is the host
+              if (doc.data().host === username) {
+                sessionRef
+                  .update({ active: false }) // Set active to false when the host leaves
+                  .then(() => {
+                    console.log("Session ended by the host.");
+                    this.$router.push("/home");
+                  })
+                  .catch((error) => {
+                    console.error("Error deactivating session: ", error);
+                  });
+              } else {
+                console.error("You are not authorized to end this session.");
+              }
+            } else {
+              console.error("No such session exists!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting document:", error);
+          });
       }
-    }).catch((error) => {
-      console.error("Error getting document:", error);
-    });
-  }
-}
-
+    },
+    storeSessionCode(sessionCode) {
+      this.sessionCode = sessionCode;
+      console.log("host/member page received:", this.sessionCode);
+    },
   },
 };
 </script>
+
 <style scoped>
 html,
 body {
@@ -163,15 +182,15 @@ body {
   justify-content: center;
   border-radius: 10px;
   margin: 0;
-  width: 80vw; 
+  width: 80vw;
   max-width: 600px;
   flex-wrap: wrap;
   gap: 1px;
 }
 
 .member-badge {
-  background-color: white; 
-  color: black; 
+  background-color: white;
+  color: black;
   border-radius: 35px;
   padding: 0.5rem 1rem;
   margin: 0.5rem 0.2rem;
@@ -179,8 +198,8 @@ body {
   font-weight: bold;
   text-align: center;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-  cursor: pointer; 
-  transition: background-color 0.3s; 
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .member-badge:hover {
@@ -206,5 +225,19 @@ body {
   margin-top: 5px; /* adjust as needed */
   cursor: pointer;
   fill: white;
+}
+
+#boostedXPStatement {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  transform: translateY(-150%);
+  margin-bottom: -50px;
+  text-align: center;
+  font-size: 1.6rem;
+  color: white;
+  font-size: 15px;
+  font-weight: 450;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
 </style>

@@ -1,3 +1,23 @@
+<template>
+  <div class="overlay">
+    <div class="home">
+      <div v-show="buttonText == 'Start!'">
+        <SignOutButton class="signout" />
+      </div>
+      <div v-show="buttonText == 'Start!'"><NavBar /></div>
+      <div><XpBar /></div>
+
+      <div>
+        <Timer
+          :SessionCode="sessionCode"
+          @clickOnButtonEvent="updateButtonText"
+        />
+      </div>
+      <div><SessionCode /></div>
+    </div>
+  </div>
+</template>
+
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
@@ -22,23 +42,6 @@ export default {
   },
 };
 </script>
-
-<template>
-  <div class="overlay">
-    <div class="home">
-      <div v-show="buttonText == 'Start!'">
-        <SignOutButton class="signout" />
-      </div>
-      <div v-show="buttonText == 'Start!'"><NavBar /></div>
-      <div><XpBar /></div>
-
-      <div>
-        <Timer @clickOnButtonEvent="updateButtonText" />
-      </div>
-      <div><SessionCode /></div>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .home {
