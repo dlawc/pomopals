@@ -175,6 +175,9 @@ import { firebaseAuth, firestore } from "../firebase.js";
 
 export default {
   name: "Home",
+  props: {
+    sessionCode: String,
+  },
   data: function () {
     let pomodoroDuration = 25 * 60;
     let restDuration = 5 * 60;
@@ -372,17 +375,16 @@ export default {
         if (this.currentSegment < 4) {
           this.currentSegment += 1;
         } else {
-          this.resetCorners(); // Assume this method resets all corners to 1
+          this.resetSegments();
           this.currentSegment = 1;
         }
-
         // Update segment in Firebase
-        this.updateSegmentInFirebase(userRef, doc);
+        this.updateSegmentInUserFirebase(userRef, doc);
 
+        // timer animation and stuff
         clearInterval(this.interval);
         this.isResting = true;
         this.buttonText = "Rest";
-
         setTimeout(() => {
           this.currentTimeInSeconds = this.restDuration;
           this.boopAudio.play();
@@ -399,21 +401,26 @@ export default {
         }
 
         // Update XP in Firebase
-        this.updateXpInFirebase(userRef, doc, calculatedXP);
+        this.updateXpInUserFirebase(userRef, doc, calculatedXP);
 
         // Update xp with time
-        await this.updateXpWithTime(userRef, calculatedXP);
+        await this.updateXpWithTimeInUserFirebase(userRef, calculatedXP);
+
+        // If current page is on HostHomePage, update Xp in groupID document
+        if (this.currentPage == "HostHomePage") {
+          await this.updateXpInGroupFirebase();
+        }
       }
     },
 
-    resetCorners() {
+    resetSegments() {
       this.topRight.set(1);
       this.topLeft.set(1);
       this.bottomRight.set(1);
       this.bottomLeft.set(1);
     },
 
-    async updateSegmentInFirebase(userRef, doc) {
+    async updateSegmentInUserFirebase(userRef, doc) {
       if (doc.exists && doc.data().currentSegment) {
         await userRef.update({ currentSegment: this.currentSegment });
       } else {
@@ -424,7 +431,7 @@ export default {
       }
     },
 
-    async updateXpInFirebase(userRef, doc, calculatedXP) {
+    async updateXpInUserFirebase(userRef, doc, calculatedXP) {
       if (doc.exists && doc.data().xp) {
         let currXP = doc.data().xp;
         await userRef.update({ xp: currXP + calculatedXP });
@@ -433,7 +440,7 @@ export default {
       }
     },
 
-    async updateXpWithTime(userRef, calculatedXP) {
+    async updateXpWithTimeInUserFirebase(userRef, calculatedXP) {
       let key = new Date().toISOString();
       let value = calculatedXP;
       await userRef
@@ -448,6 +455,17 @@ export default {
             console.error(error);
           }
         });
+    },
+
+    async updateXpInGroupFirebase(calculatedXP) {
+      let groupRef = firestore.collection("groupSession").doc(this.sessionCode);
+      let doc = await groupRef.get();
+      if (doc.exists && doc.data().xp) {
+        let currXP = doc.data().xp;
+        await groupRef.update({ xp: currXP + calculatedXP });
+      } else {
+        await groupRef.set({ xp: calculatedXP }, { merge: true });
+      }
     },
 
     reduceTime() {
