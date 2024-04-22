@@ -222,14 +222,16 @@ export default {
 <style scoped>
 .popup {
   position: fixed;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: purple;
   color: white;
+  font-size: 20px;
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 .popup p {
   margin-bottom: 30px;
@@ -248,7 +250,7 @@ export default {
   cursor: pointer;
   background-color: #ff69b4; 
   color: white;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
   transition: background-color 0.3s;
 }
