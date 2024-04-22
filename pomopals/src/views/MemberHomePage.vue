@@ -1,12 +1,12 @@
 <script>
-import Timer from "/src/components/Timer.vue";
+import MemberTimer from "/src/components/MemberTimer.vue";
 import XpBar from "/src/components/XpBar.vue";
 import { firebaseAuth, db } from "@/firebase";
 import firebase from "@/firebase";
 
 export default {
   name: "MemberHomePage",
-  components: { Timer, XpBar },
+  components: { MemberTimer, XpBar },
   methods: {
     fetchSessionDetails() {
       const sessionRef = firebase
@@ -92,34 +92,33 @@ export default {
 <template>
   <div class="overlay">
     <div class="home">
-    <div id="xpBar">
-      <XpBar />
-    </div>
-    <div><Timer :isHost="false" /></div>
-    <div id="sessionInfo">
-      <span id="sessionCode">Session Code: {{ sessionCode }}</span>
-      <div id="groupMembers">
-        <div
-          v-for="(member, index) in members"
-          :key="index"
-          class="member-badge"
-        >
-          {{ member }}
+      <div id="xpBar">
+        <XpBar />
+      </div>
+      <div><MemberTimer :isHost="false" /></div>
+      <div id="sessionInfo">
+        <span id="sessionCode">Session Code: {{ sessionCode }}</span>
+        <div id="groupMembers">
+          <div
+            v-for="(member, index) in members"
+            :key="index"
+            class="member-badge"
+          >
+            {{ member }}
+          </div>
+          <img
+            src="@/components/icons/leave.svg"
+            alt="Leave"
+            class="leave-icon"
+            @click="leaveSession"
+          />
         </div>
-        <img
-          src="@/components/icons/leave.svg"
-          alt="Leave"
-          class="leave-icon"
-          @click="leaveSession"
-        />
-      </div>
-      <div id="memberCount">
-        {{ members.length }} members in this group session
+        <div id="memberCount">
+          {{ members.length }} members in this group session
+        </div>
       </div>
     </div>
   </div>
-  </div>
-  
 </template>
 
 <style scoped>
@@ -200,18 +199,18 @@ body {
 
 #memberCount {
   text-align: center;
-  color: white; 
-  font-size: 1.15rem; 
-  margin-top: 1px; 
+  color: white;
+  font-size: 1.15rem;
+  margin-top: 1px;
   font-weight: 500;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .leave-icon {
   cursor: pointer;
-  width: 40px; 
-  height: 40px; 
-  margin-top: 5px; 
+  width: 40px;
+  height: 40px;
+  margin-top: 5px;
   cursor: pointer;
   fill: white;
 }
