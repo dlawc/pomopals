@@ -14,7 +14,7 @@
           :isHost="true"
         />
       </div>
-      <div><SessionCode @generatedSessionCode="storeSessionCode" /></div>
+      <div v-show="buttonText == 'Start!'"><SessionCode @generatedSessionCode="storeSessionCode" /></div>
     </div>
   </div>
 </template>
