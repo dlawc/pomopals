@@ -84,17 +84,10 @@ export default {
                     const urlBlocklist = doc.data().urlblocklist;
                     const table = document.getElementById("urls");
 
-                    // Clear existing rows
                     table.innerHTML = "";
 
-                    // Iterate over the URL blocklist and create table rows
                     urlBlocklist.forEach((url) => {
                         const newRow = table.insertRow();
-
-                        //const pointCell = newRow.insertCell(); 
-                        //const img = document.createElement("img");
-                        //img.src = "@/assets/white_circle.png"; // Set the image source
-                        //pointCell.appendChild(img);
 
                         const urlCell = newRow.insertCell();
                         urlCell.className = "urlcell";
@@ -104,6 +97,9 @@ export default {
 
                         const deleteButton = document.createElement("button");
                         const deleteCell = newRow.insertCell(); 
+                        deleteCell.style.textAlign = "right";
+                        deleteCell.style.width = "100%";
+
                         deleteButton.className = "bwt";
                         deleteButton.textContent = "Delete";
                         deleteButton.onclick = () => {
@@ -133,7 +129,6 @@ export default {
                         await userRef.update({ urlblocklist: urlBlocklist });
                         console.log("URL deleted successfully!");
 
-                        
                     } else {
                         console.log("URL not found in the blocklist.");
                     }
@@ -153,16 +148,19 @@ export default {
                 if (doc.exists) {
                     const data = doc.data();
                     const existingUrlBlocklist = data.urlblocklist || [];
-                    // Append the new URL to the existing list
+
+                    if (existingUrlBlocklist.includes(this.url.trim())) {
+                        alert("This URL has already been blocked.");
+                        return; 
+                    }
+
                     const updatedUrlBlocklist = [...existingUrlBlocklist, this.url.trim()];
-                    // Update the user document with the updated urlblocklist
                     userRef.update({ urlblocklist: updatedUrlBlocklist }).then(async () => {
                         console.log("URL added successfully!");
-                        // Clear the input field after successful save
                         this.url = '';
                         await this.display()
                     }).catch(error => {
-                        console.error("Error updating user document:", error);
+                        console.error("Error updating blocklist:", error);
                     });
                 } else {
                     console.log("No such user!");

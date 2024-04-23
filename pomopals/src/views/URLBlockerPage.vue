@@ -1,7 +1,7 @@
 <template>
     <div class="overlay">
         <div class="signout">
-            <SignOutButton />
+            <SignOutButton/>
         </div>
         <div class = navbar>
             <NavBar/>
