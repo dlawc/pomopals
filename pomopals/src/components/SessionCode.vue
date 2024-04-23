@@ -28,9 +28,8 @@
     </div>
   </div>
 </template>
-
 <script>
-import { firebaseAuth, db, firestore } from "../firebase.js";
+import { firebaseAuth, firestore } from "../firebase.js";
 
 export default {
   name: "SessionCode",
@@ -39,161 +38,116 @@ export default {
       sessionCode: "",
       inputCode: "",
       viewState: "start",
+      currentUser: null,
     };
   },
+  mounted() {
+    firebaseAuth.onAuthStateChanged(user => {
+      if (user) {
+        this.currentUser = user;
+        // User is logged in, you can perform additional setup here
+      } else {
+        // User is not logged in or session expired
+        console.error("No user is logged in. Redirecting to login page.");
+        this.$router.replace("/login");
+      }
+    }, error => {
+      console.error("Failed to authenticate user:", error);
+      alert("Authentication error. Please try again.");
+    });
+  },
   methods: {
-    // generates unique code upon click; if time is still running, clicking this button will auto cancel the timer
     generateCode() {
-      this.sessionCode =
-        Date.now().toString(36) + Math.random().toString(36).substring(2);
+      if (!this.currentUser) {
+        alert("You must be logged in to generate a session code.");
+        return;
+      }
+
+      this.sessionCode = Date.now().toString(36) + Math.random().toString(36).substr(2);
       this.$emit("cancelDurationEvent");
       this.$emit("generatedSessionCode", this.sessionCode);
-      let currentUser = firebaseAuth.currentUser;
-      let username = currentUser.displayName; // username as primary key
+
       let userRef = firestore.collection("groupSession").doc(this.sessionCode);
-      let timeStamp = Date.now();
       let data = {
         active: true,
-        host: username,
+        host: this.currentUser.displayName,
         members: [],
         restDuration: 0,
         pomodoroDuration: 0,
         xp: 0,
-        timeStamp: timeStamp,
+        timeStamp: Date.now(),
       };
-      console.log(data);
-      userRef
-        .set(data)
+
+      userRef.set(data)
         .then(() => {
-          // Only navigate once the Firestore set is successful
           this.$router.push({
             path: "/host",
             query: { sessionCode: this.sessionCode },
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.error("Error setting session data:", error);
+          alert("Failed to create session. Please try again.");
         });
-      const userDocRef = firestore.collection("users").doc(username);
-      userDocRef.get().then((docSnapshot) => {
-        if (docSnapshot.exists) {
-          let currentCount = docSnapshot.data().groupstudy;
-          currentCount = currentCount ? currentCount + 1 : 1;
-          userDocRef
-            .update({ groupstudy: currentCount })
-            .then(() => {
-              console.log("groupstudy count incremented successfully");
-            })
-            .catch((error) => {
-              console.error("Error incrementing groupstudy count:", error);
-            });
+
+      this.updateUserGroupCount();
+    },
+    updateUserGroupCount() {
+      const userDocRef = firestore.collection("users").doc(this.currentUser.displayName);
+
+      userDocRef.get().then(doc => {
+        if (doc.exists) {
+          let currentCount = doc.data().groupstudy || 0;
+          userDocRef.update({ groupstudy: currentCount + 1 });
         } else {
-          userDocRef
-            .set({ groupstudy: 1 })
-            .then(() => {
-              console.log(
-                "groupstudy attribute added and set to 1 successfully"
-              );
-            })
-            .catch((error) => {
-              console.error("Error setting groupstudy attribute:", error);
-            });
+          userDocRef.set({ groupstudy: 1 });
         }
+      }).catch(error => {
+        console.error("Error updating user data:", error);
       });
     },
-    // adds user to the members array of the group session document
     enterCode() {
-      this.viewState = "start";
-      let sessionCode = this.$refs.groupCodeInput.value;
-      let currentUser = firebaseAuth.currentUser;
-
-      if (currentUser) {
-        let username = currentUser.displayName;
-        let docRef = db.collection("groupSession").doc(sessionCode);
-
-        // Start a batch
-        let batch = db.batch();
-
-        docRef
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-              let data = doc.data();
-              let members = data.members || [];
-              let host = data.host;
-
-              // Check if the current user is the host
-              if (username === host) {
-                console.log("Host cannot join as a member.");
-                alert("You are the host and cannot join as a member.");
-              } else if (!members.includes(username)) {
-                // User is not the host and is not already a member, proceed to join
-                members.push(username);
-                batch.update(docRef, { members: members });
-
-                // Get a reference to the user's document in the users collection
-                const userDocRef = db.collection("users").doc(username);
-
-                // Manually increment the `groupstudy` field
-                userDocRef
-                  .get()
-                  .then((userDoc) => {
-                    if (userDoc.exists) {
-                      let userDocData = userDoc.data();
-                      let groupstudyCount = userDocData.groupstudy || 0;
-                      groupstudyCount += 1; // Manually increment
-
-                      // Update the `groupstudy` field with the new count
-                      batch.update(userDocRef, { groupstudy: groupstudyCount });
-                    } else {
-                      // If the user document doesn't exist, initialize `groupstudy` with 1
-                      batch.set(userDocRef, { groupstudy: 1 });
-                    }
-
-                    // Commit the batch
-                    batch
-                      .commit()
-                      .then(() => {
-                        console.log(
-                          "Members and groupstudy count updated successfully!"
-                        );
-                        alert("Group joined successfully");
-                        this.$router.push({
-                          path: "/member",
-                          query: { sessionCode: sessionCode },
-                        });
-                      })
-                      .catch((error) => {
-                        console.error(
-                          "Error updating members or groupstudy count: ",
-                          error
-                        );
-                        alert("Error updating group");
-                      });
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "Error getting user document for groupstudy count:",
-                      error
-                    );
-                  });
-              } else {
-                console.log("User already in group");
-                alert("You are already a member of this group");
-              }
-            } else {
-              console.log("No such document!");
-              alert("No such group found");
-            }
-          })
-          .catch((error) => {
-            console.error("Error getting group session document:", error);
-            alert("Error accessing group");
-          });
-      } else {
-        console.log("No user logged in!");
-        alert("You need to be logged in to join a group");
+      if (!this.currentUser) {
+        alert("You must be logged in to join a group.");
+        return;
       }
+
+      let sessionCode = this.inputCode; // Assume you have a two-way binding on inputCode
+      let docRef = firestore.collection("groupSession").doc(sessionCode);
+
+      docRef.get().then(doc => {
+        if (!doc.exists) {
+          alert("No such group found.");
+          return;
+        }
+
+        let data = doc.data();
+        if (data.host === this.currentUser.displayName) {
+          alert("You are the host and cannot join as a member.");
+          return;
+        }
+
+        if (data.members.includes(this.currentUser.displayName)) {
+          alert("You are already a member of this group.");
+          return;
+        }
+
+        docRef.update({ members: [...data.members, this.currentUser.displayName] })
+          .then(() => {
+            alert("Group joined successfully");
+            this.$router.push({
+              path: "/member",
+              query: { sessionCode: sessionCode },
+            });
+          })
+          .catch(error => {
+            console.error("Error updating group session document:", error);
+            alert("Error updating group. Please try again.");
+          });
+      }).catch(error => {
+        console.error("Error getting group session document:", error);
+        alert("Error accessing group. Please try again.");
+      });
     },
     setViewState(state) {
       this.viewState = state;
@@ -202,6 +156,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .sessionCodeContainer {

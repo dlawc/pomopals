@@ -27,6 +27,7 @@ firebase.auth().onAuthStateChanged(user => {
     // Optional: Add logic here to handle user state (e.g., setting Vuex state, redirecting, etc.)
     if (user) {
       // User is signed in.
+      this.userName = user.displayName;
       console.log('User is signed in:', user);
       Vue.prototype.$currentUser = user;
     } else {

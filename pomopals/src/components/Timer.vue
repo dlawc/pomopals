@@ -174,6 +174,7 @@
 import ProgressBar from "progressbar.js";
 import boop from "../assets/boop.mp3";
 import { firebaseAuth, firestore } from "../firebase.js";
+import firebase from "../firebase.js";
 
 export default {
   name: "Home",
@@ -198,6 +199,7 @@ export default {
       inputDuration: "",
       inputRestDuration: "",
       pomodoroDuration,
+      currentUser: null,
       restDuration,
       currentTimeInSeconds: pomodoroDuration,
       currentSegment,
@@ -259,7 +261,18 @@ export default {
   },
   mounted() {
     // Initialize progress bars
-    this.initializeProgressBars();
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.userName = user.displayName;
+        this.initializeProgressBars();
+        this.fetchData();
+      } else {
+        // Handle the case where there is no user logged in
+        // Possibly redirect to login page or show a message
+        console.error("No user is logged in. Redirecting to login page.");
+        this.$router.push("/login");
+      }
+    });
   },
   
   methods: {
@@ -293,7 +306,7 @@ export default {
     fetchData() {
       const userRef = firestore
         .collection("users")
-        .doc(firebaseAuth.currentUser.displayName);
+        .doc(this.userName);
 
       userRef
         .get()
@@ -325,7 +338,7 @@ export default {
     savePomodoroDuration() {
       const userRef = firestore
         .collection("users")
-        .doc(firebaseAuth.currentUser.displayName);
+        .doc(this.userName);
       userRef
         .set({ pomodoroDuration: this.pomodoroDuration }, { merge: true })
         .then(() =>
