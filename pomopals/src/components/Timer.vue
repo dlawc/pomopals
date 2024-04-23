@@ -187,7 +187,7 @@ export default {
   },
   firestore() {
     return {
-      session: firestore.collection("groupSession").doc(sessionCode),
+      session: firestore.collection("groupSession").doc(this.sessionCode),
     };
   },
   data: function () {
@@ -232,7 +232,6 @@ export default {
     sessionCode(newValue) {
       console.log("sessionCode prop changed to:", newValue);
     },
-
     // watch for changes in groupSession's XP
     "session.timeStamp"(newVal, oldVal) {
       if (newVal !== oldVal) {
@@ -425,8 +424,10 @@ export default {
       let username = currentUser.displayName; // username as primary key
       let userRef = firestore.collection("users").doc(username);
       let doc = await userRef.get();
-      let groupRef = firestore.collection("groupSession").doc(this.sessionCode);
-      console.log("saving xp to groupID:", this.sessionCode);
+      let groupRef = firestore
+        .collection("groupSession")
+        .doc(this.computedSessionCode);
+      console.log("saving xp to groupID:", this.computedSessionCode);
 
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
@@ -458,7 +459,7 @@ export default {
         }
 
         // Update XP in Firebase
-        this.updateXpInUserFirebase(userRef, calculatedXP);
+        this.updateXpInUserFirebase(userRef, doc, calculatedXP);
 
         // Update xp with time
         await this.updateXpWithTimeInUserFirebase(userRef, calculatedXP);
@@ -504,7 +505,7 @@ export default {
     // updates the xpWithTime of the user in firebase
     async updateXpWithTimeInUserFirebase(userRef, calculatedXP) {
       let key = new Date().toISOString();
-      console.log(this.sessionCode);
+      console.log(this.computedSessionCode);
       let value = calculatedXP;
       await userRef
         .update({ [`xpWithTime.${key}`]: value })
@@ -636,6 +637,7 @@ export default {
 
     // handles the event of restarting the timer
     restartDuration() {
+      console.log(this.sessionCode);
       clearInterval(this.interval);
 
       if (this.topRight) this.topRight.stop();
