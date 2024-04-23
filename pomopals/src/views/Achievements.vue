@@ -1,15 +1,15 @@
 <template>
-  <div class="achievementpage">
+  <div class="achievementPage">
     <NavBar id="navbar" />
-    <div class="signout">
+    <div class="signOut">
       <SignOutButton />
     </div>
-    <div id="headercontainer">
-      <h1 id="myachievementsheader">My Achievements</h1>
+    <div id="headerContainer">
+      <h1 id="myAchievementsHeader">My Achievements</h1>
     </div>
-    <div id="viewallcontainer">
+    <div id="viewAllContainer">
       <select
-        id="viewallbutton"
+        id="viewAllButton"
         v-model="selectedTimeframe"
         @change="redirectToAllAchievements"
       >
@@ -18,46 +18,46 @@
       </select>
     </div>
     <div class="achievements-container">
-      <div id="AchievementCompletedContainer">
-        <h1 id="AchievementsCompletedHeader">Achievements Unlocked</h1>
+      <div id="achievementCompletedContainer">
+        <h1 id="achievementsCompletedHeader">Achievements Unlocked</h1>
         <div
-          id="Achievementunlocked"
+          id="achievementUnlocked"
           v-for="achievement in completedAchievements"
           :key="achievement.id"
         >
-          <img
+          <img id = "completeImg"
             :src="achievement.icon"
             alt="achievement.title"
-            class="achievementcompleted-icon"
+            class="achievementCompleted-icon"
           />
-          <div class="achievementcompleted-details">
+          <div class="achievementCompleted-details">
             <h2 class="title">{{ achievement.title }}</h2>
             <p class="subtitle">{{ achievement.description }}</p>
           </div>
-          <span class="progresscompleted-text">Challenge Completed</span>
+          <span class="progressCompleted-text">Challenge Completed</span>
         </div>
       </div>
-      <div id="AchievementsInProgContainer" class="achievement-tab">
-        <h1 id="AchievementsInProgHeader">Achievements In-Progress</h1>
+      <div id="achievementsInProgContainer" class="achievement-tab">
+        <h1 id="achievementsInProgHeader">Achievements In-Progress</h1>
         <div
           class="achievement-in-progress"
           v-for="achievement in inProgressAchievements"
           :key="achievement.id"
         >
-          <img
+          <img id = "progImg"
             :src="`grey${achievement.icon}`"
             alt="achievement.title"
             class="achievementinprog-icon"
           />
           <div class="achievement-details">
-            <h2 class="greytitle">{{ achievement.title }}</h2>
-            <p class="greysubtitle">{{ achievement.description }}</p>
+            <h2 class="greyTitle">{{ achievement.title }}</h2>
+            <p class="greySubtitle">{{ achievement.description }}</p>
           </div>
-          <div id="progresscontainer">
-            <span class="inprogress-text"
+          <div id="progressContainer">
+            <span class="inProgress-text"
               >({{ achievement.current }}/{{ achievement.goal }})</span
             >
-            <ProgressBar :value="achievement.progress" id="inprogressbar" />
+            <ProgressBar :value="achievement.progress" id="inProgressBar" />
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default {
       userName: "",
       selectedTimeframe: "progress",
       achievements: [
-        {
+        { //list of achievements
           id: 1,
           title: "Novice User",
           description: "Total EXP Reached 50 XP",
@@ -195,21 +195,18 @@ export default {
     };
   },
   mounted() {
-    firebase.auth().onAuthStateChanged((user) => {
+    firebase.auth().onAuthStateChanged((user) => {     //ensure user is referenced
       if (user) {
         this.userName = user.displayName;
         this.fetchUserProgress();
       } else {
-        // Handle the case where there is no user logged in
-        // Possibly redirect to login page or show a message
         console.error("No user is logged in. Redirecting to login page.");
         this.$router.push("/login");
       }
     });
-    // this.fetchUserProgress();
   },
   methods: {
-    fetchUserProgress() {
+    fetchUserProgress() {     //fetches user data from firebase
       if (!this.userName) return;
       const userRef = firebase
         .firestore()
@@ -253,7 +250,7 @@ export default {
         }
       );
     },
-    redirectToAllAchievements() {
+    redirectToAllAchievements() { //router to allachievements
       this.$router.push("/allachievements");
     },
     beforeUnmount() {
@@ -263,7 +260,7 @@ export default {
     },
   },
   computed: {
-    inProgressAchievements() {
+    inProgressAchievements() { //filters list of inprogressachievements and ensures progress is in percentage
       return this.achievements
         .filter((achievement) => achievement.current < achievement.goal)
         .map((achievement) => ({
@@ -273,7 +270,7 @@ export default {
           ),
         }));
     },
-    completedAchievements() {
+    completedAchievements() { //filters list of completedachievements and ensures progress is in percentage
       return this.achievements
         .filter((achievement) => achievement.current >= achievement.goal)
         .map((achievement) => ({
@@ -287,7 +284,13 @@ export default {
 };
 </script>
 <style>
-.achievementpage {
+#progImg{
+  margin-left: 20px;
+}
+#completeImg{
+  margin-left: 20px;
+}
+.achievementPage {
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -303,16 +306,16 @@ export default {
   z-index: 1;
 }
 
-.signout {
+.signOut {
   position: absolute;
   top: 10px;
   right: 10px;
   padding: 10px;
 }
-#myachievementsheader {
+#myachievementsHeader {
   width: 700px;
   height: 82px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 64px;
@@ -325,18 +328,18 @@ export default {
   margin-right: auto;
   margin-bottom: -5px;
 }
-#viewallcontainer {
+#viewAllContainer {
   margin-top: 30px;
   margin-left: auto;
   margin-right: 5vw;
 }
-#viewallbutton {
+#viewAllButton {
   width: 200px;
   height: 33px;
   margin-bottom: 10px;
   background: #ae76a1;
   border-radius: 50px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 24px;
@@ -352,7 +355,7 @@ export default {
   top: 145px;
   background-size: 25px;
 }
-#AchievementCompletedContainer {
+#achievementCompletedContainer {
   width: 90vw;
   max-height: 35vh;
   min-height: 20vh;
@@ -364,13 +367,12 @@ export default {
   overflow-x: auto;
   margin-bottom: 10px;
 }
-#AchievementsCompletedHeader {
+#achievementsCompletedHeader {
   width: 586px;
   height: 62px;
   text-align: left;
-  margin-left: 15px;
   margin-bottom: -30px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
@@ -378,7 +380,7 @@ export default {
   text-transform: capitalize;
   color: #ffffff;
 }
-#Achievementunlocked {
+#achievementUnlocked {
   display: flex;
   align-items: center;
   margin-top: 10px;
@@ -387,12 +389,12 @@ export default {
   box-shadow: none;
   flex-direction: row;
 }
-.achievementcompleted-icon {
+.achievementsCompleted-icon {
   width: 100px;
   height: auto;
   margin-right: 20px;
 }
-.achievementscompleted-details {
+.achievementsCompleted-details {
   flex-grow: 20;
   text-align: right;
   flex-direction: column;
@@ -402,7 +404,7 @@ export default {
   height: 53px;
   margin-right: auto;
   text-align: left;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
@@ -414,7 +416,7 @@ export default {
   margin-top: -40px;
   width: 700px;
   height: 53px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
@@ -422,11 +424,11 @@ export default {
   text-transform: capitalize;
   color: #ffffff;
 }
-.progresscompleted-text {
+.progressCompleted-text {
   margin-left: auto;
   width: 450px;
   height: 39px;
-  font-family: "Lucida Sams";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 30px;
@@ -437,7 +439,7 @@ export default {
   color: #11dd11;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
-#AchievementsInProgContainer {
+#achievementsInProgContainer {
   width: 90vw;
   height: 40vh;
   max-height: 35vh;
@@ -448,12 +450,12 @@ export default {
   overflow-y: auto;
   border-radius: 10px;
 }
-#AchievementsInProgHeader {
+#achievementsInProgHeader {
   height: 62px;
   text-align: left;
   margin-left: 15px;
   margin-bottom: -30px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
@@ -472,33 +474,31 @@ export default {
   height: 85px;
   margin-right: 20px;
 }
-#progresscontainer {
+#progressContainer {
   margin-left: auto;
   margin-right: 1vw;
 }
-.inprogress-text {
-}
 
-#inprogressbar {
+#inProgressBar {
   float: right;
   margin-left: 1vw;
 }
-.greytitle {
+.greyTitle {
   width: 700px;
   height: 53px;
   text-align: left;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
   text-transform: capitalize;
   color: #474242;
 }
-.greysubtitle {
+.greySubtitle {
   width: 700px;
   height: 53px;
   margin-top: -35px;
-  font-family: "Lucida Sans";
+  font-family: 'DM Sans', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;

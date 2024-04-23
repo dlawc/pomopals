@@ -1,33 +1,33 @@
 <template>
-  <div class="achievementpage">
+  <div class="achievementPage">
     <NavBar/>
-    <div class = "signout">
+    <div class = "signOut">
     <SignOutButton/>
   </div>
-  <div id = "headercontainer">
-      <h1 id = "myachievementsheader">All Achievements</h1>
+  <div id = "headerContainer">
+      <h1 id = "myAchievementsHeader">All Achievements</h1>
   </div>  
-  <div id = "viewallcontainer">
-    <select id="viewallbutton" v-model="selectedTimeframe" @change = "redirectToAllAchievements">
+  <div id = "viewAllContainer">
+    <select id="viewAllButton" v-model="selectedTimeframe" @change = "redirectToAllAchievements">
       <option value="all">View All</option>
       <option value="progress">View Progress</option>
     </select>
   </div>
-  <div id = "AllAchievementContainer">
-    <h1 id = "AchievementsCompletedHeader"> Achievements Unlocked</h1>
-    <div id = "Achievementunlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
-      <img :src=" achievement.icon" alt="achievement.title" class="achievementcompleted-icon">
-      <div class="achievementcompleted-details">
+  <div id = "allAchievementContainer">
+    <h1 id = "achievementsCompletedHeader"> Achievements Unlocked</h1>
+    <div id = "achievementUnlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
+      <img id = "unlockedImg":src=" achievement.icon" alt="achievement.title" class="achievementCompleted-icon">
+      <div class="achievementCompleted-details">
         <h2 class="title">{{ achievement.title }}</h2>
         <p class="subtitle">{{ achievement.description }}</p>
       </div>
-      <span class="progresscompleted-text">Challenge Completed</span>
+      <span class="progressCompleted-text">Challenge Completed</span>
     </div>
-    <div class="allachievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
-      <img :src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
+    <div class="allAchievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
+      <img id = "lockedImg":src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
       <div class="achievement-details">
-        <h2 class="greytitle">{{ achievement.title }}</h2>
-        <p class="greysubtitle">{{ achievement.description }}</p>
+        <h2 class="greyTitle">{{ achievement.title }}</h2>
+        <p class="greySubtitle">{{ achievement.description }}</p>
       </div>
       <span class="incompleted-text">LOCKED</span>
     </div>
@@ -50,10 +50,10 @@ export default {
   },
   data() {
     return {
-      userName: firebase.auth().currentUser.displayName,
+      userName: "",
       selectedTimeframe: 'all',
       achievements: [
-        { 
+        {  //list of achievements
           id: 1,
           title: 'Novice User',
           description: 'Total EXP Reached 50 XP',
@@ -164,44 +164,63 @@ export default {
 
       ]
     };
-  }, mounted(){
-    this.fetchUserProgress();
   },
-  methods: {
-    fetchUserProgress() {
-    const userRef = firebase.firestore().collection('users').doc(this.userName);
-    this.unsubscribe = onSnapshot(userRef, (doc) => {
-      if (doc.exists()) {
-        const userData = doc.data();
-        const updatedAchievements = this.achievements.map(achievement => {
-          let currentProgress = 0; 
-          switch (achievement.conditionType) {
-            case 'xp':
-              currentProgress = userData.xp || 0;
-              break;
-            case 'top3':
-              currentProgress = userData.top3Placements || 0;
-              break;
-            case 'friends':
-              currentProgress = userData.friends ? Object.keys(userData.friends).length : 0;
-              break;
-            case 'groupstudy':
-              currentProgress = userData.groupstudy || 0;
-              break;
-          }
-          return {
-            ...achievement,
-            currentTest: currentProgress
-          };
-        });
-        this.achievements = updatedAchievements;
+  mounted() {
+    firebase.auth().onAuthStateChanged((user) => {     //ensure user is referenced
+      if (user) {
+        this.userName = user.displayName;
+        this.fetchUserProgress();
       } else {
-        console.log("No such document!");
+        console.error("No user is logged in. Redirecting to login page.");
+        this.$router.push("/login");
       }
-    }, error => {
-      console.error("Error listening to the document:", error);
     });
   },
+  methods: {
+    fetchUserProgress() {     //fetches user data from firebase
+      if (!this.userName) return;
+      const userRef = firebase
+        .firestore()
+        .collection("users")
+        .doc(this.userName);
+      this.unsubscribe = onSnapshot(
+        userRef,
+        (doc) => {
+          if (doc.exists()) {
+            const userData = doc.data();
+            const updatedAchievements = this.achievements.map((achievement) => {
+              let currentProgress = 0;
+              switch (achievement.conditionType) {
+                case "xp":
+                  currentProgress = userData.xp || 0;
+                  break;
+                case "top3":
+                  currentProgress = userData.top3Placements || 0;
+                  break;
+                case "friends":
+                  currentProgress = userData.friends
+                    ? Object.keys(userData.friends).length
+                    : 0;
+                  break;
+                case "groupstudy":
+                  currentProgress = userData.groupstudy || 0;
+                  break;
+              }
+              return {
+                ...achievement,
+                currentTest: currentProgress,
+              };
+            });
+            this.achievements = updatedAchievements;
+          } else {
+            console.log("No such document!");
+          }
+        },
+        (error) => {
+          console.error("Error listening to the document:", error);
+        }
+      );
+    },
   redirectToAllAchievements() {
         this.$router.push('/achievements');
   },
@@ -228,7 +247,13 @@ export default {
 };
 </script>
 <style>
-.achievementpage{
+#lockedImg{
+ margin-left: 20px;
+}
+#unlockedImg{
+  margin-left: 20px;
+}
+.achievementPage{
   display: flex;
 flex-direction: column;
   margin: 0;
@@ -244,10 +269,10 @@ height: 100vh;
   z-index: 1;
 }
 
-#myachievementsheader{
+#myAchievementsHeader{
 width: 700px;
 height: 82px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 64px;
@@ -259,19 +284,19 @@ display:flex;
 margin-left: 35vw;
 margin-right: auto;
 }
-#viewallcontainer{
+#viewAllContainer{
   margin-top: -1vw;
   margin-left: auto;
   margin-right: 5vw;
 }
-#viewallbutton{
+#viewAllButton{
 width: 200px;
 height: 33px;
 margin-bottom: 10px;
 background: #AE76A1;
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 50px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 24px;
@@ -287,7 +312,7 @@ left: 1445px;
 top: 145px;
 background-size: 25px ;
 }
-#AllAchievementContainer{
+#allAchievementContainer{
 width: 90vw;
 height: 70vh;
 margin-left:auto;
@@ -300,13 +325,13 @@ overflow-x: auto;
 margin-bottom: 10px;
 
 }
-#AchievementsCompletedHeader{
+#achievementsCompletedHeader{
 width: 586px;
 height: 62px;
 text-align: left;
 margin-left: 15px;
 margin-bottom: -30px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
@@ -314,7 +339,7 @@ line-height: 41px;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-#Achievementunlocked {
+#achievementUnlocked {
   display: flex;
   align-items: center;
   margin-top: 10px;
@@ -323,7 +348,7 @@ background-color: #B857A1;
 
 flex-direction: row;
 }
-.achievementcompleted-icon{
+.achievementCompleted-icon{
   width: 100px; 
 height: auto; 
 margin-right: 20px;
@@ -338,7 +363,7 @@ width: 700px;
 height: 53px;
 margin-right: auto;
 text-align: left ;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
@@ -350,7 +375,7 @@ color: #FFFFFF;
 margin-top: -40px;
 width: 700px;
 height: 53px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 400;
 font-size: 20px;
@@ -358,11 +383,11 @@ line-height: 31px;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-.progresscompleted-text{
+.progressCompleted-text{
   margin-left: auto;
 width: 450px;
 height: 39px;
-font-family: 'Lucida Sams';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 30px;
@@ -377,7 +402,7 @@ text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   margin-left: auto;
 width: 450px;
 height: 39px;
-font-family: 'Lucida Sams';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 30px;
@@ -386,7 +411,7 @@ text-align: center;
 text-transform: uppercase;
 color: #2a2828;
 }
-#AchievementsInProgContainer {
+#achievementsInProgContainer {
   width: 90vw;
   height: 40vh;
   margin-left: auto;
@@ -400,7 +425,7 @@ height: 62px;
 text-align: left;
 margin-left: 15px;
 margin-bottom: -30px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
@@ -408,7 +433,7 @@ line-height: 41px;
 text-transform: capitalize;
 color: #FFFFFF;
 }
-.allachievement-in-progress{
+.allAchievement-in-progress{
   display: flex;
   align-items: center;
 flex-direction: row;
@@ -431,22 +456,22 @@ margin-right: 1vw;
 float: right;
 margin-left: 1vw;
 }
-.greytitle {
+.greyTitle {
 width: 700px;
 height: 53px;
 text-align: left;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 700;
 font-size: 32px;
 text-transform: capitalize;
 color: #474242;
 }
-.greysubtitle {
+.greySubtitle {
 width: 700px;
 height: 53px;
 margin-top: -35px;
-font-family: 'Lucida Sans';
+font-family: 'DM Sans', sans-serif;
 font-style: normal;
 font-weight: 400;
 font-size: 20px;
