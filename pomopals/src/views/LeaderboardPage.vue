@@ -206,12 +206,6 @@ width: 100%;
 height: 100vh;
 z-index: 1;
 }
-.signout {
-position: absolute;
-top: 10px;
-right: 10px;
-padding: 10px;
-}
 
 .header {
 background-color: #4d003c;

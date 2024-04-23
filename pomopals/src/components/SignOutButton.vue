@@ -41,11 +41,11 @@ export default {
 .button {
   background-color: transparent;
   color: white;
-  padding: 10px 15px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-weight: bold; 
-  font-size: medium; 
+  font-size: large; 
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
+
 </style>

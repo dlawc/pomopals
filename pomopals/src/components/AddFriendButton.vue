@@ -8,6 +8,7 @@
     </button>
     <div v-if="showPopup" class="popup" @click.self="closePopup">
       <div class="input-container">
+        <button class="close-btn" @click="closePopup">✖</button>
         <input
           v-model="friend_username"
           class="input-field"
@@ -23,7 +24,7 @@
           <div
             v-for="request in pendingRequests"
             :key="request.id"
-            class="friend-request"
+            class="friend-request" @click.stop>
           >
             <p>{{ request.senderID }}</p>
             <button
@@ -69,6 +70,10 @@ export default {
   methods: {
     togglePopup() {
       this.showPopup = !this.showPopup;
+    },
+
+    closePopup() {
+      this.showPopup = false;
     },
 
     sendRequest() {
@@ -331,34 +336,34 @@ export default {
 }
 
 .send-request-btn {
-  width: 50%; /* Width relative to its parent container */
+  width: 50%; 
   padding: 10px;
-  border-radius: 20px; /* More pronounced rounded corners for the button */
+  border-radius: 20px; 
   border: none;
   background-color: #ae76a1;
   color: white;
-  font-weight: bold; /* Bold text for the button */
+  font-weight: bold; 
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .send-request-btn:hover {
-  background-color: #9c6891; /* Darker shade on hover */
+  background-color: #9c6891; 
 }
 
 .pending-requests-title {
   text-align: center;
   color: #2b3674;
   font-size: 1.1em;
-  margin-bottom: 15px; /* Space before the requests list starts */
+  margin-bottom: 15px; 
 }
 
 .friend-requests-container {
   overflow-y: auto;
   margin-top: 10px;
   padding-right: 5px;
-  max-height: 220px; /* Set a max-height to ensure scrolling */
-  transition: max-height 0.3s ease; /* Smooth transition for scrolling */
+  max-height: 220px; 
+  transition: max-height 0.3s ease; 
 }
 
 .friend-request {
@@ -370,14 +375,14 @@ export default {
   margin-bottom: 10px;
   background-color: #f7f7f7;
   border: 1px solid #eee;
-  border-radius: 6px; /* Slightly rounded corners for friend requests */
+  border-radius: 6px; 
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .no-requests-message {
   text-align: center;
-  color: #757575; /* A neutral, informational color */
+  color: #757575; 
   font-size: 1em;
-  margin-top: 20px; /* Gives some space from the title */
+  margin-top: 20px; 
 }
 
 .accept-btn {
@@ -392,7 +397,7 @@ export default {
 }
 
 .accept-btn:hover {
-  background-color: #9c6891; /* Darker shade on hover for accept button */
+  background-color: #9c6891;
 }
 
 .decline-btn {
@@ -400,13 +405,28 @@ export default {
   margin-left: 10px;
   border: none;
   border-radius: 4px;
-  background-color: #89959e; /* Grey color for decline */
+  background-color: #89959e;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .decline-btn:hover {
-  background-color: #5a6268; /* Darker shade on hover for decline button */
+  background-color: #5a6268; 
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  background: none;
+  color: #a4a4a4;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #7e7e7e;
 }
 </style>
