@@ -46,7 +46,17 @@ import firebase from "@/firebase";
 export default {
     data() {
         return {
-            url: ''
+            url: '', 
+            currentUser: null, 
+        }
+    }, 
+    watch : {
+        currentUser : {
+        handler(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                this.display();
+            }
+        },
         }
     }, 
     async mounted() {
