@@ -41,13 +41,16 @@ export default {
 </script>
 <style>
 .navbar{
-    height: 100%; /* 100% Full-height */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
-    top: 0; /* Stay at the top */
+    height: 100vh;
+    position: fixed; 
+    z-index: 1; 
+    top: 0; 
     left: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 200px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden; 
     padding-left: 20px; 
 }
 .nav-btn{
