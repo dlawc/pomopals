@@ -9,6 +9,7 @@
     <div class = center>
         <URLDisplay/>
     </div>
+    <ToggleURL/>
     </div>
     
 </template>
@@ -16,6 +17,7 @@
 import NavBar from "@/components/NavBar.vue"
 import SignOutButton from "@/components/SignOutButton.vue"
 import URLDisplay from "@/components/URLDisplay.vue"
+import ToggleURL from "@/components/ToggleURL.vue"
 
 export default {
     name: "URLBlocker", 
@@ -23,6 +25,7 @@ export default {
         NavBar, 
         SignOutButton, 
         URLDisplay,
+        ToggleURL, 
     }, 
 }
 </script>
