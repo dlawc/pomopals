@@ -103,8 +103,8 @@
         <div id="timeDisplay">{{ timeDisplay }}</div>
       </div>
     </div>
-
-    <div class="buttons">
+    <div v-if="isHost">
+      <div class="buttons">
       <button
         v-if="!isSettingTime"
         :disabled="isResting"
@@ -165,6 +165,8 @@
         <img src="@/assets/settings.png" alt="Settings" />
       </button>
     </div>
+    </div>
+    
   </div>
 </template>
 
@@ -177,6 +179,10 @@ export default {
   name: "Home",
   props: {
     sessionCode: String,
+    isHost: {
+      type: Boolean,
+      default: false
+    }
   },
   firestore() {
     return {

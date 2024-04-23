@@ -130,10 +130,10 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100vh; /* Use viewport height to ensure full height */
-  overflow: hidden; /* Prevent scrolling */
-  background-color: #f0f0f0; /* Background color if needed */
-  font-family: "Lucida Sans", Arial, sans-serif; /* Define the font family once */
+  height: 100vh;
+  overflow: hidden; 
+  background-color: #f0f0f0; 
+  font-family: "Lucida Sans", Arial, sans-serif; 
 }
 #sessionInfo {
   display: flex;

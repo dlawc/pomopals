@@ -11,6 +11,7 @@
         <Timer
           :sessionCode="sessionCode"
           @clickOnButtonEvent="updateButtonText"
+          :isHost="true"
         />
       </div>
       <div><SessionCode @generatedSessionCode="storeSessionCode" /></div>
