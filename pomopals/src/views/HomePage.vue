@@ -28,7 +28,7 @@ import SignOutButton from "@/components/SignOutButton.vue";
 
 export default {
   name: "HomePage",
-  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode },
+  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode},
 
   data() {
     return {

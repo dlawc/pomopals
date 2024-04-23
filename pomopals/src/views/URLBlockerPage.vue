@@ -1,14 +1,14 @@
 <template>
     <div class="overlay">
         <div class="signout">
-        <SignOutButton />
-      </div>
-    <div class = navbar>
-        <NavBar/>
-    </div>
-    <div class = center>
-        <URLDisplay/>
-    </div>
+            <SignOutButton />
+        </div>
+        <div class = navbar>
+            <NavBar/>
+        </div>
+        <div class = center>
+            <URLDisplay/>
+        </div>
     </div>
     
 </template>
