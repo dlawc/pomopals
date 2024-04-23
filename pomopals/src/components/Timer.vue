@@ -257,21 +257,26 @@ export default {
       this.saveCurrentSegment();
     },
   },
-  mounted: function () {
-    this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
-    this.topRight.set(1);
-
-    this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
-    this.bottomRight.set(1);
-
-    this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
-    this.bottomLeft.set(1);
-
-    this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
-    this.topLeft.set(1);
+  mounted() {
+    // Initialize progress bars
+    this.initializeProgressBars();
   },
+  
   methods: {
     // handle updating of xp for members in a groupSession when timeStamp changes
+    initializeProgressBars() {
+      this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
+      this.topRight.set(1);
+
+      this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
+      this.bottomRight.set(1);
+
+      this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
+      this.bottomLeft.set(1);
+
+      this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
+      this.topLeft.set(1);
+    },
     async handleTimeUpdate() {
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
