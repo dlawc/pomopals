@@ -459,7 +459,7 @@ export default {
         }
 
         // Update XP in Firebase
-        this.updateXpInUserFirebase(userRef, doc, calculatedXP);
+        this.updateXpInUserFirebase(userRef, calculatedXP);
 
         // Update xp with time
         await this.updateXpWithTimeInUserFirebase(userRef, calculatedXP);
