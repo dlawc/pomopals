@@ -302,8 +302,6 @@ export default {
   height: 100vh;
   z-index: 1;
 }
-#navbar {
-}
 
 .signout {
   position: absolute;
