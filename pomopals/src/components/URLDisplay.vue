@@ -9,10 +9,12 @@
         color: white;
     }
     .bwt{
-        background-color: red;
+        background-color:crimson; 
         color: white; 
         border: none;
         cursor: pointer;
+        border-radius: 40px;
+        padding: 5px 10px;
     }
     .bwt:hover {
         background-color: brown;
@@ -24,6 +26,8 @@
     input {
         padding: 5px 10px; 
         width: 100%; 
+        border-radius: 50px;
+        border-color: white;
     }
 </style>
 <template>
