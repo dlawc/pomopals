@@ -63,16 +63,16 @@ import LeaderboardAddFriendButton from '@/components/LeaderboardAddFriendButton.
 import NavBar from "@/components/NavBar.vue";
 
 export default {
-name: 'LeaderboardPage',
+name: 'MonthlyLeaderboardPage',
 data() {
   return {
-    selectedTimeframe: 'all',
-    leaderboardItems: [],
-    currentUser: null,
-    isLoading: true,
-    friendsMap: {}, 
-    friendRequests: {}, 
-  };
+      selectedTimeframe: 'monthly',
+      leaderboardItems: [],
+      currentUser: null,
+      isLoading: true,
+      friendsMap: {},
+      friendRequests: {},
+    };
 },
 watch: {
   currentUser: {
@@ -98,80 +98,104 @@ mounted() {
     }
   });
 },
+
 methods: {
-  fetchLeaderboard() {
+  getStartOfCurrentMonth() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  },
+    fetchLeaderboard() {
     this.isLoading = true;
     const db = firebase.firestore();
 
+    const getStartOfCurrentMonth = () => {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), 1);
+    };
+
+    // Helper function to check if a date is within the current month
+    const isDateInCurrentMonth = (date) => {
+      const startOfCurrentMonth = getStartOfCurrentMonth();
+      const endOfCurrentMonth = new Date(new Date(startOfCurrentMonth).setMonth(startOfCurrentMonth.getMonth() + 1));
+      return date >= startOfCurrentMonth && date < endOfCurrentMonth;
+    };
+
     db.collection("users").get().then(querySnapshot => {
-        let leaderboardData = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            let points = 0;
+      let leaderboardData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        let points = 0;
 
-            points = data.xp || 0;
-
-            let friendStatus = this.determineFriendStatus(doc.id); // Ensure this is always checked
-
-            return {
-              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
-                points: points,
-                isUser: doc.id === this.currentUser.displayName,
-                showButton: doc.id !== this.currentUser.displayName,
-                friendStatus: friendStatus, // Ensure this status is updated appropriately
-            };
+        Object.entries(data.xpWithTime || {}).forEach(([dateString, xpRecord]) => {
+          const date = new Date(dateString);
+          if (isDateInCurrentMonth(date)) {
+            points += Object.values(xpRecord).reduce((sum, xp) => sum + xp, 0);
+          }
         });
 
-        this.sortAndRankLeaderboard(leaderboardData);
-        this.isLoading = false;
-    }).catch(error => {
-        console.error("Error getting documents:", error);
-        this.isLoading = false;
-    });
-},
-
-  refreshFriendStatus() {
-    // Only update the friend status and pending requests if necessary
-    this.leaderboardItems = this.leaderboardItems.map(item => {
-        return {
-            ...item,
-            friendStatus: this.determineFriendStatus(item.username),
-        };
-    });
-  },
-
-
-  determineFriendStatus(userId) {
-      if (this.friendsMap[userId]) {
-          return 'added';
-      } else if (this.friendRequests[userId] && this.friendRequests[userId].status === 'pending') {
-          return 'pending';
-      }
-      return 'none';
-  },
-
-  sortAndRankLeaderboard(leaderboardData) {
-      // Sort leaderboard data by points in descending order
-      leaderboardData.sort((a, b) => b.points - a.points);
-
-      let rank = 1; // Start ranking at 1
-      let prevPoints = null; // Variable to store points of the previous item in the loop
-
-      // Loop through the sorted leaderboard data to assign ranks
-      leaderboardData.forEach((item, index) => {
-          if (prevPoints !== item.points) { // If current item's points are different from the previous one
-              rank = index + 1; // Update rank to current index + 1
-              prevPoints = item.points; // Update prevPoints to current item's points
+        let friendStatus = 'none';
+          if (this.currentUser && this.friendsMap[doc.id]) {
+            friendStatus = 'added';
+          } else if (this.friendRequests[doc.id] === 'pending') {
+            friendStatus = 'pending';
           }
-          item.rank = rank; // Assign the rank to the current item
+      
+        return {
+              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
+              points: points, 
+              isUser: doc.id === this.currentUser.displayName,
+              showButton: doc.id !== this.currentUser.displayName, // Don't show button for self or already friends
+              friendStatus: friendStatus,
+            };
+          });
 
-          // Assign display rank, use medal emojis for top 3
-          item.displayRank = item.rank <= 3 ? ['🥇', '🥈', '🥉'][item.rank - 1] : item.rank.toString();
+      // Sort and assign ranks
+      leaderboardData.sort((a, b) => b.points - a.points);
+      let rank = 1;
+      let prevPoints = null;
+      leaderboardData.forEach((item, index) => {
+        if (prevPoints !== item.points) {
+          rank = index + 1;
+          prevPoints = item.points;
+        }
+        item.rank = rank;
       });
 
-      this.leaderboardItems = leaderboardData; // Update the leaderboardItems with the ranked data
-  },
+      this.leaderboardItems = leaderboardData.map(item => ({
+        ...item,
+        displayRank: item.rank <= 3 ? ['🥇', '🥈', '🥉'][item.rank - 1] : item.rank.toString()
+      }));
+
+      this.isLoading = false;
+      }).catch(error => {
+        console.error("Error getting documents:", error);
+        this.isLoading = false;
+      });
+    },
+  fetchFriends(userId) {
+      const db = firebase.firestore();
+      db.collection("users").doc(userId).onSnapshot(doc => {
+        if (doc.exists && doc.data().friends) {
+          this.friendsMap = doc.data().friends;
+        } else {
+          this.friendsMap = {};
+        }
+        this.isLoading = false;
+      }, error => {
+        console.error("Error fetching friends:", error);
+        this.isLoading = false;
+      });
+    },
+    updateLocalFriendStatus(friendUsername, status) {
+      this.$set(this.friendRequests, friendUsername, status);
+      this.leaderboardItems = this.leaderboardItems.map(item => {
+        if (item.username === friendUsername) {
+          return { ...item, friendStatus: status };
+        }
+        return item;
+      });
+    },
   changeTimeframe() {
-    this.$router.push('/monthlyleaderboard'); 
+    this.$router.push('/leaderboard');
   },
   redirectToGlobal() {
   },
@@ -205,6 +229,12 @@ left: 0;
 width: 100%;
 height: 100vh;
 z-index: 1;
+}
+.signout {
+position: absolute;
+top: 10px;
+right: 10px;
+padding: 10px;
 }
 
 .header {

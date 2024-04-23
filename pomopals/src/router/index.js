@@ -5,6 +5,7 @@ import SignUpPage from "@/views/SignUpPage.vue";
 import HomePage from "@/views/HomePage.vue";
 import FriendsPage from "@/views/FriendsPage.vue";
 import LeaderboardPage from "@/views/LeaderboardPage.vue";
+import MonthlyLeaderboardPage from "@/views/MonthlyLeaderboardPage.vue";
 import FriendsLeaderboardPage from "@/views/FriendsLeaderboardPage.vue";
 import URLBlockerPage from "@/views/URLBlockerPage.vue";
 import AchievementPage from "@/views/Achievements.vue";
@@ -67,6 +68,14 @@ const router = createRouter({
       path: "/leaderboard",
       name: "LeaderboardPage",
       component: LeaderboardPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/monthlyleaderboard",
+      name: "MonthlyLeaderboardPage",
+      component: MonthlyLeaderboardPage,
       meta: {
         requiresAuth: true,
       },
