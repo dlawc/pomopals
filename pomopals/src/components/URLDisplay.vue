@@ -9,9 +9,12 @@
         color: white;
     }
     .bwt{
-        background-color: red;
+        background-color:crimson; 
         color: white; 
         border: none;
+        cursor: pointer;
+        border-radius: 40px;
+        padding: 5px 10px;
     }
     .bwt:hover {
         background-color: brown;
@@ -23,13 +26,15 @@
     input {
         padding: 5px 10px; 
         width: 100%; 
+        border-radius: 50px;
+        border-color: white;
     }
 </style>
 <template>
     <h2>Block sites <u>distracting</u> you:</h2>
     <div id = form> 
         <input type = "text" v-model = "url" required = "true" 
-            placeholder = "Enter URL of website here" @keydown.enter="saveurl()"> 
+            placeholder = "Please enter URL of the website here" @keydown.enter="saveurl()"> 
         <!--<button id = "save" type = "button" @click="saveurl()">Save</button>-->
     </div>
     <h1>My Blocklist</h1>
@@ -46,7 +51,17 @@ export default {
     }, 
     async mounted() {
         this.display();
-    },
+        this.isLoading = true;
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                this.currentUser = user;
+                this.fetchLeaderboard();
+            } else {
+                this.currentUser = null;
+                this.isLoading = false;
+            }
+        });
+    }, 
     methods: {
         async display() {
             const db = firebase.firestore();
@@ -65,6 +80,12 @@ export default {
                     // Iterate over the URL blocklist and create table rows
                     urlBlocklist.forEach((url) => {
                         const newRow = table.insertRow();
+
+                        //const pointCell = newRow.insertCell(); 
+                        //const img = document.createElement("img");
+                        //img.src = "@/assets/white_circle.png"; // Set the image source
+                        //pointCell.appendChild(img);
+
                         const urlCell = newRow.insertCell();
                         urlCell.className = "urlcell";
                         urlCell.textContent = url;
