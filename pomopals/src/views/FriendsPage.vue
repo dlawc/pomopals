@@ -90,6 +90,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'DM Sans', sans-serif;
+
   justify-content: center;
   position: relative;
 }
@@ -101,16 +103,20 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .header-title h1 {
   margin: 0;
   color: white;
+  font-family: 'DM Sans', sans-serif;
+
 }
 
 .header-controls {
   display: flex;
   align-items: center;
+
 }
 
 .header-controls input[type="search"] {
@@ -121,6 +127,8 @@ export default {
   font-size: 1em;
   outline: none;
   margin-left: 10px;
+  font-family: 'DM Sans', sans-serif;
+
 }
 
 .header-controls input[type="search"] {

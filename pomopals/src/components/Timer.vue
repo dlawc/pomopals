@@ -174,10 +174,12 @@
 import ProgressBar from "progressbar.js";
 import boop from "../assets/boop.mp3";
 import { firebaseAuth, firestore } from "../firebase.js";
+import firebase from "../firebase.js";
 
 export default {
   name: "Home",
   props: {
+    // passed as props from sessionCode.vue
     sessionCode: String,
     isHost: {
       type: Boolean,
@@ -197,6 +199,7 @@ export default {
       inputDuration: "",
       inputRestDuration: "",
       pomodoroDuration,
+      currentUser: null,
       restDuration,
       currentTimeInSeconds: pomodoroDuration,
       currentSegment,
@@ -207,7 +210,7 @@ export default {
       topLeft: null,
       pathOptions: {
         easing: "linear",
-        duration: (pomodoroDuration + 1) * 1000, // Updated dynamically below in fetched data
+        duration: (pomodoroDuration + 1) * 1000,
       },
       interval: null,
       boopAudio: new Audio(boop),
@@ -222,11 +225,12 @@ export default {
   },
   watch: {
     $route(to, from) {
-      // This will log when the route changes
+      // watch when routed page changes
       this.currentPage = to.name;
       console.log("Route changed to:", this.currentPage);
     },
 
+    // watch for changes in sessionCode prop
     sessionCode(newValue) {
       console.log("sessionCode prop changed to:", newValue);
     },
@@ -237,32 +241,55 @@ export default {
         this.handleTimeUpdate();
       }
     },
+
+    // watch for changes in pomodoroDuration
     pomodoroDuration(newVal) {
       this.pathOptions.duration = (newVal + 1) * 1000;
       this.currentTimeInSeconds = newVal; // Update current time as well
       this.savePomodoroDuration();
     },
+
+    // watch for changes in restDuration
     restDuration(newVal) {
       this.saveRestDuration();
     },
+
+    // watch for changes in currentSegment
     currentSegment(newVal) {
       this.saveCurrentSegment();
     },
   },
-  mounted: function () {
-    this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
-    this.topRight.set(1);
-
-    this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
-    this.bottomRight.set(1);
-
-    this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
-    this.bottomLeft.set(1);
-
-    this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
-    this.topLeft.set(1);
+  mounted() {
+    // Initialize progress bars
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.userName = user.displayName;
+        this.initializeProgressBars();
+        this.fetchData();
+      } else {
+        // Handle the case where there is no user logged in
+        // Possibly redirect to login page or show a message
+        console.error("No user is logged in. Redirecting to login page.");
+        this.$router.push("/login");
+      }
+    });
   },
+  
   methods: {
+    // handle updating of xp for members in a groupSession when timeStamp changes
+    initializeProgressBars() {
+      this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
+      this.topRight.set(1);
+
+      this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
+      this.bottomRight.set(1);
+
+      this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
+      this.bottomLeft.set(1);
+
+      this.topLeft = new ProgressBar.Path("#top-left", this.pathOptions);
+      this.topLeft.set(1);
+    },
     async handleTimeUpdate() {
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
@@ -275,10 +302,11 @@ export default {
       }
     },
 
+    // fetch timer data from users collection
     fetchData() {
       const userRef = firestore
         .collection("users")
-        .doc(firebaseAuth.currentUser.displayName);
+        .doc(this.userName);
 
       userRef
         .get()
@@ -305,10 +333,12 @@ export default {
           console.error("Error getting document:", error);
         });
     },
+
+    // saves pomodoroDuration to firebase
     savePomodoroDuration() {
       const userRef = firestore
         .collection("users")
-        .doc(firebaseAuth.currentUser.displayName);
+        .doc(this.userName);
       userRef
         .set({ pomodoroDuration: this.pomodoroDuration }, { merge: true })
         .then(() =>
@@ -321,6 +351,8 @@ export default {
           console.error("Error writing pomodoro duration: ", error)
         );
     },
+
+    // saves restDuration to firebase
     saveRestDuration() {
       const userRef = firestore
         .collection("users")
@@ -332,6 +364,8 @@ export default {
           console.error("Error writing rest duration: ", error)
         );
     },
+
+    // saves segment to firebase
     saveCurrentSegment() {
       const userRef = firestore
         .collection("users")
@@ -343,6 +377,8 @@ export default {
           console.error("Error writing currentSegment: ", error)
         );
     },
+
+    // update segment to firebase
     updateCurrentSegment() {
       if (this.currentSegment == 1) {
         this.topRight.set(1);
@@ -367,6 +403,7 @@ export default {
       }
     },
 
+    // handles clicking of the start/pause/resume button
     click() {
       if (this.buttonText === "Start!" || this.buttonText === "Resume") {
         this.animateBar();
@@ -380,6 +417,7 @@ export default {
       this.$emit("clickOnButtonEvent", this.buttonText);
     },
 
+    // handles the event of pausing the bar
     pauseBar() {
       clearInterval(this.interval);
       switch (this.currentSegment) {
@@ -398,6 +436,7 @@ export default {
       }
     },
 
+    // handles event when study timer hits 0
     async onFinish() {
       let currentUser = firebaseAuth.currentUser;
       let username = currentUser.displayName; // username as primary key
@@ -438,7 +477,7 @@ export default {
         }
 
         // Update XP in Firebase
-        this.updateXpInUserFirebase(userRef, doc, calculatedXP);
+        this.updateXpInUserFirebase(userRef, calculatedXP);
 
         // Update xp with time
         await this.updateXpWithTimeInUserFirebase(userRef, calculatedXP);
@@ -450,6 +489,7 @@ export default {
       }
     },
 
+    // resets the segments of the timer back to the original
     resetSegments() {
       this.topRight.set(1);
       this.topLeft.set(1);
@@ -457,6 +497,7 @@ export default {
       this.bottomLeft.set(1);
     },
 
+    // updates the current segment of the timer to firebase
     async updateSegmentInUserFirebase(userRef, doc) {
       if (doc.exists && doc.data().currentSegment) {
         await userRef.update({ currentSegment: this.currentSegment });
@@ -468,6 +509,7 @@ export default {
       }
     },
 
+    // updates the total xp of the user in firebase
     async updateXpInUserFirebase(userRef, calculatedXP) {
       let doc = await userRef.get();
       if (doc.exists && doc.data().xp) {
@@ -478,6 +520,7 @@ export default {
       }
     },
 
+    // updates the xpWithTime of the user in firebase
     async updateXpWithTimeInUserFirebase(userRef, calculatedXP) {
       let key = new Date().toISOString();
       console.log(this.computedSessionCode);
@@ -496,10 +539,12 @@ export default {
         });
     },
 
+    // updates the total xp in the groupID document in firebase
     async updateXpInGroupFirebase(groupRef, calculatedXP) {
       await groupRef.set({ xp: calculatedXP }, { merge: true });
     },
 
+    // handles the reduction in time for the timer
     reduceTime() {
       this.interval = setInterval(() => {
         if (this.currentTimeInSeconds > 0) {
@@ -508,6 +553,7 @@ export default {
       }, 1000);
     },
 
+    // handles the event of the rest timer
     startRest() {
       // set new interval
       this.reduceTime();
@@ -521,6 +567,7 @@ export default {
       }, this.restDuration * 1000);
     },
 
+    // handles the animation of the timer
     animateBar() {
       this.reduceTime();
       let segment = null;
@@ -547,11 +594,13 @@ export default {
       );
     },
 
+    // handles the appearance of the input boxes for updating of the timer
     showInputBox() {
       this.isSettingTime = true;
       this.restartDuration();
     },
 
+    // handles the event of updating the timer durations
     async updateDuration() {
       let duration = Number(this.inputDuration);
       let restDuration = Number(this.inputRestDuration);
@@ -604,6 +653,7 @@ export default {
       }
     },
 
+    // handles the event of restarting the timer
     restartDuration() {
       console.log(this.sessionCode);
       clearInterval(this.interval);
@@ -628,6 +678,7 @@ export default {
     },
   },
   computed: {
+    // allows pomodoroDuration and restDuration to be logged onto the screen
     timeDisplay() {
       const totalSeconds = this.currentTimeInSeconds;
       const hours = Math.floor(totalSeconds / 3600);
