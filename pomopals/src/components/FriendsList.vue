@@ -135,6 +135,7 @@ export default {
   width: 80%;
   max-width: 800px;
   border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -165,6 +166,8 @@ ul li {
   color: white;
   border: none;
   border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+
   padding: 5px 10px;
   cursor: pointer;
 }
