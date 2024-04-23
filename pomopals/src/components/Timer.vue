@@ -103,8 +103,8 @@
         <div id="timeDisplay">{{ timeDisplay }}</div>
       </div>
     </div>
-
-    <div class="buttons">
+    <div v-if="isHost">
+      <div class="buttons">
       <button
         v-if="!isSettingTime"
         :disabled="isResting"
@@ -165,6 +165,8 @@
         <img src="@/assets/settings.png" alt="Settings" />
       </button>
     </div>
+    </div>
+    
   </div>
 </template>
 
@@ -177,6 +179,15 @@ export default {
   name: "Home",
   props: {
     sessionCode: String,
+    isHost: {
+      type: Boolean,
+      default: false
+    }
+  },
+  firestore() {
+    return {
+      session: firestore.collection("groupSession").doc(this.sessionCode),
+    };
   },
   data: function () {
     let pomodoroDuration = 25 * 60;
@@ -215,10 +226,20 @@ export default {
       this.currentPage = to.name;
       console.log("Route changed to:", this.currentPage);
     },
+
+    sessionCode(newValue) {
+      console.log("sessionCode prop changed to:", newValue);
+    },
+    // watch for changes in groupSession's XP
+    "session.timeStamp"(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        console.log("timeStamp in groupSession changed");
+        this.handleTimeUpdate();
+      }
+    },
     pomodoroDuration(newVal) {
       this.pathOptions.duration = (newVal + 1) * 1000;
       this.currentTimeInSeconds = newVal; // Update current time as well
-      console.log("hi");
       this.savePomodoroDuration();
     },
     restDuration(newVal) {
@@ -242,6 +263,18 @@ export default {
     this.topLeft.set(1);
   },
   methods: {
+    async handleTimeUpdate() {
+      let currentUser = firebaseAuth.currentUser;
+      let username = currentUser.displayName; // username as primary key
+      let userRef = firestore.collection("users").doc(username);
+      let doc = await userRef.get();
+      const sessionData = this.session;
+      if (sessionData.members.includes(username)) {
+        this.updateXpInUserFirebase(userRef, sessionData.xp);
+        this.updateXpWithTimeInUserFirebase(userRef, sessionData.xp);
+      }
+    },
+
     fetchData() {
       const userRef = firestore
         .collection("users")
@@ -370,6 +403,10 @@ export default {
       let username = currentUser.displayName; // username as primary key
       let userRef = firestore.collection("users").doc(username);
       let doc = await userRef.get();
+      let groupRef = firestore
+        .collection("groupSession")
+        .doc(this.computedSessionCode);
+      console.log("saving xp to groupID:", this.computedSessionCode);
 
       if (this.currentTimeInSeconds <= 0) {
         if (this.currentSegment < 4) {
@@ -408,7 +445,7 @@ export default {
 
         // If current page is on HostHomePage, update Xp in groupID document
         if (this.currentPage == "HostHomePage") {
-          this.updateXpInGroupFirebase();
+          this.updateXpInGroupFirebase(groupRef, calculatedXP);
         }
       }
     },
@@ -431,7 +468,8 @@ export default {
       }
     },
 
-    async updateXpInUserFirebase(userRef, doc, calculatedXP) {
+    async updateXpInUserFirebase(userRef, calculatedXP) {
+      let doc = await userRef.get();
       if (doc.exists && doc.data().xp) {
         let currXP = doc.data().xp;
         await userRef.update({ xp: currXP + calculatedXP });
@@ -442,6 +480,7 @@ export default {
 
     async updateXpWithTimeInUserFirebase(userRef, calculatedXP) {
       let key = new Date().toISOString();
+      console.log(this.computedSessionCode);
       let value = calculatedXP;
       await userRef
         .update({ [`xpWithTime.${key}`]: value })
@@ -457,15 +496,8 @@ export default {
         });
     },
 
-    async updateXpInGroupFirebase(calculatedXP) {
-      let groupRef = firestore.collection("groupSession").doc(this.sessionCode);
-      let doc = await groupRef.get();
-      if (doc.exists && doc.data().xp) {
-        let currXP = doc.data().xp;
-        await groupRef.update({ xp: currXP + calculatedXP });
-      } else {
-        await groupRef.set({ xp: calculatedXP }, { merge: true });
-      }
+    async updateXpInGroupFirebase(groupRef, calculatedXP) {
+      await groupRef.set({ xp: calculatedXP }, { merge: true });
     },
 
     reduceTime() {
@@ -573,6 +605,7 @@ export default {
     },
 
     restartDuration() {
+      console.log(this.sessionCode);
       clearInterval(this.interval);
 
       if (this.topRight) this.topRight.stop();

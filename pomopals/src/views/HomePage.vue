@@ -9,11 +9,12 @@
 
       <div>
         <Timer
-          :SessionCode="sessionCode"
+          :sessionCode="sessionCode"
           @clickOnButtonEvent="updateButtonText"
+          :isHost="true"
         />
       </div>
-      <div><SessionCode /></div>
+      <div><SessionCode @generatedSessionCode="storeSessionCode" /></div>
     </div>
   </div>
 </template>
@@ -32,12 +33,17 @@ export default {
   data() {
     return {
       buttonText: "Start!",
+      sessionCode: "",
     };
   },
   methods: {
     updateButtonText(data) {
       console.log("home page received buttonText from Timer:", this.buttonText);
       this.buttonText = data;
+    },
+    storeSessionCode(sessionCode) {
+      this.sessionCode = sessionCode;
+      console.log("home page received session code:", this.sessionCode);
     },
   },
 };
