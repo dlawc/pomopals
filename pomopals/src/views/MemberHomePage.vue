@@ -1,5 +1,8 @@
 <template>
   <div class="overlay">
+    <div class = "toggle">
+      <ToggleURL/>
+    </div>
     <div class="home">
       <span id="boostedXPStatement"
         >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
@@ -36,12 +39,13 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
+import ToggleURL from "@/components/ToggleURL.vue"
 import { firebaseAuth, db } from "@/firebase";
 import firebase from "@/firebase";
 
 export default {
   name: "MemberHomePage",
-  components: { Timer, XpBar },
+  components: { Timer, XpBar, ToggleURL },
   methods: {
     fetchSessionDetails() {
       const sessionRef = firebase
@@ -52,7 +56,7 @@ export default {
         (doc) => {
           if (doc.exists) {
             const data = doc.data();
-            // Create a new array from the proxy to ensure reactivity
+
             const membersArray = [data.host, ...(data.members || [])];
             this.members = [...membersArray];
             console.log(this.members);
@@ -79,7 +83,7 @@ export default {
               let members = data.members || [];
 
               if (members.includes(username)) {
-                // Remove the user from the members array
+                // Remove user from the members array
                 members = members.filter((member) => member !== username);
                 sessionRef
                   .update({ members: members })
@@ -111,7 +115,7 @@ export default {
     };
   },
   created() {
-    // Set the sessionCode based on the router query parameter
+    // set sessionCode based on router query parameter
     this.sessionCode = this.$route.query.sessionCode;
     this.fetchSessionDetails();
     console.log("Received session code:", this.sessionCode);
@@ -232,5 +236,12 @@ body {
   font-size: 15px;
   font-weight: 450;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
+}
+
+.toggle {
+    position: absolute; 
+    bottom: 10px; 
+    left: 30px; 
+    padding: 10px; 
 }
 </style>

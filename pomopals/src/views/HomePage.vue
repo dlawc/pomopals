@@ -1,8 +1,8 @@
 <template>
   <div class="overlay">
     <div class = "toggle">
-            <ToggleURL/>
-        </div>
+      <ToggleURL/>
+    </div>
     <div class="home">
       <div v-show="buttonText == 'Start!'">
         <SignOutButton class="signout" />
