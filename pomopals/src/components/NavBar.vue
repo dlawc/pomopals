@@ -29,11 +29,11 @@ export default {
     name:"Nav", 
     computed: {
     isAchievementsActive() {
-      // Check if the current route is '/achievements' or starts with '/achievements/'
       return this.$route.path === '/achievements' || this.$route.path === '/allachievements';
     }, 
     isLeaderboardActive() {
-      return this.$route.path === '/leaderboard' || this.$route.path === '/friendsleaderboard'; 
+      return this.$route.path === '/leaderboard' || this.$route.path === '/friendsleaderboard' 
+        || this.$route.path === '/monthlyleaderboard'; 
     }, 
   }
 }
@@ -72,17 +72,17 @@ export default {
 #url:hover img {
 content: url('@/assets/url_filled.png'); 
 }
-/* Default icon */
+/* default */
 .nav-btn img {
   display: block;
 }
 
-/* Filled icon (hidden by default) */
+/* filled */
 .nav-btn img.filled {
   display: none;
 }
 
-/* Swap icons when active */
+/* swap when active */
 .active img.default {
   display: none;
 }

@@ -26,3 +26,11 @@ export default {
     }, 
 }
 </script>
+<style>
+.signout {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+}
+</style>
