@@ -16,7 +16,7 @@
   <div id = "allAchievementContainer">
     <h1 id = "achievementsCompletedHeader"> Achievements Unlocked</h1>
     <div id = "achievementUnlocked" v-for = "achievement in completedAchievements" :key = "achievement.id">
-      <img id = "unlockedImg":src=" achievement.icon" alt="achievement.title" class="achievementCompleted-icon">
+      <img id = "unlockedImg" :src=" achievement.icon" alt="achievement.title" class="achievementCompleted-icon">
       <div class="achievementCompleted-details">
         <h2 class="title">{{ achievement.title }}</h2>
         <p class="subtitle">{{ achievement.description }}</p>
@@ -24,7 +24,7 @@
       <span class="progressCompleted-text">Challenge Completed</span>
     </div>
     <div class="allAchievement-in-progress" v-for="achievement in inProgressAchievements" :key="achievement.id">
-      <img id = "lockedImg":src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
+      <img id = "lockedImg" :src="`grey${achievement.icon}`" alt="achievement.title" class="achievementinprog-icon">
       <div class="achievement-details">
         <h2 class="greyTitle">{{ achievement.title }}</h2>
         <p class="greySubtitle">{{ achievement.description }}</p>
