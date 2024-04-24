@@ -1,5 +1,8 @@
 <template>
   <div class="overlay">
+    <div class = "toggle">
+            <ToggleURL/>
+        </div>
     <div class="home">
       <div v-show="buttonText == 'Start!'">
         <SignOutButton class="signout" />
@@ -25,10 +28,11 @@ import XpBar from "/src/components/XpBar.vue";
 import NavBar from "@/components/NavBar.vue";
 import SessionCode from "/src/components/SessionCode.vue";
 import SignOutButton from "@/components/SignOutButton.vue";
+import ToggleURL from "@/components/ToggleURL.vue"
 
 export default {
   name: "HomePage",
-  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode},
+  components: { SignOutButton, XpBar, Timer, NavBar, SessionCode, ToggleURL},
 
   data() {
     return {
@@ -81,5 +85,11 @@ export default {
   top: 10px;
   right: 10px;
   padding: 10px;
+}
+.toggle {
+    position: absolute; 
+    bottom: 10px; 
+    left: 30px; 
+    padding: 10px; 
 }
 </style>
