@@ -84,6 +84,10 @@ export default {
         );
     },
     deleteFriend(friend) {
+      const confirmed = window.confirm(`Are you sure you want to delete ${friend} as a friend?`);
+    if (!confirmed) {
+        return; // Do nothing if the user cancels the action
+    }
       const db = firebase.firestore();
 
       if (this.currentUser) {
