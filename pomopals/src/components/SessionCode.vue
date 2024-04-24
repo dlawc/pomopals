@@ -161,23 +161,21 @@ export default {
 <style scoped>
 .sessionCodeContainer {
   display: flex;
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center children horizontally in the container */
-  justify-content: center; /* Center children vertically in the container */
-  position: fixed; /* Fix position relative to the viewport */
-  left: 50%; /* Position the left edge of the container in the middle of the viewport */
-  bottom: 0; /* Align the container to the bottom of the viewport */
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  position: fixed; 
+  left: 50%;
+  bottom: 0; 
   transform: translateX(
     -50%
-  ); /* Shift the container left by half its width to center it */
-  z-index: 1000; /* Ensure it sits above other content; adjust as necessary */
+  ); 
+  z-index: 1000; 
 }
 
-/* You may want to add styles for the buttons and inputs to ensure they look good when centered */
 .sessionCodeContainer button,
 .sessionCodeContainer input[type="text"] {
-  margin: 0.5rem; /* Spacing around buttons and input */
-  /* Additional styles for buttons and input */
+  margin: 0.5rem; 
 }
 
 p1 {

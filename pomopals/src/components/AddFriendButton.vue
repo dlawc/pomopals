@@ -11,7 +11,8 @@
         <button class="close-btn" @click="closePopup">✖</button>
         <input
           v-model="friend_username"
-          class="input-field"
+          class="input-field" 
+          @keydown.enter="sendRequest"
           placeholder="Enter friend's username"
         />
         <button class="send-request-btn" @click="sendRequest">
@@ -46,6 +47,7 @@
 
 <script>
 import firebase from "@/firebase";
+import { firebaseAuth } from "@/firebase";
 
 export default {
   name: "AddFriendButton",
@@ -59,15 +61,32 @@ export default {
     };
   },
   created() {
-    // Fetch the current user's information
-    this.currentUser = firebase.auth().currentUser;
-    if (this.currentUser) {
-      this.username = this.currentUser.displayName;
-      console.log("username:", this.username);
-    }
-    this.fetchPendingRequests(this.username);
+    this.handleCurrentUser(firebase.auth().currentUser);
+  },
+  mounted() {
+    firebaseAuth.onAuthStateChanged(user => {
+      this.handleCurrentUser(user);
+      if (!user) {
+        console.error("No user is logged in. Redirecting to login page.");
+        this.$router.replace("/login");
+      }
+    }, error => {
+      console.error("Failed to authenticate user:", error);
+      alert("Authentication error. Please try again.");
+    });
   },
   methods: {
+    handleCurrentUser(user) {
+      if (user) {
+        this.currentUser = user;
+        this.username = user.displayName; // Update username for current user
+        this.fetchPendingRequests(this.username);
+      } else {
+        this.currentUser = null;
+        this.username = null;
+        this.pendingRequests = [];
+      }
+    },
     togglePopup() {
       this.showPopup = !this.showPopup;
     },
@@ -260,21 +279,21 @@ export default {
 }
 
 .button:hover {
-  background-color: #878787; /* Darker shade on hover for feedback */
+  background-color: #878787; 
 }
 
 .button-container {
   position: relative;
-  display: inline-block; /* Or use 'inline-flex' if needed */
+  display: inline-block; 
 }
 
 .badge {
   position: absolute;
-  top: -10px; /* Adjust as needed */
-  right: -10px; /* Adjust as needed */
+  top: -10px; 
+  right: -10px; 
   background-color: red;
   color: white;
-  width: 20px; /* You might need to adjust this based on content */
+  width: 20px; 
   height: 20px;
   border-radius: 50%;
   display: flex;
@@ -282,22 +301,22 @@ export default {
   align-items: center;
   font-size: 0.75em;
   font-weight: bold;
-  border: 2px solid white; /* This helps the badge stand out against backgrounds */
+  border: 2px solid white; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .input-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centralize the input and button */
+  align-items: center; 
   margin-bottom: 20px;
 }
 
 .input-field {
-  width: 90%; /* Smaller width to allow padding space */
+  width: 90%; 
   padding: 12px;
-  margin-bottom: 10px; /* Space between input and button */
-  border: 2px solid #dbdbdb; /* Thicker border with theme color */
+  margin-bottom: 10px; 
+  border: 2px solid #dbdbdb; 
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -306,33 +325,33 @@ export default {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Centers the popup perfectly */
+  transform: translate(-50%, -50%); 
   background-color: #fff;
   border: 1px solid #ddd;
   padding: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px; /* Rounded corners for the popup */
+  border-radius: 8px; 
   width: 300px;
   max-height: 400px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   z-index: 100;
-  transition: all 0.3s ease; /* Smooth transition for popup */
+  transition: all 0.3s ease; 
 }
 .popup input[type="text"] {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid #ddd;
-  border-radius: 8px; /* Consistent rounded corners for input fields */
+  border-radius: 8px; 
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s ease; /* Transition for focus effect */
+  transition: border-color 0.2s ease; 
 }
 
 .popup input[type="text"]:focus {
-  border-color: #ae76a1; /* Highlight color when input is focused */
-  outline: none; /* Removes the default focus outline */
+  border-color: #ae76a1; 
+  outline: none; 
 }
 
 .send-request-btn {
