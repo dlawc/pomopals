@@ -1,5 +1,8 @@
 <template>
   <div class="overlay">
+    <div class = "toggle">
+      <ToggleURL/>
+    </div>
     <div id="timerWrapper">
       <XpBar />
       <span id="boostedXPStatement"
@@ -38,6 +41,7 @@
 <script>
 import Timer from "/src/components/Timer.vue";
 import XpBar from "/src/components/XpBar.vue";
+import ToggleURL from "@/components/ToggleURL.vue"
 import firebase from "@/firebase";
 import { firebaseAuth, db } from "@/firebase";
 import "firebase/firestore";
@@ -48,6 +52,7 @@ export default {
   components: {
     Timer,
     XpBar,
+    ToggleURL,
   },
   data() {
     return {
@@ -238,5 +243,12 @@ body {
   font-size: 15px;
   font-weight: 450;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
+}
+
+.toggle {
+    position: absolute; 
+    bottom: 10px; 
+    left: 30px; 
+    padding: 10px; 
 }
 </style>
