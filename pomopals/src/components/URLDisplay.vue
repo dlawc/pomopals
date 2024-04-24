@@ -25,7 +25,7 @@ h1 {
 }
 
 .url-input {
-  padding: 20px 15px;
+  padding: 15px 5px;
   border-radius: 50px;
   width: 28em;
   border: 2px solid white;
@@ -43,6 +43,10 @@ h1 {
   box-shadow: 0 0 8px rgba(3, 110, 217, 0.6); 
 }
 
+#urls {
+  border-collapse: collapse; 
+}
+
 #urls td {
   padding: 5px 10px;
   text-align: center;
@@ -52,20 +56,22 @@ h1 {
   vertical-align: middle;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
-
+#urls tr:hover {
+  background-color: rgba(255, 255, 255, 0.2); 
+}
 #urls .urlcell {
-  width: 100%; /* Ensures URL cells use full width */
+  width: 100%;
 }
 
 #urls .deleteCell {
-  visibility: hidden; /* Hide the cell initially */
-  width: 0; /* No initial width */
-  transition: width 0.3s ease; /* Smooth transition for width */
+  visibility: hidden; 
+  width: 0;
+  transition: width 0.3s ease;
 }
 
 #urls tr:hover .deleteCell {
-  visibility: visible; /* Make cell visible on hover */
-  width: 100px; /* Assign width that will fit the delete button */
+  visibility: visible; 
+  width: 100px; 
 }
 
 #urls .invisibleCell {
@@ -76,7 +82,6 @@ h1 {
 
 </style>
 <template>
-  <!-- <div id="input-container"> -->
     <input
       type="text"
       v-model="url"
@@ -85,7 +90,6 @@ h1 {
       @keydown.enter="saveurl"
       class="url-input"
     />
-  <!-- </div> -->
   <h1>My Blocklist</h1>
   <table id="urls"></table>
 </template>
