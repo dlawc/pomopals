@@ -32,11 +32,15 @@ h1 {
   font-size: 17px;
   color: #333;
   text-align: center;
+  background: linear-gradient(to right, #ffffff, #f6f6f6); 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8); 
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
 }
 
 .url-input:focus {
   outline: none;
   border-color: rgb(3, 110, 217);
+  box-shadow: 0 0 8px rgba(3, 110, 217, 0.6); 
 }
 
 #urls td {

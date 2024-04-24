@@ -128,13 +128,16 @@ export default {
   outline: none;
   margin-left: 10px;
   font-family: 'DM Sans', sans-serif;
-
-}
-
-.header-controls input[type="search"] {
   background-color: white;
   color: grey;
   margin-right: 10px;
+
+}
+
+
+.header-controls input[type="search"]:focus {
+    border-color: rgb(3, 110, 217);
+    box-shadow: 0 0 8px rgba(3, 110, 217, 0.8);
 }
 
 </style>
