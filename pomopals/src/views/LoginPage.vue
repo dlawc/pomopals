@@ -6,6 +6,7 @@
         <p>Enter your email and password to sign in!</p>
 
         <button class="google-signin" @click="signInWithGoogle">
+          <img :src="googleIcon" alt="Google sign-in" class="google-icon">
           Sign in with Google
         </button>
         <div class="divider">
@@ -51,6 +52,7 @@
 <script>
 import FormField from "@/components/FormField.vue";
 import firebase from "@/firebase";
+import GoogleIcon from '@/components/icons/google.png'; 
 
 export default {
   name: "SignInPage",
@@ -62,6 +64,7 @@ export default {
       },
       passwordVisible: false,
       errorMessage: "",
+      googleIcon: GoogleIcon
     };
   },
   methods: {
@@ -238,12 +241,22 @@ export default {
 .google-signin {
   background-color: #f4f7fe;
   color: #2b3674;
-  padding: 10px 15px;
+  padding: 15px 15px;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   margin-bottom: 10px;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14.5px;
+}
+
+.google-icon {
+  margin-right: 8px;
+  width: 18px; 
+  height: 18px; 
 }
 
 .divider {
