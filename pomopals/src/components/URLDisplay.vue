@@ -1,5 +1,5 @@
 <style>
-h1 {
+.blocklist {
   text-align: center;
   color: white;
   font-size: 50px;
@@ -7,6 +7,15 @@ h1 {
   margin-bottom: 1px;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 100);
 }
+
+h1 {
+  text-align: center;
+  color: white;
+  font-size: 50px;
+  margin-top: 20px;
+  margin-bottom: 1px;
+}
+
 .bwt {
   background-color: #c20606;
   color: white;
@@ -90,7 +99,7 @@ h1 {
       @keydown.enter="saveurl"
       class="url-input"
     />
-  <h1>My Blocklist</h1>
+  <h1 class="blocklist">My Blocklist</h1>
   <table id="urls"></table>
 </template>
 <script>
