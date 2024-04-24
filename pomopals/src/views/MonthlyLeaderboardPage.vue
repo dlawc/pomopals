@@ -97,6 +97,7 @@ mounted() {
       this.isLoading = false;
     }
   });
+  this.checkEndOfMonthDaily();
 },
 
 methods: {
@@ -204,6 +205,55 @@ methods: {
   },
   redirectToHome() {
     this.$router.push('/home');
+  },
+  checkEndOfMonthDaily() {
+    const check = () => {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      if (tomorrow.getDate() === 1) {
+        this.awardMonthlyAchievements();
+      }
+      setTimeout(check, 86400000); // Check every 24 hours
+    };
+    check();
+  },
+
+  awardMonthlyAchievements() {
+    const today = new Date();
+    const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    if (today.getDate() === lastDayOfCurrentMonth.getDate()) {
+      this.assignTopThreeAchievements();
+    } else {
+      console.log("Not the last day of the month. Achievements not awarded.");
+    }
+  },
+
+  assignTopThreeAchievements() {
+    // Assume that the leaderboardItems are already sorted and up to date
+    const topThree = this.leaderboardItems.slice(0, 3);
+    topThree.forEach((user, index) => {
+      console.log(user);
+      const userRef = firebase.firestore().collection("users").doc(user.username);
+      userRef.get().then(doc => {
+        if (doc.exists) {
+          let currentPlacements = doc.data().top3Placements || 0;
+          currentPlacements += 1; // Increment their top3Placements count by 1
+
+          userRef.update({
+            top3Placements: currentPlacements
+          }).then(() => {
+            console.log(`Incremented top 3 placements for ${user.username}`);
+          }).catch(error => {
+            console.error(`Error incrementing top 3 placements for ${user.username}: `, error);
+          });
+        } else {
+          console.log(`No user found with the username ${user.username}`);
+        }
+      }).catch(error => {
+        console.error(`Error fetching user data for ${user.username}: `, error);
+      });
+    });
   },
 },
 components: {
