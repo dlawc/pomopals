@@ -150,12 +150,15 @@ export default {
           );
         const user = userCredential.user;
         // Check if the user's email is not verified
-
-        // if (!user.emailVerified) {
-        //   this.errorMessage = "Please verify your email before signing in.";
-        //   firebase.auth().signOut(); // Optionally sign out the user
-        //   return; // Prevent login
-        // }
+        if (!user.emailVerified) {
+          // Prevent login for any unverified email addresses, except the test account
+          if (user.displayName !== "BT3103user") {
+            this.errorMessage = "Please verify your email before signing in.";
+            firebase.auth().signOut(); // Optionally sign out the user
+            return;
+          }
+          
+        }
         // Continue with the sign-in process
         console.log("Email has been verified, proceed with login.");
         this.$router.push("/home");
@@ -202,7 +205,8 @@ export default {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
-  background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/bg.jpeg");
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("/bg.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   display: flex;
