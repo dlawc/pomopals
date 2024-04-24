@@ -171,4 +171,8 @@ ul li {
   padding: 5px 10px;
   cursor: pointer;
 }
+
+.delete-button:hover {
+  background-color: #960c0c;
+}
 </style>

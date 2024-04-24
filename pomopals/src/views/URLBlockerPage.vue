@@ -33,4 +33,12 @@ export default {
     right: 10px;
     padding: 10px;
 }
+
+.center {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20em;
+}
 </style>

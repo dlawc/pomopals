@@ -275,6 +275,7 @@ export default {
   font-size: 1em;
   outline: none;
   margin-left: 10px;
+  height: 2.7em;
   transition: background-color 0.3s ease;
 }
 
