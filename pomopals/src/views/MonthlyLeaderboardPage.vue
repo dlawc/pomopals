@@ -106,72 +106,72 @@ methods: {
     return new Date(now.getFullYear(), now.getMonth(), 1);
   },
     fetchLeaderboard() {
-    this.isLoading = true;
-    const db = firebase.firestore();
+      this.isLoading = true;
+      const db = firebase.firestore();
 
-    const getStartOfCurrentMonth = () => {
-      const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), 1);
-    };
+      const getStartOfCurrentMonth = () => {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+      };
 
-    // Helper function to check if a date is within the current month
-    const isDateInCurrentMonth = (date) => {
-      const startOfCurrentMonth = getStartOfCurrentMonth();
-      const endOfCurrentMonth = new Date(new Date(startOfCurrentMonth).setMonth(startOfCurrentMonth.getMonth() + 1));
-      return date >= startOfCurrentMonth && date < endOfCurrentMonth;
-    };
+      // Helper function to check if a date is within the current month
+      const isDateInCurrentMonth = (date) => {
+        const startOfCurrentMonth = getStartOfCurrentMonth();
+        const endOfCurrentMonth = new Date(new Date(startOfCurrentMonth).setMonth(startOfCurrentMonth.getMonth() + 1));
+        return date >= startOfCurrentMonth && date < endOfCurrentMonth;
+      };
 
-    db.collection("users").get().then(querySnapshot => {
-      let leaderboardData = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        let points = 0;
+      db.collection("users").get().then(querySnapshot => {
+        let leaderboardData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          let points = 0;
 
-        Object.entries(data.xpWithTime || {}).forEach(([dateString, xpRecord]) => {
-          const date = new Date(dateString);
-          if (isDateInCurrentMonth(date)) {
-            points += Object.values(xpRecord).reduce((sum, xp) => sum + xp, 0);
-          }
-        });
-
-        let friendStatus = 'none';
-          if (this.currentUser && this.friendsMap[doc.id]) {
-            friendStatus = 'added';
-          } else if (this.friendRequests[doc.id] === 'pending') {
-            friendStatus = 'pending';
-          }
-      
-        return {
-              username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
-              points: points, 
-              isUser: doc.id === this.currentUser.displayName,
-              showButton: doc.id !== this.currentUser.displayName, // Don't show button for self or already friends
-              friendStatus: friendStatus,
-            };
+          Object.entries(data.xpWithTime || {}).forEach(([dateString, xpRecord]) => {
+            const date = new Date(dateString);
+            if (isDateInCurrentMonth(date)) {
+              points += Object.values(xpRecord).reduce((sum, xp) => sum + xp, 0);
+            }
           });
 
-      // Sort and assign ranks
-      leaderboardData.sort((a, b) => b.points - a.points);
-      let rank = 1;
-      let prevPoints = null;
-      leaderboardData.forEach((item, index) => {
-        if (prevPoints !== item.points) {
-          rank = index + 1;
-          prevPoints = item.points;
-        }
-        item.rank = rank;
-      });
+          let friendStatus = 'none';
+            if (this.currentUser && this.friendsMap[doc.id]) {
+              friendStatus = 'added';
+            } else if (this.friendRequests[doc.id] === 'pending') {
+              friendStatus = 'pending';
+            }
+        
+          return {
+                username: doc.id === this.currentUser.displayName ? `${doc.id} (You)` : doc.id,
+                points: points, 
+                isUser: doc.id === this.currentUser.displayName,
+                showButton: doc.id !== this.currentUser.displayName, // Don't show button for self or already friends
+                friendStatus: friendStatus,
+              };
+            });
 
-      this.leaderboardItems = leaderboardData.map(item => ({
-        ...item,
-        displayRank: item.rank <= 3 ? ['🥇', '🥈', '🥉'][item.rank - 1] : item.rank.toString()
-      }));
+        // Sort and assign ranks
+        leaderboardData.sort((a, b) => b.points - a.points);
+        let rank = 1;
+        let prevPoints = null;
+        leaderboardData.forEach((item, index) => {
+          if (prevPoints !== item.points) {
+            rank = index + 1;
+            prevPoints = item.points;
+          }
+          item.rank = rank;
+        });
 
-      this.isLoading = false;
-      }).catch(error => {
-        console.error("Error getting documents:", error);
+        this.leaderboardItems = leaderboardData.map(item => ({
+          ...item,
+          displayRank: item.rank <= 3 ? ['🥇', '🥈', '🥉'][item.rank - 1] : item.rank.toString()
+        }));
+
         this.isLoading = false;
-      });
-    },
+        }).catch(error => {
+          console.error("Error getting documents:", error);
+          this.isLoading = false;
+        });
+      },
   fetchFriends(userId) {
       const db = firebase.firestore();
       db.collection("users").doc(userId).onSnapshot(doc => {
