@@ -87,9 +87,8 @@ h1 {
   visibility: hidden;
     width: 100px;
 }
-
-
 </style>
+
 <template>
     <input
       type="text"
@@ -218,6 +217,7 @@ export default {
 
             if (existingUrlBlocklist.includes(this.url.trim())) {
               alert("This URL has already been blocked.");
+              this.url = ""
               return;
             }
 
