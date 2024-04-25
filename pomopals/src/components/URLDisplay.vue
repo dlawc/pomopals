@@ -125,7 +125,6 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.currentUser = user;
-        this.fetchLeaderboard();
       } else {
         this.currentUser = null;
         this.isLoading = false;
