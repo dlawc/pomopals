@@ -1,6 +1,6 @@
 <template>
   <div class="overlay">
-    <div class = "toggle">
+    <div v-show="buttonText == 'Start!'" class = "toggle">
       <ToggleURL/>
     </div>
     <div class="home">

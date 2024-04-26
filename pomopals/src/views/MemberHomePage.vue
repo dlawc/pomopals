@@ -1,8 +1,8 @@
 <template>
   <div class="overlay">
-    <div class = "toggle">
+    <!-- <div class = "toggle">
       <ToggleURL/>
-    </div>
+    </div> -->
     <div class="home">
       <span id="boostedXPStatement"
         >You’ve earned an XP boost! Enjoy 1.5x XP this session.</span
