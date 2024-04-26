@@ -50,11 +50,17 @@ const router = createRouter({
       path: "/host",
       name: "HostHomePage",
       component: HostHomePage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/member",
       name: "MemberHomePage",
       component: MemberHomePage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/friends",
