@@ -105,68 +105,67 @@
     </div>
     <div v-if="isHost">
       <div class="buttons">
-      <button
-        v-if="!isSettingTime"
-        :disabled="isResting"
-        @click="click"
-        id="changingButton"
-      >
-        <img
-          v-show="buttonText == 'Start!' || isResting"
-          src="@/assets/start.png"
-          id="startButton"
-          alt="Start!"
-        />
-        <img
-          v-show="buttonText == 'Pause'"
-          src="@/assets/pause.png"
-          id="pauseButton"
-          alt="Pause"
-        />
-        <img
-          v-show="buttonText == 'Resume'"
-          src="@/assets/resume.png"
-          id="resumeButton"
-          alt="Resume"
-        />
-      </button>
+        <button
+          v-if="!isSettingTime"
+          :disabled="isResting"
+          @click="click"
+          id="changingButton"
+        >
+          <img
+            v-show="buttonText == 'Start!' || isResting"
+            src="@/assets/start.png"
+            id="startButton"
+            alt="Start!"
+          />
+          <img
+            v-show="buttonText == 'Pause'"
+            src="@/assets/pause.png"
+            id="pauseButton"
+            alt="Pause"
+          />
+          <img
+            v-show="buttonText == 'Resume'"
+            src="@/assets/resume.png"
+            id="resumeButton"
+            alt="Resume"
+          />
+        </button>
 
-      <button
-        v-if="!isSettingTime && this.pomodoroDuration != 0"
-        :disabled="isResting"
-        id="restartButton"
-        @click="restartDuration"
-      >
-        <img src="@/assets/restart.png" alt="Restart" />
-      </button>
+        <button
+          v-if="!isSettingTime && this.pomodoroDuration != 0"
+          :disabled="isResting"
+          id="restartButton"
+          @click="restartDuration"
+        >
+          <img src="@/assets/restart.png" alt="Restart" />
+        </button>
 
-      <div v-if="isSettingTime">
-        <input
-          id="inputDurationBox"
-          type="number"
-          v-model="inputDuration"
-          placeholder="Work duration in minutes"
-        />
-        <input
-          id="inputRestDurationBox"
-          type="number"
-          v-model="inputRestDuration"
-          placeholder="Rest duration in minutes"
-        />
-        <button id="updateButton" @click="updateDuration">Update</button>
+        <div v-if="isSettingTime">
+          <input
+            id="inputDurationBox"
+            type="number"
+            v-model="inputDuration"
+            placeholder="Work duration in minutes"
+          />
+          <input
+            id="inputRestDurationBox"
+            type="number"
+            v-model="inputRestDuration"
+            placeholder="Rest duration in minutes"
+          />
+          <button id="updateButton" @click="updateDuration">Update</button>
+        </div>
+
+        <button
+          v-if="!isSettingTime"
+          :disabled="isResting"
+          @click="showInputBox"
+          id="settingButton"
+        >
+          <img src="@/assets/settings.png" alt="Settings" />
+        </button>
       </div>
-
-      <button
-        v-if="!isSettingTime"
-        :disabled="isResting"
-        @click="showInputBox"
-        id="settingButton"
-      >
-        <img src="@/assets/settings.png" alt="Settings" />
-      </button>
     </div>
-    </div>
-    
   </div>
 </template>
 
@@ -183,8 +182,11 @@ export default {
     sessionCode: String,
     isHost: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    canStartTimer: {
+      type: Boolean,
+    },
   },
   firestore() {
     return {
@@ -274,14 +276,17 @@ export default {
       }
     });
   },
-  
+
   methods: {
     // handle updating of xp for members in a groupSession when timeStamp changes
     initializeProgressBars() {
       this.topRight = new ProgressBar.Path("#top-right", this.pathOptions);
       this.topRight.set(1);
 
-      this.bottomRight = new ProgressBar.Path("#bottom-right", this.pathOptions);
+      this.bottomRight = new ProgressBar.Path(
+        "#bottom-right",
+        this.pathOptions
+      );
       this.bottomRight.set(1);
 
       this.bottomLeft = new ProgressBar.Path("#bottom-left", this.pathOptions);
@@ -304,9 +309,7 @@ export default {
 
     // fetch timer data from users collection
     fetchData() {
-      const userRef = firestore
-        .collection("users")
-        .doc(this.userName);
+      const userRef = firestore.collection("users").doc(this.userName);
 
       userRef
         .get()
@@ -336,9 +339,7 @@ export default {
 
     // saves pomodoroDuration to firebase
     savePomodoroDuration() {
-      const userRef = firestore
-        .collection("users")
-        .doc(this.userName);
+      const userRef = firestore.collection("users").doc(this.userName);
       userRef
         .set({ pomodoroDuration: this.pomodoroDuration }, { merge: true })
         .then(() =>
@@ -405,18 +406,24 @@ export default {
 
     // handles clicking of the start/pause/resume button
     click() {
-      if (this.buttonText === "Start!" || this.buttonText === "Resume") {
-        this.animateBar();
-        this.buttonText = "Pause";
-        this.$emit("clickOnButtonEvent", this.buttonText);
-      } else if (this.buttonText === "Pause") {
-        this.pauseBar();
-        this.buttonText = "Resume";
+      if (!this.canStartTimer) {
+        alert(
+          "The timer can only start if there are at least 2 people in the room."
+        );
+      } else {
+        // Existing logic to start the timer
+        if (this.buttonText === "Start!" || this.buttonText === "Resume") {
+          this.animateBar();
+          this.buttonText = "Pause";
+          this.$emit("clickOnButtonEvent", this.buttonText);
+        } else if (this.buttonText === "Pause") {
+          this.pauseBar();
+          this.buttonText = "Resume";
+          this.$emit("clickOnButtonEvent", this.buttonText);
+        }
         this.$emit("clickOnButtonEvent", this.buttonText);
       }
-      this.$emit("clickOnButtonEvent", this.buttonText);
     },
-
     // handles the event of pausing the bar
     pauseBar() {
       clearInterval(this.interval);

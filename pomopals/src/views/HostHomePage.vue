@@ -12,6 +12,7 @@
         @generatedSessionCode="storeSessionCode"
         ref="timerRef"
         :isHost="true"
+        :canStartTimer="this.can_start_timer"
       />
     </div>
     <div id="sessionInfo">
@@ -59,6 +60,8 @@ export default {
       sessionCode: "",
       members: [],
       groupID: "",
+
+      can_start_timer:true,
     };
   },
   created() {
@@ -71,6 +74,14 @@ export default {
     memberCount() {
       return `${this.members.length} member(s) in this group session`;
     },
+  },
+  watch: {
+    members() {
+      // Set can_start_timer to false if there's only one member
+      this.can_start_timer = this.members.length !== 1;
+      console.log("Number of members in this session:", this.members.length);
+      console.log("can_start_timer:", this.can_start_timer);
+    }
   },
   // In HostHomePage.vue script
   methods: {
@@ -137,6 +148,7 @@ export default {
       this.sessionCode = sessionCode;
       console.log("host/member page received:", this.sessionCode);
     },
+
   },
 };
 </script>

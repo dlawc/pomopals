@@ -15,6 +15,7 @@
           :sessionCode="sessionCode"
           @clickOnButtonEvent="updateButtonText"
           :isHost="true"
+          :canStartTimer="true"
         />
       </div>
       <div v-show="buttonText == 'Start!'"><SessionCode @generatedSessionCode="storeSessionCode" /></div>
