@@ -77,28 +77,4 @@ src/
 ├── firebase.js         # Firebase configuration
 └── main.js            # App entry point
 ```
-
-## 🔧 Development
-
-### Available Scripts
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-
-### IDE Setup
-Recommended: [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
 **Pomopals** - Making studying social, engaging, and productive! 🍅✨
